@@ -19,7 +19,7 @@ $(document).ready(function(){
 		$(".container").append(v.generate());
 		v.addHandelers();
 	}
-
+	autosize($('textarea'));
 });
 function commentWrapper(comments){
 	this.comments = comments

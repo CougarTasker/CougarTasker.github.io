@@ -12,6 +12,36 @@ a{
 }
 body{
 	overflow-x: hidden;
+		padding-top:5em;
+	padding-bottom: 3.5em;
+}
+.userinput{
+	display: flex;
+	flex-direction:row;
+	flex-wrap:nowrap;
+	justify-content:space-between;
+	align-items:stretch;
+	align-content:flex-end;
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+	border-radius: 0px !important;
+	z-index: 2;
+}
+.userinput>textarea{
+	flex-grow:1;
+	flex-basis:0;
+	border: 0;
+	outline: none;
+	resize: none;
+	background:inherit;
+	color: inherit;
+}
+.userinput a{
+	padding: .7em;
+}
+.userinput i{
+	font-size: 1.5em !important;
 }
 .container{
 	padding: 0 10vw;
@@ -125,10 +155,14 @@ header{
 	text-align: center;
 	border-radius: 0px !important;
 	padding-top:0.5em;
-	padding-bottom:0.7em;
+	padding-bottom:0.5em;
+	position: fixed;
+	width:100vw;
+	top:0;
+	z-index: 2;
 }
 h1{
-	font-size: 4em;
+	font-size: 3em;
 }
 .forange{
 	color:#f94d18;
