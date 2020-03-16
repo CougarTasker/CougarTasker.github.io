@@ -90,7 +90,7 @@ function ventWrapper(vent){
 							<div class="message">`;
 		if(vent.image != ""){
 			message += `<div class="round">
-				<img src="`;
+				<img class="blur" src="`;
 			message += vent.image;
 			message += `" alt="`;
 			message += vent.alt;
@@ -106,7 +106,10 @@ function ventWrapper(vent){
 		return message
 	};
 	this.addHandelers = function(){
-		this.comments.addHandelers()
+		this.comments.addHandelers();
+		$(".message>div").click(function(event){
+			$(event.target).toggleClass("blur");
+		});
 	}
 }
 

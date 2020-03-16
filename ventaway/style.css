@@ -35,13 +35,16 @@ body{
 	max-width: 50%;
 	min-width: 30%;
 	float:right;
-	overflow: hidden;	
+	overflow: hidden;
+	cursor: pointer;
 }
 .message>div>img{
 	max-width: 100%;
 	display: block;
+}
+.blur{
 	-webkit-filter: blur(30px); /* Safari 6.0 - 9.0 */
-  filter: blur(30px);
+	filter: blur(30px);
 }
 .controls{
 	display: flex;
