@@ -41,6 +41,7 @@ body{
 .message>div>img{
 	max-width: 100%;
 	display: block;
+	transition:all ease 0.5s; 	
 }
 .blur{
 	-webkit-filter: blur(30px); /* Safari 6.0 - 9.0 */
