@@ -120,6 +120,10 @@ box-shadow: 0.4em 0.4em 1em 0em rgba(0,0,0,0.6);
 header{
 	text-align: center;
 	border-radius: 0px !important;
+	padding: 0.1rem 0;
+}
+h1{
+	font-size: 4em;
 }
 .forange{
 	color:#f94d18;
