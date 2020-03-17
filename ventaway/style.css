@@ -1,6 +1,7 @@
 *{
 	margin:0;
 	font-family: 'Roboto', sans-serif;
+	font-display: swap;
 	/*transition: ease 1s;*/
 	-webkit-text-size-adjust: 100%;
 }
@@ -29,6 +30,7 @@ body{
 	z-index: 2;
 }
 .userinput>textarea{
+	font-size: 1.2em;
 	flex-grow:1;
 	flex-basis:0;
 	border: 0;
@@ -36,6 +38,9 @@ body{
 	resize: none;
 	background:inherit;
 	color: inherit;
+}
+.userinput>textarea::placeholder{
+	color:#f94d18;
 }
 .userinput a{
 	padding: .7em;
