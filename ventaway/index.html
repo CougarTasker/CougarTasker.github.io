@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
 	<title>Ventaway</title>
-	<link rel="stylesheet" type="text/css" href="style.css">
+	<link rel="stylesheet" type="text/css" href="style.css" async>
 	<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet" async>
-	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js" async></script>
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" async>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<script src="autosize.js" async></script>
 	<script src="comments.js" async></script>
@@ -18,10 +18,14 @@
 <div class="container">
 	
 </div>
-<div class="userinput bblack round">
-	<textarea placeholder="Send your vent" name="textinput" wrap="off" rows="2"></textarea>
-	<a><i class="material-icons">attach_file</i></a>
-	<a><i class="material-icons">send</i></a>
+<div class="userinput bblack round ">  <!-- offscreen -->
+	<form method="post" action="">
+		<input type="hidden" id="responce" name="responce" value="-1">
+		<textarea placeholder="Send your vent" name="textinput" wrap="off" rows="2"></textarea>
+		<input type="file" id="img" name="img" accept="image/*" style="display: none;">
+		<div><button type="button" id="attachImg"><i class="material-icons">attach_file</i></button></div>
+		<div><button type="submit" id="submitForm" formmethod="post"><i class="material-icons">send</i></button></div>
+	</form>
 </div>
 </body>
 </html>
