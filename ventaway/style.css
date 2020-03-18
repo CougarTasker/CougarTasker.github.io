@@ -10,6 +10,10 @@ a{
 	text-decoration: none;
 	color: inherit;
 	cursor: pointer;
+	-webkit-user-select: none;  /* Chrome all / Safari all */
+  -moz-user-select: none;     /* Firefox all */
+  -ms-user-select: none;      /* IE 10+ */
+  user-select: none;  
 }
 body{
 	overflow-x: hidden;
@@ -45,7 +49,7 @@ body{
 	color: inherit;
 	border: none;
 	outline: none;
-	cursor: pointer
+	cursor: pointerz
 }
 .userinput textarea{
 	font-size: 1.2em;
@@ -108,6 +112,10 @@ body{
 	border-width:1px 0;
 	border-style: solid;
 	padding-top: 0.3em;
+		-webkit-user-select: none;  /* Chrome all / Safari all */
+  -moz-user-select: none;     /* Firefox all */
+  -ms-user-select: none;      /* IE 10+ */
+  user-select: none;  
 }
 .controls *{
 	flex-grow: 1;

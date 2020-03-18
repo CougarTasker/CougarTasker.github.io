@@ -74,7 +74,7 @@ function commentWrapper(comments){
 	var elem =  $(event.target);
 	switch(elem.text()){
 		case "mode_comment":
-			$(".userinput #responce").val(elem.closest(".comment").attr('id').substring(3)).change();
+			$(".userinput#responce").val(elem.closest(".comment").attr('id').substring(3)).change();
 		break;
 		case "arrow_downward":
 			console.log("comm");
@@ -84,7 +84,7 @@ function commentWrapper(comments){
 			elem.toggleClass("forange");
 		break;
 		}
-	}
+	} 	
 	this.addHandelers = function(){
 		$(".expand>a").click(this.expandClick);
 		$(".controls a").click(this.controlClick);
