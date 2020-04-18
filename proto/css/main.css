@@ -28,13 +28,6 @@ nav {
   -moz-box-shadow: inset 5px 5px 28px 2px rgba(0, 0, 0, 0.66);
   box-shadow: inset 5px 5px 28px 2px rgba(0, 0, 0, 0.66); }
 
-nav {
-  z-index: 100; }
-
-nav, .header-height {
-  line-height: 2rem;
-  font-size: 1.3rem; }
-
 .container {
   padding: 0.5em 5%; }
 
@@ -52,39 +45,36 @@ header {
   justify-content: center;
   align-items: flex-start; }
 
+nav {
+  font-size: 1.3rem;
+  z-index: 100; }
+
 @media only screen and (min-width: 600px) {
   /* For tablets: */
   nav, .header-height {
-    line-height: 2rem;
-    font-size: 1.2rem; }
-
-  .container {
-    padding: 0.5em 10%; }
-
-  #header-text {
-    position: absolute;
-    top: 0;
-    color: #f7fff7;
-    z-index: 101; }
-
-  #header-text {
-    font-family: 'Roboto', sans-serif;
-    font-size: 1.2rem; } }
-@media only screen and (min-width: 768px) {
-  /* For desktop: */
-  nav, .header-height {
-    line-height: 2.5rem;
     font-size: 1.5rem; }
 
   .container {
-    padding: 0.5em 20%; }
+    padding: 0.5em 10%; } }
+@media only screen and (min-width: 768px) {
+  /* For desktop: */
+  nav, .header-height {
+    font-size: 1.8rem; }
 
-  #header-text {
-    font-family: 'Roboto', sans-serif;
-    font-size: 1.5rem; } }
+  .container {
+    padding: 0.5em 20%; } }
+nav img {
+  display: block;
+  max-height: 1em;
+  width: auto; }
+
+nav > a {
+  float: left; }
+
 nav ul {
   margin: 0;
-  padding: 0; }
+  padding: 0;
+  display: inline-block; }
 
 nav li {
   display: inline;
