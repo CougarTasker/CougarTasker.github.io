@@ -95,7 +95,7 @@ nav, .nav-height{
   padding: 0.5em 20%;
 }
 }
-
+//header styling
 #header-text{
 	color: $black;
 	font-family: 'Oswald', sans-serif;
@@ -110,6 +110,7 @@ header{
 	justify-content: space-between;
 	align-items:flex-start;
 }
+//chrome wont scale an image lower than orinal size because it isnt a flexbox item
 header .chromefix{
   	flex-basis: 0;
 	flex-shrink:1;
@@ -126,7 +127,7 @@ header img{
 	min-height:100%;
 	//width: auto;
 }
-
+//to animate the arrow in
 @keyframes arrowSlideInFromBottom{
   0% {
     transform: translateY(100%);
@@ -151,7 +152,7 @@ header>a.scroll{
 	width:100%;
 	text-align: center;
 	z-index: 0;
-	animation: arrowSlideInFromBottom 2s ease 2s;
+	animation: arrowSlideInFromBottom 2s ease 3s;
 	animation-fill-mode:both;
 }
 
