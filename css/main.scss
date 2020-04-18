@@ -1,9 +1,10 @@
-
+//for consistant colors
 $black:#292e1e;
 $white:#f7fff7;
 $blue:#4357ad;
 $green:#9cde9f;
 $teal:#48a9a6;
+//generic setup stuff
 html {
   scroll-behavior: smooth;
 }
@@ -13,6 +14,8 @@ body{
   color:$black;
   font-size:1.5rem;
 }
+
+
 nav{
   position: fixed;
   top: 0;
@@ -24,8 +27,7 @@ nav{
   backdrop-filter: blur(7px);
   text-align: right;
 }
-
-
+//allow for drop shaddows
 .shadow,nav li.active,li:hover{
 	-webkit-box-shadow: 5px 5px 28px 2px rgba(0,0,0,0.66);
 -moz-box-shadow: 5px 5px 28px 2px rgba(0,0,0,0.66);
@@ -36,46 +38,11 @@ box-shadow: 5px 5px 28px 2px rgba(0,0,0,0.66);
 -moz-box-shadow:inset 5px 5px 28px 2px rgba(0,0,0,0.66);
 box-shadow:inset 5px 5px 28px 2px rgba(0,0,0,0.66);
 }
-
+//consistant padding for containers
 .container{
   padding: 0.5em 5%;
 }
-#header-text{
-	color: $black;
-	font-family: 'Oswald', sans-serif;
-	font-size: 2rem;
-}
-header{
-	height:100vh;
-	position:relative;
-	overflow: hidden;
-	display: flex;
-	flex-direction:column;
-	justify-content: space-between;
-	align-items:flex-start;
-}
-nav, .nav-height{
-  font-size: 1.3rem;
-  z-index: 100;
-}
-@media only screen and (min-width: 600px) {
-  /* For tablets: */
-	nav, .nav-height{
-  font-size: 1.5rem;
-}
-.container{
-  padding: 0.5em 10%;
-}
-}
-@media only screen and (min-width: 768px){
-	  /* For desktop: */
-	nav, .nav-height{
-  font-size: 1.8rem;
-}
-.container{
-  padding: 0.5em 20%;
-}
-}
+
 nav img{
 	display:block;
 	max-height: 1em;
@@ -106,13 +73,58 @@ nav a{
   text-decoration: none;
   color: inherit;
 }
+nav, .nav-height{
+  font-size: 1.3rem;
+  z-index: 100;
+}
+@media only screen and (min-width: 600px) {
+  /* For tablets: */
+	nav, .nav-height{
+  font-size: 1.5rem;
+}
+.container{
+  padding: 0.5em 10%;
+}
+}
+@media only screen and (min-width: 768px){
+	  /* For desktop: */
+	nav, .nav-height{
+  font-size: 1.8rem;
+}
+.container{
+  padding: 0.5em 20%;
+}
+}
 
-header img{
+#header-text{
+	color: $black;
+	font-family: 'Oswald', sans-serif;
+	font-size: 2rem;
+}
+header{
+	height:100vh;
+	position:relative;
+	overflow: hidden;
+	display: flex;
+	flex-direction:column;
+	justify-content: space-between;
+	align-items:flex-start;
+}
+header .chromefix{
   	flex-basis: 0;
 	flex-shrink:1;
 	flex-grow: 1;
-	max-width: 99vw;
 	align-self: center;
+	width:100%;
+	overflow: hidden;
+}
+header img{
+	display: block;
+	margin: 0 auto;
+	max-width: 99vw;
+	max-height: 100%;
+	min-height:100%;
+	//width: auto;
 }
 
 @keyframes arrowSlideInFromBottom{
@@ -133,8 +145,6 @@ header>a.scroll>*{
 
 }
 header>a.scroll{
-	flex-shrink: 2;
-	flex-basis: 3rem;
 	line-height: 3rem;
 	font-size: 5rem;
 	display: block;

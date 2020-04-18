@@ -31,38 +31,6 @@ nav {
 .container {
   padding: 0.5em 5%; }
 
-#header-text {
-  color: #292e1e;
-  font-family: 'Oswald', sans-serif;
-  font-size: 2rem; }
-
-header {
-  height: 100vh;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-start; }
-
-nav, .nav-height {
-  font-size: 1.3rem;
-  z-index: 100; }
-
-@media only screen and (min-width: 600px) {
-  /* For tablets: */
-  nav, .nav-height {
-    font-size: 1.5rem; }
-
-  .container {
-    padding: 0.5em 10%; } }
-@media only screen and (min-width: 768px) {
-  /* For desktop: */
-  nav, .nav-height {
-    font-size: 1.8rem; }
-
-  .container {
-    padding: 0.5em 20%; } }
 nav img {
   display: block;
   max-height: 1em;
@@ -93,12 +61,52 @@ nav a {
   text-decoration: none;
   color: inherit; }
 
-header img {
+nav, .nav-height {
+  font-size: 1.3rem;
+  z-index: 100; }
+
+@media only screen and (min-width: 600px) {
+  /* For tablets: */
+  nav, .nav-height {
+    font-size: 1.5rem; }
+
+  .container {
+    padding: 0.5em 10%; } }
+@media only screen and (min-width: 768px) {
+  /* For desktop: */
+  nav, .nav-height {
+    font-size: 1.8rem; }
+
+  .container {
+    padding: 0.5em 20%; } }
+#header-text {
+  color: #292e1e;
+  font-family: 'Oswald', sans-serif;
+  font-size: 2rem; }
+
+header {
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start; }
+
+header .chromefix {
   flex-basis: 0;
   flex-shrink: 1;
   flex-grow: 1;
+  align-self: center;
+  width: 100%;
+  overflow: hidden; }
+
+header img {
+  display: block;
+  margin: 0 auto;
   max-width: 99vw;
-  align-self: center; }
+  max-height: 100%;
+  min-height: 100%; }
 
 @keyframes arrowSlideInFromBottom {
   0% {
@@ -114,8 +122,6 @@ header > a.scroll > * {
   -webkit-text-fill-color: transparent; }
 
 header > a.scroll {
-  flex-shrink: 2;
-  flex-basis: 3rem;
   line-height: 3rem;
   font-size: 5rem;
   display: block;

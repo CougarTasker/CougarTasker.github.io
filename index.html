@@ -52,7 +52,9 @@
 		</div>
 		
 		<h1 style="display:none;">Cougar Tasker</h1>
-		<img src="img/cougar_tasker_title.svg" alt="Cougar Tasker"/>
+		<div class="chromefix">
+			<img id="name-image" src="img/cougar_tasker_title.svg" alt="Cougar Tasker"/>
+		</div>
 		<a class="scroll" href="#about">
 			<span class="material-icons">keyboard_arrow_up</span>
 		</a>
@@ -87,7 +89,7 @@
 
 	<script type="text/javascript">
 		var w =  $(window);
-	 w.scroll(function(event){
+	 	w.scroll(function(event){
 			var p = ($(".separator").position().top-w.scrollTop())/w.height()
 			$(".separator > .pattern").css("transform","translateY("+(-p*100/1.7)+"%)");
 		});
