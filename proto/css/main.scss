@@ -103,7 +103,7 @@ nav li{
   display: inline;
   padding:0.15em 0.25em;
   transition: background 2s ease,box-shadow 2s ease;
-  border-radius:0.25em;
+  border-radius:0.35em;
 }
 nav li.active{
 	background-image: linear-gradient(to bottom right, $green, $teal);
