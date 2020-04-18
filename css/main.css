@@ -133,7 +133,8 @@ header > a.scroll {
 
 h1, h2 {
   font-family: 'Oswald', sans-serif;
-  font-size: 3rem; }
+  font-size: 3rem;
+  margin: 0.3em 0; }
 
 h1, h2, a.underline {
   display: inline-block;
@@ -172,7 +173,15 @@ h1, h2, a.underline {
   position: absolute;
   left: 0;
   top: 0;
-  background: repeating-linear-gradient(-45deg, #9cde9f, #9cde9f 2em, #48a9a6 2em, #48a9a6 4em); }
+  background: linear-gradient(45deg, #9cde9f 45px, transparent 45px) 64px 64px, linear-gradient(45deg, #9cde9f 45px, transparent 45px, transparent 91px, #48a9a6 91px, #48a9a6 135px, transparent 135px), linear-gradient(-45deg, #9cde9f 23px, transparent 23px, transparent 68px, #9cde9f 68px, #9cde9f 113px, transparent 113px, transparent 158px, #9cde9f 158px);
+  background-color: #48a9a6;
+  background-size: 128px 128px; }
+
+.project {
+  color: #f7fff7;
+  background-color: #292e1e;
+  border-radius: 1em;
+  padding: 1px 1em; }
 
 footer, footer > a {
   color: #f7fff7;

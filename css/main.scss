@@ -159,7 +159,9 @@ header>a.scroll{
 h1,h2{
   font-family: 'Oswald', sans-serif;
   font-size:3rem;
+  margin: 0.3em 0;
 }
+
 h1,h2,a.underline{
 display:inline-block;
 position:relative;
@@ -200,13 +202,19 @@ text-decoration:none;
 	position:absolute;
 	left: 0;
 	top:0;
-		background: repeating-linear-gradient(
-	  -45deg,
-	  $green,
-	  $green 2em,
-	  $teal 2em,
-	  $teal 4em
-	);
+	// credit to https://leaverou.github.io/css3patterns/
+background:
+linear-gradient(45deg, $green 45px, transparent 45px)64px 64px,
+linear-gradient(45deg, $green 45px, transparent 45px,transparent 91px, $teal 91px, $teal 135px, transparent 135px),
+linear-gradient(-45deg, $green 23px, transparent 23px, transparent 68px,$green 68px,$green 113px,transparent 113px,transparent 158px,$green 158px);
+background-color:$teal;
+background-size: 128px 128px;
+}
+.project{
+	color: $white;
+	background-color:$black;
+	border-radius:1em;
+	padding:1px 1em;
 }
 footer, footer>a{
 	color:$white;

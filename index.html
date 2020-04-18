@@ -30,8 +30,6 @@
 	<!--[if IE]>
 		<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
 	<![endif]-->
-
-	<!-- Add your site or application content here -->
 	
 	<nav class="container shadow">
 		<a href="#"><image src="img/icon.svg" alt="CT homepage" /></a>
@@ -68,7 +66,7 @@
 		<div class="shadow-inner"></div>
 
 	</div>
-	<div class="container">
+	<div id="project-section" class="container">
 		<h2>Programming</h2>
 		<p>
 		I love programming and have made a range of different programs from games to AI to beat them. Here is an example of the latest stuff I have been working on: 
@@ -82,8 +80,6 @@
 	<script src="js/vendor/modernizr-3.8.0.min.js"></script>
 	<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 	<script>window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')</script>
-	<script src="js/plugins.js"></script>
-	<script src="js/main.js"></script>
 
 	<script type="text/javascript">
 		$(document).ready(function(){
@@ -93,6 +89,18 @@
 				$(".separator > .pattern").css("transform","translateY("+(-p*100/1.7)+"%)");
 			});
 		 });
+		$(document).ready(function(){
+		    $.getJSON("projects/posts.json", function(result){
+		    	var values = result[0];
+		    	var html = $("<div></div>").addClass("project").addClass("shadow");
+		    	html.append($("<h2></h2>").text(values.title));
+		    	for(x in values.parts){
+		    		part = values.parts[x];
+		    		html.append($("<p></p>").text(part.text));
+		    	}
+		    	$("#project-section").append(html);
+		    });
+		});
 	</script>
 
 	<!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
