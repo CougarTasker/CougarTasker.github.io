@@ -42,7 +42,7 @@ box-shadow:inset 5px 5px 28px 2px rgba(0,0,0,0.66);
 .container{
   padding: 0.5em 5%;
 }
-
+//style the nav bar
 nav img{
 	display:block;
 	max-height: 1em;
@@ -77,6 +77,7 @@ nav, .nav-height{
   font-size: 1.3rem;
   z-index: 100;
 }
+//scale the nav bar and containers for larger devices
 @media only screen and (min-width: 600px) {
   /* For tablets: */
 	nav, .nav-height{
@@ -95,71 +96,17 @@ nav, .nav-height{
   padding: 0.5em 20%;
 }
 }
-//header styling
-#header-text{
-	color: $black;
-	font-family: 'Oswald', sans-serif;
-	font-size: 2rem;
-}
-header{
-	height:100vh;
-	position:relative;
-	overflow: hidden;
-	display: flex;
-	flex-direction:column;
-	justify-content: space-between;
-	align-items:flex-start;
-}
-//chrome wont scale an image lower than orinal size because it isnt a flexbox item
-header .chromefix{
-  	flex-basis: 0;
-	flex-shrink:1;
-	flex-grow: 1;
-	align-self: center;
-	width:100%;
-	overflow: hidden;
-}
-header img{
-	display: block;
-	margin: 0 auto;
-	max-width: 99vw;
-	max-height: 100%;
-	min-height:100%;
-	//width: auto;
-}
-//to animate the arrow in
-@keyframes arrowSlideInFromBottom{
-  0% {
-    transform: translateY(100%);
-  }
-  100% {
-    transform: translateY(0);
-  }
-}
-header>a.scroll>*{
-	line-height: inherit;
-	font-size: inherit;
-	text-decoration: none;
-	background: linear-gradient(to bottom, $green, $teal);
-	  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
 
-}
-header>a.scroll{
-	line-height: 3rem;
-	font-size: 5rem;
-	display: block;
-	width:100%;
-	text-align: center;
-	z-index: 0;
-	animation: arrowSlideInFromBottom 2s ease 3s;
-	animation-fill-mode:both;
-}
-
+//custom headings syll with undeline
 h1,h2{
   font-family: 'Oswald', sans-serif;
-  font-size:3rem;
   margin: 0.3em 0;
+}
+h1{
+	  font-size:3rem;
+}
+h2{
+	  font-size:2.5rem;
 }
 
 h1,h2,a.underline{
@@ -178,10 +125,7 @@ text-decoration:none;
   	width: 100%;
   }
 }
-#about{
-	background-color:$black;
-	color:$white;
-}
+//parralax separtaor 
 .separator{
 	height: 5em;
 	overflow: hidden;
@@ -210,6 +154,7 @@ linear-gradient(-45deg, $green 23px, transparent 23px, transparent 68px,$green 6
 background-color:$teal;
 background-size: 128px 128px;
 }
+//project styling this is used in multiple places
 .project{
 	color: $white;
 	background-color:$black;
@@ -222,6 +167,7 @@ background-size: 128px 128px;
 .project>*:first-child{
 	margin-top:0;
 }
+//footer styling
 footer, footer>a{
 	color:$white;
 	background-color:$black;

@@ -1,0 +1,74 @@
+@import "main.css";
+//style sheat for the home page
+
+//for consistant colors
+$black:#292e1e;
+$white:#f7fff7;
+$blue:#4357ad;
+$green:#9cde9f;
+$teal:#48a9a6;
+
+//header styling
+#header-text{
+	color: $black;
+	font-family: 'Oswald', sans-serif;
+	font-size: 2rem;
+}
+header{
+	height:100vh;
+	position:relative;
+	overflow: hidden;
+	display: flex;
+	flex-direction:column;
+	justify-content: space-between;
+	align-items:flex-start;
+}
+//chrome wont scale an image lower than orinal size because it isnt a flexbox item
+header .chromefix{
+  	flex-basis: 0;
+	flex-shrink:1;
+	flex-grow: 1;
+	align-self: center;
+	width:100%;
+	overflow: hidden;
+}
+header img{
+	display: block;
+	margin: 0 auto;
+	max-width: 99vw;
+	max-height: 100%;
+	min-height:100%;
+	//width: auto;
+}
+//to animate the arrow in
+@keyframes arrowSlideInFromBottom{
+  0% {
+    transform: translateY(100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+header>a.scroll>*{
+	line-height: inherit;
+	font-size: inherit;
+	text-decoration: none;
+	background: linear-gradient(to bottom, $green, $teal);
+	  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+}
+header>a.scroll{
+	line-height: 3rem;
+	font-size: 5rem;
+	display: block;
+	width:100%;
+	text-align: center;
+	z-index: 0;
+	animation: arrowSlideInFromBottom 2s ease 3s;
+	animation-fill-mode:both;
+}
+#about{
+	background-color:$black;
+	color:$white;
+}
