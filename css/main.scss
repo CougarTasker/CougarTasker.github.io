@@ -28,7 +28,7 @@ nav{
   text-align: right;
 }
 //allow for drop shaddows
-.shadow,nav li.active,li:hover{
+.shadow,nav li.active, nav li:hover{
 	-webkit-box-shadow: 5px 5px 28px 2px rgba(0,0,0,0.66);
 -moz-box-shadow: 5px 5px 28px 2px rgba(0,0,0,0.66);
 box-shadow: 5px 5px 28px 2px rgba(0,0,0,0.66);
@@ -45,11 +45,14 @@ box-shadow:inset 5px 5px 28px 2px rgba(0,0,0,0.66);
 //style the nav bar
 nav img{
 	display:block;
-	max-height: 1em;
+	max-height: 1.5em;
+	min-height: 1.5em;
 	width:auto;
 }
 nav>a{
-	float: left;
+	left:5%;
+	position:absolute;
+	top:0.35em;
 }
 nav ul{
   margin: 0;
@@ -59,15 +62,21 @@ nav ul{
 nav li{
   display: inline;
   padding:0.15em 0.25em;
-  transition: background 2s ease,box-shadow 2s ease;
+  transition-property: background, box-shadow;
+  transition-duration:0.5s;
+  transition-timing-function:ease;
   border-radius:0.35em;
 }
-nav li.active{
+nav li.active,nav li:active{
 	background-image: linear-gradient(to bottom right, $green, $teal);
 	padding:0.15em 0.25em;
 }
-nav li:hover{
+
+nav li:hover:not(.active):not(:active){
 	background-color:darken($black,5);
+	-webkit-box-shadow: inset 0px 0px 0px 3px $white;
+	-moz-box-shadow: inset 0px 0px 0px 3px $white;
+	box-shadow: inset 0px 0px 0px 3px $white;
 }
 nav a{
   text-decoration: none;
@@ -94,6 +103,9 @@ nav, .nav-height{
 }
 .container{
   padding: 0.5em 20%;
+}
+nav>a{
+	left:20%;
 }
 }
 
