@@ -180,8 +180,14 @@ h1, h2, a.underline {
 .project {
   color: #f7fff7;
   background-color: #292e1e;
-  border-radius: 1em;
-  padding: 1px 1em; }
+  border-radius: 0.8em;
+  padding: 0.8em; }
+
+.project > *:last-child {
+  margin-bottom: 0; }
+
+.project > *:first-child {
+  margin-top: 0; }
 
 footer, footer > a {
   color: #f7fff7;

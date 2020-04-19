@@ -213,8 +213,14 @@ background-size: 128px 128px;
 .project{
 	color: $white;
 	background-color:$black;
-	border-radius:1em;
-	padding:1px 1em;
+	border-radius:0.8em;
+	padding:0.8em;
+}
+.project>*:last-child{
+	margin-bottom:0;
+}
+.project>*:first-child{
+	margin-top:0;
 }
 footer, footer>a{
 	color:$white;
