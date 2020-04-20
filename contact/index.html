@@ -24,6 +24,25 @@
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap"
 			rel="stylesheet">
 	<meta name="theme-color" content="#292e1e">
+	<style type="text/css">
+    .main{
+      height:100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction:column;
+  justify-content: space-between;
+  align-items:flex-start;
+  padding-bottom: 0;
+  padding-top: 0;
+  overflow: hidden;
+    }
+    main>*{
+      margin:0;
+    }
+    .center{
+      width: 100%;
+    }
+  </style>
 </head>
 
 <body>
@@ -42,15 +61,31 @@
 	<div id="nav-spacer" class="nav-height container">
 		<br/>
 	</div>
-	<div class="container">
-		<h1 id="contact">Contact me</h1>
-	</div>
-<!-- 	<div class="separator">
-		 <div class="pattern"></div>
-		<div class="shadow-inner"></div>
-
-	</div> -->
-
+	<div class="main container">
+    <div id="nav-spacer" class="nav-height container">
+      <br/>
+    </div>
+    <h1 id="contact">Contact me</h1>
+    <p>Feel free to contact me through the accounts bellow</p>
+    <div class="account">
+    	<img src="/img/mail.png" alt="email"><h2>Email</h2>
+    	<p>You can contact me directly here. this is my perfeerd communication channel.</p>
+    	<a class="button" href="mailto:cougar@cougartasker.com">cougar<span class="material-icons">fiber_manual_record</span>cougartasker.com<span class="material-icons">arrow_forward</span></a>
+    </div>
+    <div class="account">
+    	<img src="/img/github.png" alt="github"><h2>Github</h2>
+    	<p>You can find some of my newer projects here. there aren’t many yet however I will push all my future projects here.</p>
+    	<a class="button" href="https://github.com/cougartasker">github.com/CougarTasker<span class="material-icons">arrow_forward</span></a>
+    </div>
+    <div class="account">
+    	<img src="/img/instagram.png" alt="instagram"><h2>Instagram</h2>
+    	<p>I post some assorted photos of me and my life outside of computing here.</p>
+    	<a class="button" href="https://www.instagram.com/cougartasker/">instagram.com/CougarTasker<span class="material-icons">arrow_forward</span></a>
+    </div>
+    <div id="footer-spacer" class="footer-height container">
+      <br/>
+    </div>
+  </div>
 	<footer class="container fixed">
 				<a href="https://creativecommons.org/licenses/by-sa/4.0/">
 					<img src="/img/ccheart_red.svg" alt="creative commons shareAlike 4.0">
@@ -59,28 +94,6 @@
 	<script src="js/vendor/modernizr-3.8.0.min.js"></script>
 	<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 	<script>window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')</script>
-
-	<script type="text/javascript">
-		$(document).ready(function(){
-			var w =  $(window);
-		 	w.scroll(function(event){
-				var p = ($(".separator").position().top-w.scrollTop())/w.height()
-				$(".separator > .pattern").css("transform","translateY("+(-p*100/1.7)+"%)");
-			});
-		 });
-		$(document).ready(function(){
-		    $.getJSON("projects/posts.json", function(result){
-		    	var values = result[0];
-		    	var html = $("<div></div>").addClass("project").addClass("shadow");
-		    	html.append($("<h2></h2>").text(values.title));
-		    	for(x in values.parts){
-		    		part = values.parts[x];
-		    		html.append($("<p></p>").text(part.text));
-		    	}
-		    	$("#project-section").append(html);
-		    });
-		});
-	</script>
 
 	<!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
 	<script>

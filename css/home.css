@@ -48,7 +48,7 @@ header > a.scroll {
   width: 100%;
   text-align: center;
   z-index: 0;
-  animation: arrowSlideInFromBottom 2s ease 1.5s;
+  animation: arrowSlideInFromBottom 2s ease 0.9s;
   animation-fill-mode: both; }
 
 #about {

@@ -1,4 +1,10 @@
 @charset "UTF-8";
+* {
+  user-select: none;
+  -ms-user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none; }
+
 html {
   scroll-behavior: smooth; }
 
@@ -16,6 +22,15 @@ body {
 
 .right {
   text-align: right; }
+
+p {
+  user-select: text;
+  -ms-user-select: text;
+  -moz-user-select: text;
+  -webkit-user-select: text; }
+  p::selection {
+    background-color: #48a9a6;
+    color: #f7fff7; }
 
 nav {
   position: fixed;
