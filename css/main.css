@@ -1,3 +1,4 @@
+@charset "UTF-8";
 html {
   scroll-behavior: smooth; }
 
@@ -6,6 +7,15 @@ body {
   background-color: #f7fff7;
   color: #292e1e;
   font-size: 1.5rem; }
+
+.center {
+  text-align: center; }
+
+.left {
+  text-align: left; }
+
+.right {
+  text-align: right; }
 
 nav {
   position: fixed;
@@ -18,7 +28,7 @@ nav {
   backdrop-filter: blur(7px);
   text-align: right; }
 
-.shadow, nav li.active, nav li:hover {
+.shadow, nav li.active, a.button:hover, nav li:hover:not(.active):active {
   -webkit-box-shadow: 5px 5px 28px 2px rgba(0, 0, 0, 0.66);
   -moz-box-shadow: 5px 5px 28px 2px rgba(0, 0, 0, 0.66);
   box-shadow: 5px 5px 28px 2px rgba(0, 0, 0, 0.66); }
@@ -61,13 +71,13 @@ nav li.active, nav li:active {
 
 nav li:hover:not(.active):not(:active) {
   background-color: #1b1f14;
-  -webkit-box-shadow: inset 0px 0px 0px 3px #f7fff7;
-  -moz-box-shadow: inset 0px 0px 0px 3px #f7fff7;
-  box-shadow: inset 0px 0px 0px 3px #f7fff7; }
+  -webkit-box-shadow: inset 0px 0px 0px 3px #f7fff7, 5px 5px 28px 2px rgba(0, 0, 0, 0.66);
+  -moz-box-shadow: inset 0px 0px 0px 3px #f7fff7, 5px 5px 28px 2px rgba(0, 0, 0, 0.66);
+  box-shadow: inset 0px 0px 0px 3px #f7fff7, 5px 5px 28px 2px rgba(0, 0, 0, 0.66); }
 
 nav a {
   text-decoration: none;
-  color: inherit; }
+  color: #f7fff7; }
 
 nav, .nav-height {
   font-size: 1.3rem;
@@ -141,7 +151,8 @@ h1, h2, a.underline {
   color: #f7fff7;
   background-color: #292e1e;
   border-radius: 0.8em;
-  padding: 0.8em; }
+  padding: 0.8em;
+  margin-bottom: 0.8em; }
 
 .project > *:last-child {
   margin-bottom: 0; }
@@ -161,5 +172,41 @@ footer img {
   vertical-align: middle;
   max-height: 1em;
   width: auto; }
+
+a.button {
+  position: relative;
+  padding: 0.2em;
+  box-sizing: border-box;
+  text-decoration: none;
+  color: #f7fff7;
+  background: #292e1e;
+  background-clip: padding-box;
+  /* !importanté */
+  border: solid 0.2em transparent;
+  /* !importanté */
+  border-radius: 0.4em;
+  display: inline-block;
+  transition: box-shadow ease 1s;
+  margin: 0 auto;
+  background-color: #1b1f14; }
+  a.button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+    margin: -0.2em;
+    /* !importanté */
+    border-radius: inherit;
+    /* !importanté */
+    background: linear-gradient(to right, #9cde9f, #48a9a6); }
+  a.button:active {
+    background: linear-gradient(to right, #9cde9f, #48a9a6);
+    background-clip: padding-box; }
+  a.button > span {
+    display: inline-block;
+    vertical-align: middle; }
 
 /*# sourceMappingURL=main.css.map */

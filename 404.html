@@ -44,14 +44,13 @@
   </div>
   <div class="container">
     <h1 id="">Error 404</h1>
-    <p>Sorry, the page you are looking for does not exist<p>
+    <p>Sorry, the page you are looking for does not exist</p>`
+    <div class="center">
+      <a class="button" href="/projects">
+        <span class="material-icons">arrow_backwards</span>return to home
+      </a>
+    </div>
   </div>
-<!--  <div class="separator">
-     <div class="pattern"></div>
-    <div class="shadow-inner"></div>
-
-  </div> -->
-
   <footer class="container">
         <a href="https://creativecommons.org/licenses/by-sa/4.0/">
           <img src="/img/ccheart_red.svg" alt="creative commons shareAlike 4.0">
@@ -61,27 +60,6 @@
   <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
   <script>window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')</script>
 
-  <script type="text/javascript">
-    $(document).ready(function(){
-      var w =  $(window);
-      w.scroll(function(event){
-        var p = ($(".separator").position().top-w.scrollTop())/w.height()
-        $(".separator > .pattern").css("transform","translateY("+(-p*100/1.7)+"%)");
-      });
-     });
-    $(document).ready(function(){
-        $.getJSON("projects/posts.json", function(result){
-          var values = result[0];
-          var html = $("<div></div>").addClass("project").addClass("shadow");
-          html.append($("<h2></h2>").text(values.title));
-          for(x in values.parts){
-            part = values.parts[x];
-            html.append($("<p></p>").text(part.text));
-          }
-          $("#project-section").append(html);
-        });
-    });
-  </script>
 
   <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
   <script>

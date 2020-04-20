@@ -1,9 +1,11 @@
 //for consistant colors
 $black:#292e1e;
 $white:#f7fff7;
-$blue:#4357ad;
+$blue:#7BDFF2;
 $green:#9cde9f;
 $teal:#48a9a6;
+$orange:#FF8811;
+$red:#ED254E;
 //generic setup stuff
 html {
   scroll-behavior: smooth;
@@ -14,7 +16,28 @@ body{
   color:$black;
   font-size:1.5rem;
 }
-
+.center{
+	text-align: center;
+}
+.left{
+	text-align: left;
+}
+.right{
+	text-align: right;
+}
+// a{//generic link formating
+// 	text-decoration: none;
+// 	color: $red;
+// 	transition: box-shadow ease 0.5s;
+// 	// background: -webkit-linear-gradient($green, $teal);
+//  //  -webkit-background-clip: text;
+//  //  -webkit-text-fill-color: transparent;
+// }
+// a:hover{
+// 	-webkit-box-shadow: 0px 3px 0px 0px $red;
+// -moz-box-shadow: 0px 3px 0px 0px $red;
+// box-shadow: 0px 3px 0px 0px $red;
+// }
 
 nav{
   position: fixed;
@@ -28,7 +51,7 @@ nav{
   text-align: right;
 }
 //allow for drop shaddows
-.shadow,nav li.active, nav li:hover{
+.shadow,nav li.active, a.button:hover, nav li:hover:not(.active):active{
 	-webkit-box-shadow: 5px 5px 28px 2px rgba(0,0,0,0.66);
 -moz-box-shadow: 5px 5px 28px 2px rgba(0,0,0,0.66);
 box-shadow: 5px 5px 28px 2px rgba(0,0,0,0.66);
@@ -49,6 +72,7 @@ nav img{
 	min-height: 1.5em;
 	width:auto;
 }
+	
 nav>a{
 	left:5%;
 	position:absolute;
@@ -74,13 +98,13 @@ nav li.active,nav li:active{
 
 nav li:hover:not(.active):not(:active){
 	background-color:darken($black,5);
-	-webkit-box-shadow: inset 0px 0px 0px 3px $white;
-	-moz-box-shadow: inset 0px 0px 0px 3px $white;
-	box-shadow: inset 0px 0px 0px 3px $white;
+	-webkit-box-shadow: inset 0px 0px 0px 3px $white, 5px 5px 28px 2px rgba(0,0,0,0.66);
+	-moz-box-shadow: inset 0px 0px 0px 3px $white, 5px 5px 28px 2px rgba(0,0,0,0.66);
+	box-shadow: inset 0px 0px 0px 3px $white, 5px 5px 28px 2px rgba(0,0,0,0.66);
 }
 nav a{
   text-decoration: none;
-  color: inherit;
+  color: $white;
 }
 nav, .nav-height{
   font-size: 1.3rem;
@@ -172,6 +196,7 @@ background-size: 128px 128px;
 	background-color:$black;
 	border-radius:0.8em;
 	padding:0.8em;
+	margin-bottom: 0.8em;
 }
 .project>*:last-child{
 	margin-bottom:0;
@@ -192,4 +217,38 @@ footer img{
 	vertical-align: middle;
 	max-height:1em;
 	width:auto;
+}
+
+a.button{
+  $border: 0.2em;
+  position: relative;
+  padding:$border;
+  box-sizing: border-box;
+  text-decoration: none;
+  color: $white;
+  background: $black;
+  background-clip: padding-box; /* !importanté */
+  border: solid $border transparent; /* !importanté */
+  border-radius:  2 * $border;
+  display:inline-block;
+  transition: box-shadow ease 1s;
+  margin:0 auto;
+  background-color:darken($black,5);
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    z-index: -1;
+    margin: -$border; /* !importanté */
+    border-radius: inherit; /* !importanté */
+    background: linear-gradient(to right, $green, $teal);
+  }
+  &:active{
+  	background: linear-gradient(to right, $green, $teal);
+  	background-clip: padding-box;
+  }
+  &>span{
+  	display: inline-block;
+  	vertical-align: middle;
+  }
 }
