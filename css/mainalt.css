@@ -66,7 +66,7 @@ nav li {
   border-radius: 0.35em; }
 
 nav li.active, nav li:active {
-  background-image: linear-gradient(to bottom right, #9cde9f, #FF8811);
+  background-image: linear-gradient(to bottom right, #ED254E, #FF8811);
   padding: 0.15em 0.25em; }
 
 nav li:hover:not(.active):not(:active) {
@@ -119,7 +119,7 @@ h1, h2, a.underline {
     content: '';
     left: 0;
     bottom: -0.1em;
-    background-image: linear-gradient(to bottom right, #9cde9f, #FF8811);
+    background-image: linear-gradient(to bottom right, #ED254E, #FF8811);
     height: 0.1em;
     width: 100%; }
 
@@ -143,7 +143,7 @@ h1, h2, a.underline {
   position: absolute;
   left: 0;
   top: 0;
-  background: linear-gradient(45deg, #9cde9f 45px, transparent 45px) 64px 64px, linear-gradient(45deg, #9cde9f 45px, transparent 45px, transparent 91px, #FF8811 91px, #FF8811 135px, transparent 135px), linear-gradient(-45deg, #9cde9f 23px, transparent 23px, transparent 68px, #9cde9f 68px, #9cde9f 113px, transparent 113px, transparent 158px, #9cde9f 158px);
+  background: linear-gradient(45deg, #ED254E 45px, transparent 45px) 64px 64px, linear-gradient(45deg, #ED254E 45px, transparent 45px, transparent 91px, #FF8811 91px, #FF8811 135px, transparent 135px), linear-gradient(-45deg, #ED254E 23px, transparent 23px, transparent 68px, #ED254E 68px, #ED254E 113px, transparent 113px, transparent 158px, #ED254E 158px);
   background-color: #FF8811;
   background-size: 128px 128px; }
 
@@ -208,9 +208,9 @@ a.button {
     /* !importanté */
     border-radius: inherit;
     /* !importanté */
-    background: linear-gradient(to right, #9cde9f, #FF8811); }
+    background: linear-gradient(to right, #ED254E, #FF8811); }
   a.button:active {
-    background: linear-gradient(to right, #9cde9f, #FF8811);
+    background: linear-gradient(to right, #ED254E, #FF8811);
     background-clip: padding-box; }
   a.button > span {
     display: inline-block;

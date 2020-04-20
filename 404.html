@@ -25,7 +25,14 @@
       rel="stylesheet">
   <meta name="theme-color" content="#292e1e">
   <style type="text/css">
-    
+    .main{
+      height:100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction:column;
+  justify-content: space-between;
+  align-items:flex-start;
+    }
   </style>
 </head>
 
@@ -35,28 +42,28 @@
   <![endif]-->
   
   <nav class="container shadow">
-    <a href="/"><img src="/img/icon2.svg" alt="CT homepage"></a>
+    <a href="/"><img src="/img/icon2alt.svg" alt="CT homepage"></a>
     <ul>
       <li><a href="/">About</a></li>
       <li><a href="/projects">Projects</a></li>
       <li><a href="/contact">Contact</a></li>
     </ul>
   </nav>
-  <div id="nav-spacer" class="nav-height container">
-    <br/>
-  <header id="header container">
+
+  <div class="main container">
     <div id="nav-spacer" class="nav-height container">
       <br/>
     </div>
     <h1 id="">Error 404</h1>
-    <p>Sorry, the page you are looking for does not exist</p>
+    <p>Sorry, something has gone wrong. You have slipped into an alternate reality where this page does not exist, the colour scheme is better, and the velociraptor is king.</p>
     <div class="center">
       <a class="button" href="/">
         <span class="material-icons">arrow_back</span>
-        return to home
+        return to your reality
       </a>
     </div>
-  </header>
+    <br/>
+  </div>
   <footer class="container fixed">
         <a href="https://creativecommons.org/licenses/by-sa/4.0/">
           <img src="/img/ccheart_red.svg" alt="creative commons shareAlike 4.0">
