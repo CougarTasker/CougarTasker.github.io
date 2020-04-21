@@ -49,6 +49,7 @@ nav{
   /*background:inherit;*/
   backdrop-filter: blur(7px);
   text-align: right;
+    z-index: 100;
 }
 //allow for drop shaddows
 .shadow,nav li.active, a.button:hover, nav li:hover:not(.active):active{
@@ -108,7 +109,6 @@ nav a{
 }
 nav, .nav-height{
   font-size: 1.3rem;
-  z-index: 100;
 }
 //scale the nav bar and containers for larger devices
 @media only screen and (min-width: 600px) {

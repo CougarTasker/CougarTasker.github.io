@@ -26,7 +26,8 @@ nav {
   background-color: rgba(41, 46, 30, 0.85);
   /*background:inherit;*/
   backdrop-filter: blur(7px);
-  text-align: right; }
+  text-align: right;
+  z-index: 100; }
 
 .shadow, nav li.active, a.button:hover, nav li:hover:not(.active):active {
   -webkit-box-shadow: 5px 5px 28px 2px rgba(0, 0, 0, 0.66);
@@ -80,8 +81,7 @@ nav a {
   color: #f7fff7; }
 
 nav, .nav-height {
-  font-size: 1.3rem;
-  z-index: 100; }
+  font-size: 1.3rem; }
 
 @media only screen and (min-width: 600px) {
   /* For tablets: */
