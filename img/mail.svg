@@ -32,7 +32,7 @@
      id="namedview7279"
      showgrid="false"
      inkscape:zoom="15.733334"
-     inkscape:cx="24.69546"
+     inkscape:cx="14.239952"
      inkscape:cy="15.563946"
      inkscape:window-x="-9"
      inkscape:window-y="-9"
@@ -72,24 +72,25 @@
          style="stop-color:#000000;stop-opacity:1;" />
     </linearGradient>
     <radialGradient
-       gradientTransform="matrix(0.16698929,-0.00221865,0.00221972,0.16707015,12.462842,12.160738)"
+       gradientTransform="matrix(0.35426416,-0.00313889,0.00321954,0.36337104,19.32535,20.053493)"
        spreadMethod="repeat"
        gradientUnits="userSpaceOnUse"
        r="15"
-       fy="-35.889595"
-       fx="-42.197426"
-       cy="-35.889595"
-       cx="-42.197426"
-       id="radialGradient6098"
+       fy="-36.033546"
+       fx="-39.69738"
+       cy="-36.033546"
+       cx="-39.69738"
+       id="radialGradient6098-7"
        xlink:href="#linearGradient6096" />
   </defs>
   <title
      id="title831">Glyph</title>
   <g
-     transform="translate(0,0.43999863)"
-     style="display:inline"
+     transform="matrix(0.97033898,0,0,0.97033898,0.44491524,0.871863)"
+     style="display:inline;fill:#ffffff"
      id="layer1">
     <path
+       inkscape:connector-curvature="0"
        d=""
        cx="15"
        cy="14.56"
@@ -101,7 +102,7 @@
        cy="14.559999"
        cx="15"
        id="path818"
-       style="opacity:1;fill:url(#radialGradient6098);fill-opacity:1;stroke:none;stroke-width:6.19482374;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+       style="opacity:1;fill:url(#radialGradient6098-7);fill-opacity:1;stroke:none;stroke-width:6.19482374;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
   </g>
   <g
      style="display:inline"
