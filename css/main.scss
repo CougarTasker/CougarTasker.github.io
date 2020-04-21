@@ -61,6 +61,7 @@ nav{
   top: 0;
   left:0;
   right:0;
+    z-index: 100;
   color: white;
   background-color:transparentize($black,0.15);
   /*background:inherit;*/
@@ -114,7 +115,7 @@ nav li.active,nav li:active{
 }
 
 nav li:hover:not(.active):not(:active){
-	background-color:darken($black,5);
+	background-color:$black;
 	-webkit-box-shadow: inset 0px 0px 0px 3px $white, 5px 5px 28px 2px rgba(0,0,0,0.66);
 	-moz-box-shadow: inset 0px 0px 0px 3px $white, 5px 5px 28px 2px rgba(0,0,0,0.66);
 	box-shadow: inset 0px 0px 0px 3px $white, 5px 5px 28px 2px rgba(0,0,0,0.66);
@@ -125,7 +126,6 @@ nav a{
 }
 nav, .nav-height{
   font-size: 1.3rem;
-  z-index: 100;
 }
 //scale the nav bar and containers for larger devices
 @media only screen and (min-width: 600px) {
