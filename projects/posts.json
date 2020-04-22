@@ -1,6 +1,9 @@
 
-[{"title":"test artical",
+[{"title":"RHUL bus timetable",
 "parts":[
-{"text":"this is a text section test test another test and some more text to fill some space"},
-{"text":"this is a another text section test test another test and some more text to fill some space"}
+{"type":"img","url":"/projects/img/largebustimetable.jpg","alt":"an overview of all the busses avilble on a given day"},
+{"type":"link","text":"try it out","url":"https://rhulbus.ml/"},
+{"type":"text","text":"In my first term at Royal Holloway, I was constantly using their shuttle bus to get to the places I needed to go however the bus timetable was this set of three unintuitive tables that didn’t seem to make sense so I thought that an online tool could make this a lot easier reducing the busses you can see to the ones that are relevant to you."},
+{"type":"img","url":"/projects/img/smallbustimetable.jpg","alt":"it shows the next and follwing busses from you location"},
+{"type":"text","text":"I used regular expressions to parse the data into a JSON format and JavaScript so the client can select the information that is needed. I used Materialize for the styling and the colour scheme was from a poster on the busses. I did all the scripting on the client-side because it was easier, it would run faster and the file size of the data was tiny."}
 ]}]

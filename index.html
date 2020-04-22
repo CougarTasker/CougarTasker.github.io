@@ -91,13 +91,23 @@
 		 });
 		$(document).ready(function(){
 		    $.getJSON("projects/posts.json", function(result){
+		    	console.log("anything");
 		    	var values = result[0];
 		    	var html = $("<div></div>").addClass("project").addClass("shadow");
 		    	html.append($("<h2></h2>").text(values.title));
+		    	console.log(values);
 		    	for(x in values.parts){
 		    		part = values.parts[x];
-		    		html.append($("<p></p>").text(part.text));
+		    		if(part.type == "text"){
+		    			html.append($("<p></p>").text(part.text));
+		    		}else if(part.type == "link"){
+		    			var btn = $("<a></a>").html(part.text+"<span class=\"material-icons\">arrow_forward</span>").attr("href",part.url);
+		    			html.append($("<div></div>").addClass("center").html(btn));
+		    		}else if(part.type == "img"){
+		    			html.append($("<img>").attr("src",part.url).attr("alt",part.alt).addClass("shadow"));
+		    		}
 		    	}
+		    	console.log(html);
 		    	$("#project-section>p").after(html);
 		    });
 		});
