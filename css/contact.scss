@@ -2,6 +2,7 @@
 //style sheet for the contact page
 .main{
   min-height:100vh;
+  min-height: -webkit-fill-available;
   display: flex;
   flex-direction:column;
   justify-content: space-between;
@@ -11,9 +12,6 @@
 }
 main>*{
   margin:0;
-}
-.center{
-  width: 100%;
 }
 .start>img{
   max-height: 3.2em;

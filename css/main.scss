@@ -8,10 +8,10 @@ $orange:#FF8811;
 $red:#ED254E;
 //generic setup stuff
 *{
-	user-select: none;
-	-ms-user-select: none;
-	-moz-user-select: none;
-	-webkit-user-select: none;
+  user-select: none;
+  -ms-user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
 }
 html {
   scroll-behavior: smooth;
@@ -23,37 +23,37 @@ body{
   font-size:1.5rem;
 }
 .center{
-	text-align: center;
+  text-align: center;
 }
 .left{
-	text-align: left;
+  text-align: left;
 }
 .right{
-	text-align: right;
+  text-align: right;
 }
 // a{//generic link formating
-// 	text-decoration: none;
-// 	color: $red;
-// 	transition: box-shadow ease 0.5s;
-// 	// background: -webkit-linear-gradient($green, $teal);
+//  text-decoration: none;
+//  color: $red;
+//  transition: box-shadow ease 0.5s;
+//  // background: -webkit-linear-gradient($green, $teal);
 //  //  -webkit-background-clip: text;
 //  //  -webkit-text-fill-color: transparent;
 // }
 // a:hover{
-// 	-webkit-box-shadow: 0px 3px 0px 0px $red;
+//  -webkit-box-shadow: 0px 3px 0px 0px $red;
 // -moz-box-shadow: 0px 3px 0px 0px $red;
 // box-shadow: 0px 3px 0px 0px $red;
 // }
 
 p{
-		user-select: text;
-	-ms-user-select: text;
-	-moz-user-select: text;
-	-webkit-user-select: text;
-	&::selection{
-		background-color:$teal;
-		color: $white;
-	}
+    user-select: text;
+  -ms-user-select: text;
+  -moz-user-select: text;
+  -webkit-user-select: text;
+  &::selection{
+    background-color:$teal;
+    color: $white;
+  }
 }
 
 nav{
@@ -70,12 +70,12 @@ nav{
 }
 //allow for drop shaddows
 .shadow,nav li.active, a.button:hover, nav li:hover:not(.active):active{
-	-webkit-box-shadow: 5px 5px 28px 2px rgba(0,0,0,0.66);
+  -webkit-box-shadow: 5px 5px 28px 2px rgba(0,0,0,0.66);
 -moz-box-shadow: 5px 5px 28px 2px rgba(0,0,0,0.66);
 box-shadow: 5px 5px 28px 2px rgba(0,0,0,0.66);
 }
 .shadow-inner{
-	-webkit-box-shadow:inset 5px 5px 28px 2px rgba(0,0,0,0.66);
+  -webkit-box-shadow:inset 5px 5px 28px 2px rgba(0,0,0,0.66);
 -moz-box-shadow:inset 5px 5px 28px 2px rgba(0,0,0,0.66);
 box-shadow:inset 5px 5px 28px 2px rgba(0,0,0,0.66);
 }
@@ -85,16 +85,16 @@ box-shadow:inset 5px 5px 28px 2px rgba(0,0,0,0.66);
 }
 //style the nav bar
 nav img{
-	display:block;
-	max-height: 1.5em;
-	min-height: 1.5em;
-	width:auto;
+  display:block;
+  max-height: 1.5em;
+  min-height: 1.5em;
+  width:auto;
 }
-	
+  
 nav>a{
-	left:5%;
-	position:absolute;
-	top:0.35em;
+  left:5%;
+  position:absolute;
+  top:0.35em;
 }
 nav ul{
   margin: 0;
@@ -110,15 +110,15 @@ nav li{
   border-radius:0.35em;
 }
 nav li.active,nav li:active{
-	background-image: linear-gradient(to bottom right, $green, $teal);
-	padding:0.15em 0.25em;
+  background-image: linear-gradient(to bottom right, $green, $teal);
+  padding:0.15em 0.25em;
 }
 
 nav li:hover:not(.active):not(:active), .project a:hover:not(:active){
-	background-color:$black;
-	-webkit-box-shadow: inset 0px 0px 0px 3px $white, 5px 5px 28px 2px rgba(0,0,0,0.66);
-	-moz-box-shadow: inset 0px 0px 0px 3px $white, 5px 5px 28px 2px rgba(0,0,0,0.66);
-	box-shadow: inset 0px 0px 0px 3px $white, 5px 5px 28px 2px rgba(0,0,0,0.66);
+  background-color:$black;
+  -webkit-box-shadow: inset 0px 0px 0px 3px $white, 5px 5px 28px 2px rgba(0,0,0,0.66);
+  -moz-box-shadow: inset 0px 0px 0px 3px $white, 5px 5px 28px 2px rgba(0,0,0,0.66);
+  box-shadow: inset 0px 0px 0px 3px $white, 5px 5px 28px 2px rgba(0,0,0,0.66);
 }
 nav a{
   text-decoration: none;
@@ -130,7 +130,7 @@ nav, .nav-height{
 //scale the nav bar and containers for larger devices
 @media only screen and (min-width: 600px) {
   /* For tablets: */
-	nav, .nav-height{
+  nav, .nav-height{
   font-size: 1.5rem;
 }
 .container{
@@ -138,15 +138,15 @@ nav, .nav-height{
 }
 }
 @media only screen and (min-width: 768px){
-	  /* For desktop: */
-	nav, .nav-height{
+    /* For desktop: */
+  nav, .nav-height{
   font-size: 1.8rem;
 }
 .container{
   padding: 0.5em 20%;
 }
 nav>a{
-	left:20%;
+  left:20%;
 }
 }
 
@@ -156,10 +156,10 @@ h1,h2{
   margin: 0.3em 0;
 }
 h1{
-	  font-size:3rem;
+    font-size:3rem;
 }
 h2{
-	  font-size:2.5rem;
+    font-size:2.5rem;
 }
 
 h1,h2,a.underline{
@@ -168,38 +168,38 @@ position:relative;
 text-decoration:none;
 
   &::after {
-  	$height: 0.1em;
-  	position:absolute;
-  	content: '';  	
-  	left:0;
-  	bottom:-$height;
-  	background-image: linear-gradient(to bottom right, $green, $teal);
-  	height: $height;
-  	width: 100%;
+    $height: 0.1em;
+    position:absolute;
+    content: '';    
+    left:0;
+    bottom:-$height;
+    background-image: linear-gradient(to bottom right, $green, $teal);
+    height: $height;
+    width: 100%;
   }
 }
 //parralax separtaor 
 .separator{
-	height: 5em;
-	overflow: hidden;
-	position:relative;
+  height: 5em;
+  overflow: hidden;
+  position:relative;
 }
 .separator > .shadow-inner{
-	width: 100%;
-	height: 100%;
-	position:absolute;
-	z-index:2;
-	left: 0;
-	top:0;
+  width: 100%;
+  height: 100%;
+  position:absolute;
+  z-index:2;
+  left: 0;
+  top:0;
 }
 .separator > .pattern{
-		width: 100%;
-		z-index:1;
-	height: 200%;
-	position:absolute;
-	left: 0;
-	top:0;
-	// credit to https://leaverou.github.io/css3patterns/
+    width: 100%;
+    z-index:1;
+  height: 200%;
+  position:absolute;
+  left: 0;
+  top:0;
+  // credit to https://leaverou.github.io/css3patterns/
 background:
 linear-gradient(45deg, $green 45px, transparent 45px)64px 64px,
 linear-gradient(45deg, $green 45px, transparent 45px,transparent 91px, $teal 91px, $teal 135px, transparent 135px),
@@ -209,17 +209,17 @@ background-size: 128px 128px;
 }
 //project styling this is used in multiple places
 .project{
-	color: $white;
-	background-color:$black;
-	border-radius:0.8em;
-	padding:0.8em;
-	margin-bottom: 0.8em;
+  color: $white;
+  background-color:$black;
+  border-radius:0.8em;
+  padding:0.8em;
+  margin-bottom: 0.8em;
 }
 .project>*:last-child{
-	margin-bottom:0;
+  margin-bottom:0;
 }
 .project>*:first-child{
-	margin-top:0;
+  margin-top:0;
 }
 .project>img{
   max-width: 100%;
@@ -258,24 +258,24 @@ background-size: 128px 128px;
 }
 //footer styling
 footer, footer>a{
-	color:$white;
-	background-color:$black;
-	text-decoration: none;
-	font-size:1rem;
+  color:$white;
+  background-color:$black;
+  text-decoration: none;
+  font-size:1rem;
 }
 footer img{
-	margin: 0 0.2em;
-	display: inline-flex;
-	vertical-align: middle;
-	max-height:1em;
-	width:auto;
+  margin: 0 0.2em;
+  display: inline-flex;
+  vertical-align: middle;
+  max-height:1em;
+  width:auto;
 }
 footer.fixed{
-	position:fixed;
-	bottom:0;
-	left: 0;
-	right: 0;
-	z-index: 99;
+  position:fixed;
+  bottom:0;
+  left: 0;
+  right: 0;
+  z-index: 99;
 }
 a.button{
   $border: 0.2em;
@@ -303,11 +303,11 @@ a.button{
     background: linear-gradient(to right, $green, $teal);
   }
   &:active{
-  	background: linear-gradient(to right, $green, $teal);
-  	background-clip: padding-box;
+    background: linear-gradient(to right, $green, $teal);
+    background-clip: padding-box;
   }
   &>span{
-  	display: inline-block;
-  	vertical-align: middle;
+    display: inline-block;
+    vertical-align: middle;
   }
 }
