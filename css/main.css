@@ -207,7 +207,7 @@ h1, h2, a.underline {
     display: inline-block;
     vertical-align: middle; }
 
-footer, footer > a {
+footer, footer > a, #footer-spacer {
   color: #f7fff7;
   background-color: #292e1e;
   text-decoration: none;
