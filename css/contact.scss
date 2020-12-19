@@ -1,24 +1,26 @@
 @import "main.scss";
 //style sheet for the contact page
+
 .main{
-  min-height:100vh;
-  min-height: -webkit-fill-available;
+  flex-grow:1;
   display: flex;
   flex-direction:column;
-  justify-content: space-between;
+  justify-content: center;
   align-items:stretch;
   padding-bottom: 0!important;
   padding-top: 0!important;
 }
+nav{
+  position: static;
+}
 body{
-  overflow: hidden;
+  min-height:100vh;
+  display: flex;
+  flex-direction:column;
 }
-main>*{
-  margin:0;
-}
-.start>img{
+.account img{
   max-height: 3.2em;
-  min-height: 3.2em;
+  min-height: 2.7em;
   display: block;
   width: auto;
 }
@@ -32,7 +34,7 @@ main>*{
   transition-property: background, box-shadow; 
   transition-timing-function:ease;
   transition-duration: 0.5s;
-  border-radius:3.2em;
+  border-radius:2.7em;
   &:active{
     background-image: radial-gradient(circle at 1.5em 50%, $teal 0, $green 4em,$teal 100%);
     -webkit-box-shadow: 5px 5px 28px 2px rgba(0,0,0,0.66);
@@ -59,6 +61,7 @@ main>*{
 }
 .middle *{
   margin:0;
+  line-height: 1;
 }
 
 .account>a{
@@ -75,6 +78,7 @@ main>*{
 .account span{
   display: inline-block;
     vertical-align: middle;
+    font-size:1.25em;
 }
 .account>a>*{
   display: flex;
@@ -83,8 +87,9 @@ main>*{
 }
 .middle{
   flex-grow: 1;
-  margin:0.1em;
-  margin-right:0;
+  padding: 0.15em;
+  padding-left: 0.3em;
+  padding-right: 0;
   align-items:flex-start;
 }
 .middle h2{
@@ -97,20 +102,42 @@ main>*{
   .account p{
     font-size: 0.6em;
   }
+  .account img{
+    min-height:2.8em;
+  }
 }
-@media only screen and (min-width: 400px){
+@media only screen and (min-width: 430px){
   .account p{
     font-size: 0.8em;
   }
+  .account img{
+    min-height:3em;
+  }
 }
-@media only screen and (min-width: 480px){
+@media only screen and (min-width: 505px){
   .account p{
     font-size: 1em;
+  }
+  .account img{
+    min-height:3.2em;
   }
 }
 hr{
   border:0;
   border-top: 4px solid $black;
   border-style:dotted;
-  margin:0;
+  margin:7px 0;
+}
+
+@media only screen and (min-width: 600px) {
+  /* For tablets: */
+  hr{
+    margin:20px 0;
+  }
+}
+@media only screen and (min-width: 768px){
+    /* For desktop: */
+  hr{
+    margin:25px 0;
+  }
 }

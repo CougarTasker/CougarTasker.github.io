@@ -207,11 +207,13 @@ h1, h2, a.underline {
     display: inline-block;
     vertical-align: middle; }
 
+footer, .footer-height {
+  font-size: 1rem; }
+
 footer, footer > a {
   color: #f7fff7;
   background-color: #292e1e;
-  text-decoration: none;
-  font-size: 1rem; }
+  text-decoration: none; }
 
 footer img {
   margin: 0 0.2em;
@@ -264,21 +266,25 @@ a.button {
     vertical-align: middle; }
 
 .main {
-  min-height: 100vh;
-  min-height: -webkit-fill-available;
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
   align-items: stretch;
   padding-bottom: 0 !important;
   padding-top: 0 !important; }
 
-main > * {
-  margin: 0; }
+nav {
+  position: static; }
 
-.start > img {
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column; }
+
+.account img {
   max-height: 3.2em;
-  min-height: 3.2em;
+  min-height: 2.7em;
   display: block;
   width: auto; }
 
@@ -291,7 +297,7 @@ main > * {
   transition-property: background, box-shadow;
   transition-timing-function: ease;
   transition-duration: 0.5s;
-  border-radius: 3.2em; }
+  border-radius: 2.7em; }
   .account:active {
     background-image: radial-gradient(circle at 1.5em 50%, #48a9a6 0, #9cde9f 4em, #48a9a6 100%);
     -webkit-box-shadow: 5px 5px 28px 2px rgba(0, 0, 0, 0.66);
@@ -313,7 +319,8 @@ main > * {
       -moz-text-fill-color: transparent; }
 
 .middle * {
-  margin: 0; }
+  margin: 0;
+  line-height: 1; }
 
 .account > a {
   text-decoration: none;
@@ -328,7 +335,8 @@ main > * {
 
 .account span {
   display: inline-block;
-  vertical-align: middle; }
+  vertical-align: middle;
+  font-size: 1.25em; }
 
 .account > a > * {
   display: flex;
@@ -337,8 +345,9 @@ main > * {
 
 .middle {
   flex-grow: 1;
-  margin: 0.1em;
-  margin-right: 0;
+  padding: 0.15em;
+  padding-left: 0.3em;
+  padding-right: 0;
   align-items: flex-start; }
 
 .middle h2 {
@@ -349,17 +358,35 @@ main > * {
 
 @media only screen and (min-width: 345px) {
   .account p {
-    font-size: 0.6em; } }
-@media only screen and (min-width: 400px) {
+    font-size: 0.6em; }
+
+  .account img {
+    min-height: 2.8em; } }
+@media only screen and (min-width: 430px) {
   .account p {
-    font-size: 0.8em; } }
-@media only screen and (min-width: 480px) {
+    font-size: 0.8em; }
+
+  .account img {
+    min-height: 3em; } }
+@media only screen and (min-width: 505px) {
   .account p {
-    font-size: 1em; } }
+    font-size: 1em; }
+
+  .account img {
+    min-height: 3.2em; } }
 hr {
   border: 0;
   border-top: 4px solid #292e1e;
   border-style: dotted;
-  margin: 0; }
+  margin: 7px 0; }
+
+@media only screen and (min-width: 600px) {
+  /* For tablets: */
+  hr {
+    margin: 20px 0; } }
+@media only screen and (min-width: 768px) {
+  /* For desktop: */
+  hr {
+    margin: 25px 0; } }
 
 /*# sourceMappingURL=contact.css.map */
