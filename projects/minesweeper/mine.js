@@ -10,7 +10,7 @@ const createStage = ({ rows, cols }) => {
       space.addEventListener("click", (e) => {
         const x = parseInt(e.target.getAttribute('game-x'), 10);
         const y = parseInt(e.target.getAttribute('game-y'), 10);
-        floodFill(view,{x,y},dimentions);
+        floodFill(view, { x, y }, dimentions);
         updateStage(view);
       });
       game.appendChild(space);
@@ -25,7 +25,6 @@ const createView = ({ rows, cols, bombCount }) => {
     let row = [];
     for (let y = 0; y < rows; y++) {
       row[y] = Object.create(blankCell);
-      changedCells.push({ x, y });
     }
     stage[x] = row;
   }
@@ -72,12 +71,23 @@ const createView = ({ rows, cols, bombCount }) => {
 
 const updateStage = ({ stage, changedCells }) => {
   let cell;
-  while (cell = changedCells.pop()) {
-    const { x, y } = cell;
+  const updateCell = (x, y) => {
     const htmlCell = document.querySelector(`div[game-x = "${x}"][game-y = "${y}"]`);
     htmlCell.textContent = stage[x][y].count;
-    htmlCell.setAttribute("game-is-known", stage[x][y].isKnown)
+    htmlCell.setAttribute("game-is-known", stage[x][y].isKnown);
   }
+  if (changedCells.length === 0) {
+    for (let x = 0; x < stage.length; x++) {
+      for (let y = 0; y < stage[x].length; y++) {
+        updateCell(x, y);
+      }
+    }
+  } else {
+    while (cell = changedCells.pop()) {
+      updateCell(cell.x, cell.y);
+    }
+  }
+
 }
 
 const floodFill = ({ stage, changedCells }, start, { rows, cols }) => {
