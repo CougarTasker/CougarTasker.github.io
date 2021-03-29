@@ -6,11 +6,17 @@ const createStage = ({ rows, cols }) => {
       const space = document.createElement('div');
       space.setAttribute('game-x', x.toString());
       space.setAttribute('game-y', y.toString());
+      space.setAttribute("game-is-known", false);
+      space.addEventListener("click", (e) => {
+        const x = parseInt(e.target.getAttribute('game-x'), 10);
+        const y = parseInt(e.target.getAttribute('game-y'), 10);
+        floodFill(view,{x,y},dimentions);
+        updateStage(view);
+      });
       game.appendChild(space);
     }
   }
 }
-
 const createView = ({ rows, cols, bombCount }) => {
   let stage = [];
   let changedCells = [];
@@ -29,11 +35,11 @@ const createView = ({ rows, cols, bombCount }) => {
   }
   const incrementSurronding = (x, y) => {
     const range = {
-      x:{
-        min: Math.max(0, x-1),
-        max: Math.min(rows-1, x + 1)
+      x: {
+        min: Math.max(0, x - 1),
+        max: Math.min(rows - 1, x + 1)
       },
-      y:{
+      y: {
         min: Math.max(0, y - 1),
         max: Math.min(cols - 1, y + 1)
       }
@@ -70,19 +76,38 @@ const updateStage = ({ stage, changedCells }) => {
     const { x, y } = cell;
     const htmlCell = document.querySelector(`div[game-x = "${x}"][game-y = "${y}"]`);
     htmlCell.textContent = stage[x][y].count;
+    htmlCell.setAttribute("game-is-known", stage[x][y].isKnown)
   }
 }
 
-const dimentions = { rows: 16, cols: 16, bombCount: 10 };
+const floodFill = ({ stage, changedCells }, start, { rows, cols }) => {
+  toFill = [start];
+  stage[start.x][start.y].isKnown = true;
+  changedCells.push(start);
+  const expand = (x, y, testInBounds) => {
+    if (testInBounds(x, y)) {
+      let newCell = stage[x][y];
+      if (!newCell.isKnown) {
+        newCell.isKnown = true;
+        changedCells.push({ x, y });
+        if (newCell.count === 0) {
+          toFill.unshift({ x, y });
+        }
+      }
+    }
+  }
+  while (toFill.length > 0) {
+    const { x, y } = toFill.pop();
+    expand(x - 1, y, x => x >= 0);
+    expand(x + 1, y, x => x < cols);
+    expand(x, y - 1, (x, y) => y >= 0);
+    expand(x, y + 1, (x, y) => y < rows);
+  }
+}
+const dimentions = { rows: 16, cols: 16, bombCount: 30 };
 createStage(dimentions);
-
-document.querySelector(`#inputs>.button`).addEventListener("click",()=>{
-  
-  const view = createView(dimentions);
+const view = createView(dimentions);
+document.querySelector(`#inputs>.button`).addEventListener("click", () => {
   updateStage(view);
 });
 
-document.querySelector(`#game>div`).addEventListener("click", (e) => {
-  const x = e.target.setAttribute('game-x');
-  const y = e.target.setAttribute('game-y');
-});

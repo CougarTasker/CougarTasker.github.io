@@ -55,36 +55,43 @@
       grid-auto-rows: 1fr;
       justify-items: stretch;
       align-items: stretch;
-      
+
     }
 
-    @media only screen and (max-width: 500px){
+    @media only screen and (max-width: 500px) {
       #game {
         font-size: 1.2rem;
       }
     }
-    @media only screen and (max-width: 400px){
+
+    @media only screen and (max-width: 400px) {
       #game {
         font-size: 1rem;
       }
     }
+
     #game::before {
       content: '';
       width: 0;
       padding-bottom: 100%;
       grid-row: 1 / 1;
       grid-column: 1 / 1;
-      
+
     }
 
     #game>*:first-child {
       grid-row: 1 / 1;
       grid-column: 1 / 1;
     }
-    #game>*{
+
+    #game>* {
       display: flex;
       justify-content: center;
       align-items: center;
+    }
+
+    #game>*[game-is-known="false"] {
+      background-color: grey;
     }
   </style>
 </head>
