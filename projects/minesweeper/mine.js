@@ -75,6 +75,7 @@ const updateStage = ({ stage, changedCells }) => {
     const htmlCell = document.querySelector(`div[game-x = "${x}"][game-y = "${y}"]`);
     htmlCell.textContent = stage[x][y].count;
     htmlCell.setAttribute("game-is-known", stage[x][y].isKnown);
+    htmlCell.setAttribute("game-is-bomb", stage[x][y].count < 0);
   }
   if (changedCells.length === 0) {
     for (let x = 0; x < stage.length; x++) {
@@ -91,9 +92,17 @@ const updateStage = ({ stage, changedCells }) => {
 }
 
 const floodFill = ({ stage, changedCells }, start, { rows, cols }) => {
-  toFill = [start];
-  stage[start.x][start.y].isKnown = true;
+
+  const startCell = stage[start.x][start.y];
+  startCell.isKnown = true;
   changedCells.push(start);
+  if (startCell.count > 0) {
+    return;
+  }
+  if (startCell.count < 0) {
+    return;
+  }
+  toFill = [start];
   const expand = (x, y, testInBounds) => {
     if (testInBounds(x, y)) {
       let newCell = stage[x][y];
@@ -106,6 +115,7 @@ const floodFill = ({ stage, changedCells }, start, { rows, cols }) => {
       }
     }
   }
+
   while (toFill.length > 0) {
     const { x, y } = toFill.pop();
     expand(x - 1, y, x => x >= 0);
