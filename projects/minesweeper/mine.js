@@ -122,6 +122,11 @@ const floodFill = ({ stage, changedCells }, start, { rows, cols }) => {
     expand(x + 1, y, x => x < cols);
     expand(x, y - 1, (x, y) => y >= 0);
     expand(x, y + 1, (x, y) => y < rows);
+
+    expand(x - 1, y - 1, x => (x, y) => x >= 0    && y >= 0);
+    expand(x - 1, y + 1, x => (x, y) => x >= 0    && y < rows);
+    expand(x + 1, y - 1, x => (x, y) => x < cols  && y >= 0);
+    expand(x + 1, y + 1, x => (x, y) => x < cols  && y < rows);
   }
 }
 const dimentions = { rows: 16, cols: 16, bombCount: 30 };
