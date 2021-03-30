@@ -124,6 +124,7 @@ const markCellAsBomb = (view, { x, y }) => {
       }
     }
   })
+  cell.ranges = [];
   return true;
 }
 
@@ -153,7 +154,7 @@ const makeCellKnown = (view, dimentions, { x, y }) => {
     }
   });
 
-
+  cell.ranges = [];
   return cell
 }
 const blankRange = { complete: false };
@@ -278,8 +279,9 @@ const nextStep = (view) => {
   const { knownBombRanges, knownSafeRanges } = view;
   let changed = false
   while (knownBombRanges.length > 0 && !changed) {
-    changed = knownBombRanges.pop().cells
-      .map(pos => markCellAsBomb(view, pos)).some(newVal => newVal)
+    const cells = knownBombRanges.pop().cells;
+    changed = 
+      cells.map(pos => markCellAsBomb(view, pos)).some(newVal => newVal);
   }
 
 
