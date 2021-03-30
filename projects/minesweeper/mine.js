@@ -12,11 +12,16 @@ const createStage = ({ rows, cols }) => {
         const x = parseInt(e.target.getAttribute('game-x'), 10);
         const y = parseInt(e.target.getAttribute('game-y'), 10);
         floodFill(view, { x, y }, dimentions);
-        updateStage(view);
+        updateStage(view)
       });
+      // space.addEventListener("contextmenu", e => {
+      // })
       game.appendChild(space);
     }
   }
+}
+const getRndInteger = (min, max) => {
+  return Math.floor(Math.random() * (max - min)) + min;
 }
 const createView = ({ rows, cols, bombCount }) => {
   let stage = [];
@@ -24,7 +29,7 @@ const createView = ({ rows, cols, bombCount }) => {
   let blankCell = { isMarked: false, isKnown: false, count: 0 };
   let knownBombRanges = [];
   let knownSafeRanges = [];
-  let unknownRanges = [];
+  let noIdeaCell = [];
   for (let x = 0; x < cols; x++) {
     let row = [];
     for (let y = 0; y < rows; y++) {
@@ -33,9 +38,7 @@ const createView = ({ rows, cols, bombCount }) => {
     stage[x] = row;
   }
   // min (included) and max (excluded):
-  const getRndInteger = (min, max) => {
-    return Math.floor(Math.random() * (max - min)) + min;
-  }
+
   const incrementSurronding = (x, y) => {
     surronudingCells({ x, y }, { rows, cols }, (x, y) => {
       const outsideItem = stage[x][y]
@@ -60,31 +63,55 @@ const createView = ({ rows, cols, bombCount }) => {
     changedCells,
     knownBombRanges,
     knownSafeRanges,
-    unknownRanges
+    noIdeaCell,
+    triggeredBomb: false,
+    markedCount: 0
   };
 }
-const updateStage = ({ stage, changedCells }, ignoreKnown = false) => {
+const updateStage = ({ stage, changedCells, markedCount, triggeredBomb }, ignoreKnown = false) => {
   let cell;
+  const htmlGame = document.querySelector(`#game`)
+  htmlGame.classList.remove("pass", "fail");
+  htmlMessage = document.querySelector(`#gameMessage`);
+  htmlMessage.textContent = null;
+  if (view.knownBombRanges.length == 0 && view.knownSafeRanges.length == 0) {
+    htmlMessage.textContent = "No certain options avalible making guess";
+  }
+  if (triggeredBomb) {
+    htmlMessage.textContent = "Failure bomb triggered";
+    htmlGame.classList.add("fail");
+  }
+  if (markedCount == dimentions.bombCount) {
+    htmlMessage.textContent = "Success mines cleared";
+    htmlGame.classList.add("pass");
+  }
+  const gameOver = triggeredBomb || markedCount == dimentions.bombCount
   const updateCell = (x, y) => {
     const htmlCell = document.querySelector(`div[game-x = "${x}"][game-y = "${y}"]`);
     const cell = stage[x][y];
+    if("steps" in cell){
+      htmlCell.style = `transition-delay: ${20*cell.steps}ms;`
+    }
     const count = cell.count
-    if (cell.isKnown || ignoreKnown) {
+    const cellKnown = cell.isKnown || ignoreKnown || gameOver
+    if (cell.isMarked) {
+      htmlCell.innerHTML = "&#9873;";
+    }else if (cellKnown) {
       if (count < 0) {
         htmlCell.innerHTML = "&times;";
       } else if (count > 0) {
         htmlCell.textContent = count;
       }
-    } else if (cell.isMarked) {
-      htmlCell.innerHTML = "&#9873;";
+    } else {
+      htmlCell.innerHTML = null;
     }
 
 
-    htmlCell.setAttribute("game-is-known", cell.isKnown);
+    htmlCell.setAttribute("game-is-known", cellKnown);
     htmlCell.setAttribute("game-is-marked", cell.isMarked);
     htmlCell.setAttribute("game-is-bomb", cell.count < 0);
   }
-  if (changedCells.length === 0) {
+  if (changedCells.length === 0 || gameOver) {
     for (let x = 0; x < stage.length; x++) {
       for (let y = 0; y < stage[x].length; y++) {
         updateCell(x, y);
@@ -103,23 +130,15 @@ const markCellAsBomb = (view, { x, y }) => {
     return false;
   }
   cell.isMarked = true;
+  view.markedCount += 1;
   view.changedCells.push({ x, y });
 
   cell.ranges.forEach(range => {
     if (!range.complete) {
-      if (range.cells.reduce((acc, cell) => view.stage[cell.x][cell.y].count < 0 ? acc + 1 : acc, 0) != range.bombs) {
-        console.log("incorrect bombCount " + JSON.stringify(cell));
-      }
       range.cells = range.cells.filter(cell => cell.x !== x || cell.y !== y);
       range.bombs--;
-      if (range.cells.reduce((acc, cell) => view.stage[cell.x][cell.y].count < 0 ? acc + 1 : acc, 0) != range.bombs) {
-        console.log("incorrect bombCount " + JSON.stringify(cell));
-      }
       if (range.bombs === 0) {
         range.complete = true;
-        if (range.cells.some(cell => view.stage[cell.x][cell.y].count < 0)) {
-          console.log("made unsafe safe zone " + JSON.stringify(cell));
-        }
         view.knownSafeRanges.push(range)
       }
     }
@@ -135,7 +154,7 @@ const makeCellKnown = (view, dimentions, { x, y }) => {
   }
   cell.isKnown = true;
   if (cell.count < 0) {
-    console.log("err bomb found");
+    view.triggeredBomb = true;
   }
   view.changedCells.push({ x, y });
 
@@ -217,7 +236,7 @@ const createRanges = (view, dimentions, { x, y }) => {
     }
   })
   intersectingRanges.forEach(range => {
-    splitRanges(view,range, newRange);
+    splitRanges(view, range, newRange);
   })
   if (newRange.cells.reduce((acc, cell) => view.stage[cell.x][cell.y].count < 0 ? acc + 1 : acc, 0) != newRange.bombs) {
     console.log("incorrect bombCount " + JSON.stringify(cell));
@@ -253,14 +272,16 @@ const floodFill = (view, start, dimentions) => {
     return false;
   }
   toFill = [start];
-
   while (toFill.length > 0) {
-    surronudingCells(toFill.pop(), dimentions, (x, y) => {
-      let newCell = stage[x][y];
+    current = toFill.pop();
+    const nextSteps = (current.steps ?? 0) + 1;
+    surronudingCells(current, dimentions, (x, y) => {
+      let newCell = stage[x][y];      
       if (!newCell.isKnown) {
+        newCell.steps = nextSteps;
         makeCellKnown(view, dimentions, { x, y });
         if (newCell.count === 0) {
-          toFill.unshift({ x, y });
+          toFill.unshift({ x, y, steps: nextSteps });
         }
       }
     });
@@ -269,7 +290,8 @@ const floodFill = (view, start, dimentions) => {
 }
 const dimentions = { rows: 16, cols: 16, bombCount: 30 };
 createStage(dimentions);
-let view
+let view = createView(dimentions);
+updateStage(view);
 document.querySelector(`#inputs>#startButton`).addEventListener("click", () => {
   view = createView(dimentions);
   updateStage(view);
@@ -277,21 +299,35 @@ document.querySelector(`#inputs>#startButton`).addEventListener("click", () => {
 
 const nextStep = (view) => {
   const { knownBombRanges, knownSafeRanges } = view;
-  let changed = false
-  while (knownBombRanges.length > 0 && !changed) {
+  while (knownBombRanges.length > 0 && view.changedCells.length == 0) {
     const cells = knownBombRanges.pop().cells;
-    changed = 
+    changed =
       cells.map(pos => markCellAsBomb(view, pos)).some(newVal => newVal);
   }
 
 
-  while (knownSafeRanges.length > 0 && !changed) {
+  while (knownSafeRanges.length > 0 && view.changedCells.length == 0) {
     changed = !knownSafeRanges.pop().cells
       .map(pos => floodFill(view, pos, dimentions)).some(newVal => newVal)
   }
+  if (view.changedCells.length == 0) {
+    let item, x, y;
+    //worst case senario just guess
+    do {
+      x = getRndInteger(0, dimentions.cols);
+      y = getRndInteger(0, dimentions.rows);
+      item = view.stage[x][y];
+    } while (item.isKnown || item.isMarked);
+    floodFill(view, { x, y }, dimentions);
+  }
+
 };
 
-document.querySelector(`#inputs>#stepButton`).addEventListener("click", () => {
-  nextStep(view);
+document.querySelector(`#inputs>#stepButton`).addEventListener("click", (e) => {
+  if (view.triggeredBomb || view.markedCount == dimentions.bombCount) {
+    view = createView(dimentions);
+  } else {
+    nextStep(view);
+  }
   updateStage(view);
 });

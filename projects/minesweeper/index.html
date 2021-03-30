@@ -55,7 +55,8 @@
       grid-auto-rows: 1fr;
       justify-items: stretch;
       align-items: stretch;
-
+      border-radius: 6px;
+      padding: 10px;
     }
 
     @media only screen and (max-width: 500px) {
@@ -79,23 +80,60 @@
 
     }
 
-    #game>*:first-child {
-      grid-row: 1 / 1;
-      grid-column: 1 / 1;
+
+
+    #gameMessage {
+      grid-column-start: 1;
+      grid-column-end: -1;
+      grid-row-start: 1;
+      display: flex;
+      margin: 0;
+      padding: 0;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Oswald', sans-serif;
     }
 
     #game>* {
       display: flex;
       justify-content: center;
       align-items: center;
+      transition: background ease 350ms;
     }
 
-    #game>*[game-is-known="false"] {
-      background-color: grey;
+    @keyframes flagged {
+      from {
+        transform: none;
+      }
+
+      to {
+        transform: scale(0.8);
+      }
     }
 
+    #game>*[game-is-known="false"], #game>*[game-is-known="true"][game-is-bomb="true"]{
+      background-color: #292e1e;
+      color: #f7fff7;
+    }
+
+    #game.fail{
+      background: linear-gradient(to bottom right, #ED254E, #FF8811);
+    }
+    #game.pass{
+      background: linear-gradient(to bottom right, #48a9a6, #9cde9f);
+    }
     #game>*[game-is-known="true"][game-is-bomb="true"] {
-      background-color: red;
+      border-radius: 100%;
+      margin: 1px;
+    }
+
+
+    #game>*[game-is-known="false"][game-is-marked="true"] {
+      animation-name: flagged;
+      animation-direction: alternate;
+      animation-duration: 250ms;
+      animation-timing-function:ease;
+      animation-iteration-count: 2;
     }
   </style>
 </head>
@@ -125,13 +163,13 @@
     </div>
     <div class="container">
       <div id="game">
-
+        <b id="gameMessage"></b>
       </div>
     </div>
 
     <div id="inputs" class="center container">
       <a class="button" id="startButton">
-        start
+        restart
         <span class="material-icons">play_arrow</span>
       </a>
       <a class="button" id="stepButton">
