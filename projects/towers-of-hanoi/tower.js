@@ -1,15 +1,16 @@
-$(document).ready(function(){
-			//start();
+
 			create(3);
-		});
-		$(window).on("load resize",function(){
-		  var outer = $(".canvas");
-		  var inner = $("canvas");
-		  	w = outer.width();
+    const canvasChange= ()=>{
+      var outer = document.querySelector(".canvas");
+		  var inner = document.querySelector("canvas");
+		  	w = getComputedStyle(outer).width.replace("px","");
 		  	h = w/3;
-		    inner.attr("height",h);
-		    inner.attr("width",w);
-		});
+		    inner.setAttribute("height",h);
+		    inner.setAttribute("width",w);
+    }
+	  window.addEventListener("load",canvasChange);
+    window.addEventListener("resize",canvasChange);
+    
 		var number
 		function create(n){
 			number = n;
@@ -18,10 +19,10 @@ $(document).ready(function(){
 			var s = new startHandeler(b);
 			count = [number,0,0];
 			c.start();
-			$("a.button").click(s.start);
-			$(".slider").on("input",function(event){
+			document.querySelector("a.button").addEventListener("click",s.start);
+      document.querySelector(".slider").addEventListener("input",event=>{
 				s.end(function(){
-					number = Number($(event.target).val());
+					number = Number(event.target.value);
 					count = [0,0,0];
 					nb = new block(number,s.b.x.get(),0);
 					c.updateBlocks(nb);
@@ -76,7 +77,7 @@ $(document).ready(function(){
 			this.col = col;
 			this.blocks = b;
 			var self = this
-			this.canvas = $("canvas")[0];
+			this.canvas = document.querySelector("canvas");
 			this.ctx = this.canvas.getContext("2d");
 			this.update = function(){
 
