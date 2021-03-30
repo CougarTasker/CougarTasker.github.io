@@ -334,3 +334,55 @@ document.querySelector(`#inputs>#stepButton`).addEventListener("click", (e) => {
   }
   updateStage(view);
 });
+
+const auto = async (max = 10000)=>{
+  let runs = 0;
+  let pass = 0;
+  const start=Date.now();
+  while (runs<max) {
+    await new Promise(res=>{
+      setTimeout(()=>{
+        if (view.triggeredBomb || view.markedCount == dimentions.bombCount) {
+          updateStage(view);
+          if(!view.triggeredBomb){
+            pass+=1;
+          }
+        runs+=1;
+        view = createView(dimentions);
+        } else {
+        nextStep(view);
+        view.changedCells = [];
+        }
+        res();
+      },0); 
+    })
+    
+  }
+    end=Date.now();
+   return {runs,pass,timediff:(end-start).toTimeString()};
+}
+const autoNoRefresh = async (max = 10000)=>{
+  let runs = 0;
+  let pass = 0;
+  const start=Date.now();
+  while (runs<max) {
+    await new Promise(res=>{
+      setTimeout(()=>{
+        if (view.triggeredBomb || view.markedCount == dimentions.bombCount) {
+          if(!view.triggeredBomb){
+            pass+=1;
+          }
+        runs+=1;
+        view = createView(dimentions);
+        } else {
+        nextStep(view);
+        view.changedCells = [];
+        }
+        res();
+      },0); 
+    })
+    
+  }
+  end=Date.now();
+   return {runs,pass,timediff:(end-start).toTimeString()};
+};
