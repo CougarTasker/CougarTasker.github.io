@@ -126,7 +126,7 @@ const markCellAsBomb = (view, { x, y }) => {
   })
   return true;
 }
-const blankRange = { complete: false };
+
 const makeCellKnown = (view, dimentions, { x, y }) => {
   let cell = view.stage[x][y];
   if (cell.isKnown) {
@@ -140,30 +140,7 @@ const makeCellKnown = (view, dimentions, { x, y }) => {
 
   if (cell.count > 0) {
     //skip zero cells as they aren't going to have any unknown cells areound them 
-    let newRange = Object.create(blankRange);
-    newRange.bombs = cell.count;
-    newRange.cells = [];
-    surronudingCells({ x, y }, dimentions, (xoff, yoff) => {
-      const surrondingCell = view.stage[xoff][yoff];
-      if (surrondingCell.isMarked) {
-        newRange.bombs--;
-      } else {
-        if (!surrondingCell.isKnown) {
-          newRange.cells.push({ x: xoff, y: yoff });
-          surrondingCell.ranges = [...surrondingCell.ranges ?? [], newRange];
-        }
-      }
-    })
-    if (newRange.cells.reduce((acc, cell) => view.stage[cell.x][cell.y].count < 0 ? acc + 1 : acc, 0) != newRange.bombs) {
-      console.log("incorrect bombCount " + JSON.stringify(cell));
-    }
-    if (newRange.bombs === newRange.cells.length) {
-      view.knownBombRanges.push(newRange);
-      newRange.complete = true;
-    } else if (newRange.bombs === 0) {
-      view.knownSafeRanges.push(newRange);
-      newRange.complete = true;
-    }
+    createRanges(view, dimentions, { x, y })
   }
 
   cell.ranges?.forEach(range => {
@@ -179,7 +156,73 @@ const makeCellKnown = (view, dimentions, { x, y }) => {
 
   return cell
 }
+const blankRange = { complete: false };
 
+const splitRanges = ({ stage }, a, b) => {
+  let onlyb = b.cells;
+  let onlya = a.cells;
+  onlya = onlya.filter(aitem => {
+    let int = false;
+    onlyb = onlyb.filter(bitem => {
+      if (aitem.x == bitem.x && aitem.y == bitem.y) {
+        int = true;
+        return false;
+      }
+      return true;
+    })
+    return !int;
+  });
+  const splitSuperSet = (sub, sup, splitCells) => {
+    let newRange = Object.create(blankRange);
+    newRange.bombs = sup.bombs - sub.bombs;
+    newRange.cells = splitCells;
+    newRange.cells.forEach(({ x, y }) => {
+      const subCell = stage[x][y];
+      subCell.ranges = [...subCell.ranges ?? [], newRange];
+    })
+    checkNewRangeForKnownValues(newRange);
+  }
+  if (onlya.length == 0 && onlyb.length > 0) {
+    splitSuperSet(a, b, onlyb);
+  }
+  if (onlyb.length == 0 && onlya.length > 0) {
+    splitSuperSet(b, a, onlya);
+  }
+}
+checkNewRangeForKnownValues = newRange => {
+  if (newRange.bombs === newRange.cells.length) {
+    view.knownBombRanges.push(newRange);
+    newRange.complete = true;
+  } else if (newRange.bombs === 0) {
+    view.knownSafeRanges.push(newRange);
+    newRange.complete = true;
+  }
+}
+const createRanges = (view, dimentions, { x, y }) => {
+  let newRange = Object.create(blankRange);
+  newRange.bombs = view.stage[x][y].count;
+  newRange.cells = [];
+  intersectingRanges = new Set();
+  surronudingCells({ x, y }, dimentions, (xoff, yoff) => {
+    const surrondingCell = view.stage[xoff][yoff];
+    if (surrondingCell.isMarked) {
+      newRange.bombs--;
+    } else {
+      if (!surrondingCell.isKnown) {
+        newRange.cells.push({ x: xoff, y: yoff });
+        surrondingCell.ranges = [...surrondingCell.ranges ?? [], newRange];
+        surrondingCell.ranges.forEach(range => intersectingRanges.add(range));
+      }
+    }
+  })
+  intersectingRanges.forEach(range => {
+    splitRanges(view,range, newRange);
+  })
+  if (newRange.cells.reduce((acc, cell) => view.stage[cell.x][cell.y].count < 0 ? acc + 1 : acc, 0) != newRange.bombs) {
+    console.log("incorrect bombCount " + JSON.stringify(cell));
+  }
+  checkNewRangeForKnownValues(newRange);
+}
 const surronudingCells = ({ x, y }, { rows, cols }, callback) => {
   const square = (x, y, testInBounds) => {
     if (testInBounds(x, y)) {
@@ -234,16 +277,16 @@ document.querySelector(`#inputs>#startButton`).addEventListener("click", () => {
 const nextStep = (view) => {
   const { knownBombRanges, knownSafeRanges } = view;
   let changed = false
-  while (knownBombRanges.length > 0 && !changed){
+  while (knownBombRanges.length > 0 && !changed) {
     changed = knownBombRanges.pop().cells
       .map(pos => markCellAsBomb(view, pos)).some(newVal => newVal)
   }
-      
 
-  while (knownSafeRanges.length > 0 && !changed){
+
+  while (knownSafeRanges.length > 0 && !changed) {
     changed = !knownSafeRanges.pop().cells
       .map(pos => floodFill(view, pos, dimentions)).some(newVal => newVal)
-    }
+  }
 };
 
 document.querySelector(`#inputs>#stepButton`).addEventListener("click", () => {
