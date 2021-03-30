@@ -65,7 +65,8 @@ const createView = ({ rows, cols, bombCount }) => {
     knownSafeRanges,
     noIdeaCell,
     triggeredBomb: false,
-    markedCount: 0
+    markedCount: 0,
+    firstMove:true
   };
 }
 const updateStage = ({ stage, changedCells, markedCount, triggeredBomb }, ignoreKnown = false) => {
@@ -260,6 +261,7 @@ const surronudingCells = ({ x, y }, { rows, cols }, callback) => {
   square(x + 1, y + 1, (x, y) => x < cols && y < rows);
 }
 const floodFill = (view, start, dimentions) => {
+  view.firstMove= false;
   const { stage, changedCells } = view;
   const startCell = makeCellKnown(view, dimentions, start);
   if (!startCell) {
@@ -298,6 +300,7 @@ document.querySelector(`#inputs>#startButton`).addEventListener("click", () => {
 });
 
 const nextStep = (view) => {
+  
   const { knownBombRanges, knownSafeRanges } = view;
   while (knownBombRanges.length > 0 && view.changedCells.length == 0) {
     const cells = knownBombRanges.pop().cells;
@@ -317,10 +320,10 @@ const nextStep = (view) => {
       x = getRndInteger(0, dimentions.cols);
       y = getRndInteger(0, dimentions.rows);
       item = view.stage[x][y];
-    } while (item.isKnown || item.isMarked);
+      //if first move don't allow it to fail.
+    } while (item.isKnown || item.isMarked || (view.firstMove && item.count !=0));
     floodFill(view, { x, y }, dimentions);
   }
-
 };
 
 document.querySelector(`#inputs>#stepButton`).addEventListener("click", (e) => {
