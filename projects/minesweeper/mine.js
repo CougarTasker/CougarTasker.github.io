@@ -157,10 +157,10 @@ const makeCellKnown = (view, dimentions, { x, y }) => {
     if (newRange.cells.reduce((acc, cell) => view.stage[cell.x][cell.y].count < 0 ? acc + 1 : acc, 0) != newRange.bombs) {
       console.log("incorrect bombCount " + JSON.stringify(cell));
     }
-    if(newRange.bombs === newRange.cells.length){
+    if (newRange.bombs === newRange.cells.length) {
       view.knownBombRanges.push(newRange);
       newRange.complete = true;
-    } else if (newRange.bombs === 0){
+    } else if (newRange.bombs === 0) {
       view.knownSafeRanges.push(newRange);
       newRange.complete = true;
     }
@@ -233,11 +233,17 @@ document.querySelector(`#inputs>#startButton`).addEventListener("click", () => {
 
 const nextStep = (view) => {
   const { knownBombRanges, knownSafeRanges } = view;
-  if (knownBombRanges.length > 0) {
-    knownBombRanges.pop().cells.map(pos => markCellAsBomb(view, pos))
-  } else if (knownSafeRanges.length > 0) {
-    knownSafeRanges.pop().cells.map(pos => floodFill(view, pos, dimentions))
+  let changed = false
+  while (knownBombRanges.length > 0 && !changed){
+    changed = knownBombRanges.pop().cells
+      .map(pos => markCellAsBomb(view, pos)).some(newVal => newVal)
   }
+      
+
+  while (knownSafeRanges.length > 0 && !changed){
+    changed = !knownSafeRanges.pop().cells
+      .map(pos => floodFill(view, pos, dimentions)).some(newVal => newVal)
+    }
 };
 
 document.querySelector(`#inputs>#stepButton`).addEventListener("click", () => {
