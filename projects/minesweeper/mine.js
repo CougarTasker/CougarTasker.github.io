@@ -7,6 +7,7 @@ const createStage = ({ rows, cols }) => {
       space.setAttribute('game-x', x.toString());
       space.setAttribute('game-y', y.toString());
       space.setAttribute("game-is-known", false);
+      space.setAttribute("game-is-marked", false);
       space.addEventListener("click", (e) => {
         const x = parseInt(e.target.getAttribute('game-x'), 10);
         const y = parseInt(e.target.getAttribute('game-y'), 10);
@@ -20,7 +21,10 @@ const createStage = ({ rows, cols }) => {
 const createView = ({ rows, cols, bombCount }) => {
   let stage = [];
   let changedCells = [];
-  let blankCell = { isKnown: false, count: 0 };
+  let blankCell = { isMarked: false, isKnown: false, count: 0 };
+  let knownBombRanges = [];
+  let knownSafeRanges = [];
+  let unknownRanges = [];
   for (let x = 0; x < cols; x++) {
     let row = [];
     for (let y = 0; y < rows; y++) {
@@ -33,27 +37,12 @@ const createView = ({ rows, cols, bombCount }) => {
     return Math.floor(Math.random() * (max - min)) + min;
   }
   const incrementSurronding = (x, y) => {
-    const range = {
-      x: {
-        min: Math.max(0, x - 1),
-        max: Math.min(rows - 1, x + 1)
-      },
-      y: {
-        min: Math.max(0, y - 1),
-        max: Math.min(cols - 1, y + 1)
+    surronudingCells({ x, y }, { rows, cols }, (x, y) => {
+      const outsideItem = stage[x][y]
+      if (outsideItem.count >= 0) {
+        outsideItem.count++;
       }
-    }
-
-    for (let offX = range.x.min; offX <= range.x.max; offX++) {
-      for (let offY = range.y.min; offY <= range.y.max; offY++) {
-        if (offX !== x || offY !== y) {
-          const outsideItem = stage[offX][offY]
-          if (outsideItem.count >= 0) {
-            outsideItem.count++;
-          }
-        }
-      }
-    }
+    })
   }
   let bombs = 0;
   while (bombs < bombCount) {
@@ -66,16 +55,34 @@ const createView = ({ rows, cols, bombCount }) => {
       incrementSurronding(x, y);
     }
   }
-  return { stage, changedCells };
+  return {
+    stage,
+    changedCells,
+    knownBombRanges,
+    knownSafeRanges,
+    unknownRanges
+  };
 }
-
-const updateStage = ({ stage, changedCells }) => {
+const updateStage = ({ stage, changedCells }, ignoreKnown = false) => {
   let cell;
   const updateCell = (x, y) => {
     const htmlCell = document.querySelector(`div[game-x = "${x}"][game-y = "${y}"]`);
-    htmlCell.textContent = stage[x][y].count;
-    htmlCell.setAttribute("game-is-known", stage[x][y].isKnown);
-    htmlCell.setAttribute("game-is-bomb", stage[x][y].count < 0);
+    const cell = stage[x][y];
+    const count = cell.count
+    if (cell.isKnown || ignoreKnown) {
+      if (count < 0) {
+        htmlCell.innerHTML = "&times;";
+      } else if (count > 0) {
+        htmlCell.textContent = count;
+      }
+    } else if (cell.isMarked) {
+      htmlCell.innerHTML = "&#9873;";
+    }
+
+
+    htmlCell.setAttribute("game-is-known", cell.isKnown);
+    htmlCell.setAttribute("game-is-marked", cell.isMarked);
+    htmlCell.setAttribute("game-is-bomb", cell.count < 0);
   }
   if (changedCells.length === 0) {
     for (let x = 0; x < stage.length; x++) {
@@ -90,49 +97,150 @@ const updateStage = ({ stage, changedCells }) => {
   }
 
 }
+const markCellAsBomb = (view, { x, y }) => {
+  let cell = view.stage[x][y];
+  if (cell.isMarked) {
+    return false;
+  }
+  cell.isMarked = true;
+  view.changedCells.push({ x, y });
 
-const floodFill = ({ stage, changedCells }, start, { rows, cols }) => {
+  cell.ranges.forEach(range => {
+    if (!range.complete) {
+      if (range.cells.reduce((acc, cell) => view.stage[cell.x][cell.y].count < 0 ? acc + 1 : acc, 0) != range.bombs) {
+        console.log("incorrect bombCount " + JSON.stringify(cell));
+      }
+      range.cells = range.cells.filter(cell => cell.x !== x || cell.y !== y);
+      range.bombs--;
+      if (range.cells.reduce((acc, cell) => view.stage[cell.x][cell.y].count < 0 ? acc + 1 : acc, 0) != range.bombs) {
+        console.log("incorrect bombCount " + JSON.stringify(cell));
+      }
+      if (range.bombs === 0) {
+        range.complete = true;
+        if (range.cells.some(cell => view.stage[cell.x][cell.y].count < 0)) {
+          console.log("made unsafe safe zone " + JSON.stringify(cell));
+        }
+        view.knownSafeRanges.push(range)
+      }
+    }
+  })
+  return true;
+}
+const blankRange = { complete: false };
+const makeCellKnown = (view, dimentions, { x, y }) => {
+  let cell = view.stage[x][y];
+  if (cell.isKnown) {
+    return false;
+  }
+  cell.isKnown = true;
+  if (cell.count < 0) {
+    console.log("err bomb found");
+  }
+  view.changedCells.push({ x, y });
 
-  const startCell = stage[start.x][start.y];
-  startCell.isKnown = true;
-  changedCells.push(start);
+  if (cell.count > 0) {
+    //skip zero cells as they aren't going to have any unknown cells areound them 
+    let newRange = Object.create(blankRange);
+    newRange.bombs = cell.count;
+    newRange.cells = [];
+    surronudingCells({ x, y }, dimentions, (xoff, yoff) => {
+      const surrondingCell = view.stage[xoff][yoff];
+      if (surrondingCell.isMarked) {
+        newRange.bombs--;
+      } else {
+        if (!surrondingCell.isKnown) {
+          newRange.cells.push({ x: xoff, y: yoff });
+          surrondingCell.ranges = [...surrondingCell.ranges ?? [], newRange];
+        }
+      }
+    })
+    if (newRange.cells.reduce((acc, cell) => view.stage[cell.x][cell.y].count < 0 ? acc + 1 : acc, 0) != newRange.bombs) {
+      console.log("incorrect bombCount " + JSON.stringify(cell));
+    }
+    if(newRange.bombs === newRange.cells.length){
+      view.knownBombRanges.push(newRange);
+      newRange.complete = true;
+    } else if (newRange.bombs === 0){
+      view.knownSafeRanges.push(newRange);
+      newRange.complete = true;
+    }
+  }
+
+  cell.ranges?.forEach(range => {
+    if (!range.complete) {
+      range.cells = range.cells.filter(cell => cell.x !== x || cell.y !== y);
+      if (range.cells.length === range.bombs) {
+        view.knownBombRanges.push(range);
+        range.complete = true;
+      }
+    }
+  });
+
+
+  return cell
+}
+
+const surronudingCells = ({ x, y }, { rows, cols }, callback) => {
+  const square = (x, y, testInBounds) => {
+    if (testInBounds(x, y)) {
+      callback(x, y);
+    }
+  }
+  square(x - 1, y, x => x >= 0);
+  square(x + 1, y, x => x < cols);
+  square(x, y - 1, (x, y) => y >= 0);
+  square(x, y + 1, (x, y) => y < rows);
+
+  square(x - 1, y - 1, (x, y) => x >= 0 && y >= 0);
+  square(x - 1, y + 1, (x, y) => x >= 0 && y < rows);
+  square(x + 1, y - 1, (x, y) => x < cols && y >= 0);
+  square(x + 1, y + 1, (x, y) => x < cols && y < rows);
+}
+const floodFill = (view, start, dimentions) => {
+  const { stage, changedCells } = view;
+  const startCell = makeCellKnown(view, dimentions, start);
+  if (!startCell) {
+    return false;
+  }
   if (startCell.count > 0) {
-    return;
+    return true;
   }
   if (startCell.count < 0) {
-    return;
+    return false;
   }
   toFill = [start];
-  const expand = (x, y, testInBounds) => {
-    if (testInBounds(x, y)) {
+
+  while (toFill.length > 0) {
+    surronudingCells(toFill.pop(), dimentions, (x, y) => {
       let newCell = stage[x][y];
       if (!newCell.isKnown) {
-        newCell.isKnown = true;
-        changedCells.push({ x, y });
+        makeCellKnown(view, dimentions, { x, y });
         if (newCell.count === 0) {
           toFill.unshift({ x, y });
         }
       }
-    }
+    });
   }
-
-  while (toFill.length > 0) {
-    const { x, y } = toFill.pop();
-    expand(x - 1, y, x => x >= 0);
-    expand(x + 1, y, x => x < cols);
-    expand(x, y - 1, (x, y) => y >= 0);
-    expand(x, y + 1, (x, y) => y < rows);
-
-    expand(x - 1, y - 1, x => (x, y) => x >= 0    && y >= 0);
-    expand(x - 1, y + 1, x => (x, y) => x >= 0    && y < rows);
-    expand(x + 1, y - 1, x => (x, y) => x < cols  && y >= 0);
-    expand(x + 1, y + 1, x => (x, y) => x < cols  && y < rows);
-  }
+  return true;
 }
 const dimentions = { rows: 16, cols: 16, bombCount: 30 };
 createStage(dimentions);
-const view = createView(dimentions);
-document.querySelector(`#inputs>.button`).addEventListener("click", () => {
+let view
+document.querySelector(`#inputs>#startButton`).addEventListener("click", () => {
+  view = createView(dimentions);
   updateStage(view);
 });
 
+const nextStep = (view) => {
+  const { knownBombRanges, knownSafeRanges } = view;
+  if (knownBombRanges.length > 0) {
+    knownBombRanges.pop().cells.map(pos => markCellAsBomb(view, pos))
+  } else if (knownSafeRanges.length > 0) {
+    knownSafeRanges.pop().cells.map(pos => floodFill(view, pos, dimentions))
+  }
+};
+
+document.querySelector(`#inputs>#stepButton`).addEventListener("click", () => {
+  nextStep(view);
+  updateStage(view);
+});
