@@ -1,0 +1,19 @@
+// Sass configuration
+{
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
+  // for the documentation about the tasks.json format
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Sass Compile",
+      "type": "shell",
+      "command": "for name in $(find . -regextype posix-egrep -regex '.*\\.scss' | grep -oP '.*(?=\\.)'); do node-sass $name.scss $name.css; done",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    }
+  ]
+}//for name in $(find . -regextype posix-egrep -regex '.*\\.scss' | grep -oP '.*(?=\\.)'); do node-sass $name.scss $name.css;
+//for name in $(find . -regextype posix-egrep -regex '.*\.scss' | grep -oP '.*(?=\.)'); do node-sass $name.scss $name.css;

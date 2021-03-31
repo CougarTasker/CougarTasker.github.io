@@ -7,12 +7,6 @@ $teal:#48a9a6;
 $orange:#FF8811;
 $red:#ED254E;
 //generic setup stuff
-*{
-  user-select: none;
-  -ms-user-select: none;
-  -moz-user-select: none;
-  -webkit-user-select: none;
-}
 html {
   scroll-behavior: smooth;
 }
@@ -20,30 +14,7 @@ body{
   font-family: 'Roboto', sans-serif;
   background-color: $white;
   color:$black;
-  font-size:1.5rem;
 }
-.center{
-  text-align: center;
-}
-.left{
-  text-align: left;
-}
-.right{
-  text-align: right;
-}
-// a{//generic link formating
-//  text-decoration: none;
-//  color: $red;
-//  transition: box-shadow ease 0.5s;
-//  // background: -webkit-linear-gradient($green, $teal);
-//  //  -webkit-background-clip: text;
-//  //  -webkit-text-fill-color: transparent;
-// }
-// a:hover{
-//  -webkit-box-shadow: 0px 3px 0px 0px $red;
-// -moz-box-shadow: 0px 3px 0px 0px $red;
-// box-shadow: 0px 3px 0px 0px $red;
-// }
 
 p{
     user-select: text;
@@ -140,7 +111,7 @@ nav, .nav-height{
 @media only screen and (min-width: 768px){
     /* For desktop: */
   nav, .nav-height{
-  font-size: 1.8rem;
+  font-size: 1.6rem;
 }
 .container{
   padding: 0.5em 20%;
@@ -178,84 +149,7 @@ text-decoration:none;
     width: 100%;
   }
 }
-//parralax separtaor 
-.separator{
-  height: 5em;
-  overflow: hidden;
-  position:relative;
-}
-.separator > .shadow-inner{
-  width: 100%;
-  height: 100%;
-  position:absolute;
-  z-index:2;
-  left: 0;
-  top:0;
-}
-.separator > .pattern{
-    width: 100%;
-    z-index:1;
-  height: 200%;
-  position:absolute;
-  left: 0;
-  top:0;
-  // credit to https://leaverou.github.io/css3patterns/
-background:
-linear-gradient(45deg, $green 45px, transparent 45px)64px 64px,
-linear-gradient(45deg, $green 45px, transparent 45px,transparent 91px, $teal 91px, $teal 135px, transparent 135px),
-linear-gradient(-45deg, $green 23px, transparent 23px, transparent 68px,$green 68px,$green 113px,transparent 113px,transparent 158px,$green 158px);
-background-color:$teal;
-background-size: 128px 128px;
-}
-//project styling this is used in multiple places
-.project{
-  color: $white;
-  background-color:$black;
-  border-radius:0.8em;
-  padding:0.8em;
-  margin-bottom: 0.8em;
-}
-.project>*:last-child{
-  margin-bottom:0;
-}
-.project>*:first-child{
-  margin-top:0;
-}
-.project>img{
-  max-width: 100%;
-  max-height: 80vh;
-  min-width: 20vw;
-  min-height:4em;
-  object-fit: cover;
-  display: block;
-  width: auto;
-  border-radius:0.8em;
-  margin: 0.8em auto;
-}
-.project a{
-  text-decoration: none;
-  color: $white;
-  padding:0.3em;
-  background: $black;
-  border-radius:  0.2em;
-  display:inline-block;
-  transition: box-shadow ease 1s;
-  margin:0 auto;
-  //background-color:darken($black,5);
-      -webkit-box-shadow: inset 0px 0px 0px 1px $white;
-  -moz-box-shadow: inset 0px 0px 0px 1px $white;
-  box-shadow: inset 0px 0px 0px 1px $white;
-  &:active{
-    background: linear-gradient(to right, $green, $teal);
-        -webkit-box-shadow: inset 0px 0px 0px 0px $white;
-  -moz-box-shadow: inset 0px 0px 0px 0px $white;
-  box-shadow: inset 0px 0px 0px 0px $white;
-  }
-  &>span{
-    display: inline-block;
-    vertical-align: middle;
-  }
-}
+
 //footer styling
 footer,.footer-height{
   font-size:1rem;
@@ -279,6 +173,21 @@ footer.fixed{
   right: 0;
   z-index: 99;
 }
+// link styling 
+// a{
+//  text-decoration: none;
+//  color: $red;
+//  transition: box-shadow ease 0.5s;
+//  // background: -webkit-linear-gradient($green, $teal);
+//  //  -webkit-background-clip: text;
+//  //  -webkit-text-fill-color: transparent;
+// }
+// a:hover{
+//  -webkit-box-shadow: 0px 3px 0px 0px $red;
+// -moz-box-shadow: 0px 3px 0px 0px $red;
+// box-shadow: 0px 3px 0px 0px $red;
+// }
+
 a.button{
   $border: 0.2em;
   position: relative;
@@ -312,4 +221,21 @@ a.button{
     display: inline-block;
     vertical-align: middle;
   }
+}
+
+//responsive images
+.responsive {
+  max-width: 100%;
+  height: auto;
+}
+//fullheight pages 
+.page{
+ min-height: 100vh;
+ display: flex;
+ flex-direction: column;
+ align-items: stretch;
+ justify-content: space-between;
+}
+.spacer{
+  flex-grow: 1;
 }

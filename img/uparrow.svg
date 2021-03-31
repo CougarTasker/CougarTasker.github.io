@@ -1,0 +1,5 @@
+<?xml version="1.0" standalone="no"?>
+<svg width="100" height="20" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <desc>upwards arrow</desc>
+  <polygon class="uparrow" points="100,20 0,20 20,0" fill="#292e1e" stroke="none" />
+</svg>

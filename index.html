@@ -2,120 +2,82 @@
 <html class="no-js" lang="en">
 
 <head>
-	<meta charset="utf-8">
-	<title>Cougar Tasker</title>
-	<meta name="description" content="Hello, I am Cougar Tasker a computer science student and here is my website where I post my projects and a little bit about myself.">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="manifest" href="site.webmanifest">
+  <meta charset="utf-8">
+  <title>Cougar Tasker</title>
+  <meta name="description"
+    content="Hello, I am Cougar Tasker a computer science student and here is my website where I post some my projects">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="manifest" href="site.webmanifest">
 
-	<!-- add the relavent icons -->
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2">
-<link rel="mask-icon" href="/safari-pinned-tab.svg?v=2" color="#5bbad5">
-<meta name="msapplication-TileColor" content="#2b5797">
+  <!-- add the relavent icons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg?v=2" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#2b5797">
 
-	<link rel="stylesheet" href="css/normalize.css">
-	<link rel="stylesheet" href="css/home.css">
-	<link rel="stylesheet" href="css/main.css">
-	<!-- include fonts and icon set from google -->
-	<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500&family=Roboto&display=swap" rel="stylesheet">
-	<link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" rel="stylesheet">
-	<meta name="theme-color" content="#292e1e">
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/home.css">
+  <link rel="stylesheet" href="css/main.css">
+  <!-- include fonts and icon set from google -->
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500&family=Roboto&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#292e1e">
 </head>
 
 <body>
-	<!--[if IE]>
+  <!--[if IE]>
 		<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
 	<![endif]-->
-	
-	<nav class="container shadow">
-		<a href="/"><img src="img/icon2.svg" alt="CT homepage"></a>
-		<ul>
-			<li class="active"><a href="#about">About</a></li>
-			<li><a href="/projects">Projects</a></li>
-			<li><a href="/contact">Contact</a></li>
-		</ul>
-	</nav>
-	<header id="header">
-		<div id="nav-spacer" class="nav-height container">
-			<br/>
-		</div>
-		<div id="header-text" class="container">
-			Hello I am
-		</div>
-		
-		<h1 style="display:none;">Cougar Tasker</h1>
-		<div class="chromefix">
-			<img id="name-image" src="img/cougar_tasker_title.svg" alt="Cougar Tasker">
-		</div>
-		<a class="scroll" href="#about">
-			<span class="material-icons">keyboard_arrow_up</span>
-		</a>
-	</header>
-	<div id="about" class="container">
-		<h2>About Me</h2>
-		<p>
-		I’m a first-year Computer Science (Artificial Intelligence) MSci student at the Royal Holloway University of London. I am from West Sussex but was born in Byron Bay, Australia. I enjoy playing badminton the Rubix cube and all things computing especially AI and graphics! 
-		</p>
-	</div>
-	<div class="separator">
-		 <div class="pattern"></div>
-		<div class="shadow-inner"></div>
 
-	</div>
-	<div id="project-section" class="container">
-		<h2>Programming</h2>
-		<p>
-		I love programming and have made a range of different programs from games to AI to beat them. Here is an example of the latest stuff I have been working on: 
-		</p>
-		<div class="center">
-			<a class="button" href="/projects">view more<span class="material-icons">arrow_forward</span></a>
-		</div>
-	</div>
-	<footer class="container">
-				<a href="https://creativecommons.org/licenses/by-sa/4.0/">
-					<img src="img/ccheart_red.svg" alt="creative commons shareAlike 4.0">
-			 Cougar Tasker 2020</a>
-	</footer>
-	<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-	<script>window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')</script>
 
-	<script defer type="text/javascript">
-		$(window).on('load',function(){
-			var w =  $(window);
-		 	w.scroll(function(event){
-				var p = ($(".separator").position().top-w.scrollTop())/w.height()
-				$(".separator > .pattern").css("transform","translateY("+(-p*100/1.7)+"%)");
-			});
-		 });
-		$(window).on('load',function(){
-		    $.getJSON("projects/posts.json", function(result){
-		    	var values = result[0];
-		    	var html = $("<div></div>").addClass("project").addClass("shadow");
-		    	html.append($("<h2></h2>").text(values.title));
-		    	for(x in values.parts){
-		    		part = values.parts[x];
-		    		if(part.type == "text"){
-		    			html.append($("<p></p>").text(part.text));
-		    		}else if(part.type == "link"){
-		    			var btn = $("<a></a>").html(part.text+"<span class=\"material-icons\">arrow_forward</span>").attr("href",part.url);
-		    			html.append($("<div></div>").addClass("center").html(btn));
-		    		}else if(part.type == "img"){
-		    			html.append($("<img>").attr("src",part.url).attr("alt",part.alt).addClass("shadow"));
-		    		}
-		    	}
-		    	$("#project-section>p").after(html);
-		    });
-		});
-	</script>
+  <div class="page">
+    <nav class="container shadow">
+      <a href="/"><img src="img/icon2.svg" alt="CT homepage"></a>
+      <ul>
+        <li class="active"><a href="#about">About</a></li>
+        <li><a href="/projects">Projects</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+    </nav>
+    <div id="nav-spacer" class="nav-height container">
+      <br />
+    </div>
+    <div id="header-text" class="container">
+      Hello i'm
+    </div>
+    <h1 style="display:none;">Cougar Tasker</h1>
+    <div class="container">
+      <img class="responsive" src="img/cougar_tasker_title.svg" alt="Cougar Tasker">
+    </div>
+    <img class="" width="100" height="20" id="uparrow" src="img/uparrow.svg" alt="an upwards arrow">
+  </div>
+  <div class="page" id="about">
+    <div class="container">
+      <h2>About Me</h2>
+      <p>
+        I’m a first-year Computer Science (Artificial Intelligence) MSci student at the Royal Holloway University of
+        London.
+        I am from West Sussex but was born in Byron Bay, Australia. I enjoy playing badminton the Rubix cube and all
+        things
+        computing especially AI and graphics!
+      </p>
+    </div>
+    <div class="spacer"></div>
+    <footer class="container">
+      <a href="https://creativecommons.org/licenses/by-sa/4.0/">
+        <img src="img/ccheart_red.svg" alt="creative commons shareAlike 4.0">
+        Cougar Tasker 2020</a>
+    </footer>
+  </div>
 
-	<!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
-	<script>
-		window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
-		ga('create', 'UA-XXXXX-Y', 'auto'); ga('set','transport','beacon'); ga('send', 'pageview')
-	</script>
-	<script src="https://www.google-analytics.com/analytics.js" async></script>
+
+  <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-XXXXX-Y', 'auto'); ga('set', 'transport', 'beacon'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async></script>
 </body>
 
 </html>
