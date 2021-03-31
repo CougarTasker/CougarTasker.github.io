@@ -56,7 +56,8 @@ nav li:hover:not(.active):active {
   box-shadow: inset 5px 5px 28px 2px rgba(0, 0, 0, 0.66); }
 
 .container {
-  padding: 0 5%; }
+  padding-left: 5%;
+  padding-right: 5%; }
 
 nav img {
   height: 1.5em;
@@ -108,7 +109,8 @@ nav,
   .nav-height {
     font-size: 1.4rem; }
   .container {
-    padding: 0 10%; } }
+    padding-left: 10%;
+    padding-right: 10%; } }
 
 @media only screen and (min-width: 768px) {
   /* For desktop: */
@@ -116,7 +118,8 @@ nav,
   .nav-height {
     font-size: 1.5rem; }
   .container {
-    padding: 0 20%; }
+    padding-left: 20%;
+    padding-right: 20%; }
   nav > a {
     left: 20%; } }
 
