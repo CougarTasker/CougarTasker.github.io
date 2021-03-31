@@ -1,7 +1,32 @@
 @import "main.scss";
 //style sheat for the home page
-#uparrow{
+
+#intro{
+  min-height: 50vh;
+}
+#about {
+  background-color: $black;
+  color: $white;
+  flex-grow: 1;
+}
+
+#intro>*{
+  margin-bottom: 3rem;
+}
+#uparrow {
   width: 100%;
-  height: auto;
-  max-height: 10vh;
+  height: 55px;
+  margin: 0;
+}
+@media only screen and (min-width: 600px) {
+  /* For tablets: */
+  #uparrow {
+    height: 65px;
+  }
+}
+@media only screen and (min-width: 768px) {
+  /* For desktop: */
+  #uparrow {
+    height: 80px;
+  }
 }

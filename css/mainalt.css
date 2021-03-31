@@ -87,19 +87,18 @@ nav, .nav-height {
   /* For tablets: */
   nav, .nav-height {
     font-size: 1.5rem; }
-
   .container {
     padding: 0.5em 10%; } }
+
 @media only screen and (min-width: 768px) {
   /* For desktop: */
   nav, .nav-height {
     font-size: 1.8rem; }
-
   .container {
     padding: 0.5em 20%; }
-
   nav > a {
     left: 20%; } }
+
 h1, h2 {
   font-family: 'Oswald', sans-serif;
   margin: 0.3em 0; }
@@ -215,5 +214,3 @@ a.button {
   a.button > span {
     display: inline-block;
     vertical-align: middle; }
-
-/*# sourceMappingURL=mainalt.css.map */

@@ -1,149 +1,183 @@
 //for consistant colors
-$black:#292e1e;
-$white:#f7fff7;
-$blue:#7BDFF2;
-$green:#9cde9f;
-$teal:#48a9a6;
-$orange:#FF8811;
-$red:#ED254E;
+$black: #292e1e;
+$white: #f7fff7;
+$blue: #7bdff2;
+$green: #9cde9f;
+$teal: #48a9a6;
+$orange: #ff8811;
+$red: #ed254e;
 //generic setup stuff
 html {
   scroll-behavior: smooth;
 }
-body{
-  font-family: 'Roboto', sans-serif;
+body,
+.page {
+  font-family: "Roboto", sans-serif;
   background-color: $white;
-  color:$black;
-}
+  color: $black;
 
-p{
-    user-select: text;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-between;
+}
+//fullheight pages
+body {
+  min-height: 100vh;
+}
+.spacer {
+  flex-grow: 1;
+}
+p {
+  user-select: text;
   -ms-user-select: text;
   -moz-user-select: text;
   -webkit-user-select: text;
-  &::selection{
-    background-color:$teal;
+  &::selection {
+    background-color: $teal;
     color: $white;
   }
 }
 
-nav{
+nav {
   position: fixed;
   top: 0;
-  left:0;
-  right:0;
-    z-index: 100;
-  color: white;
-  background-color:transparentize($black,0.15);
+  left: 0;
+  right: 0;
+  z-index: 100;
+  color: $white;
+  background-color: transparentize($black, 0.15);
   /*background:inherit;*/
   backdrop-filter: blur(7px);
-  text-align: right;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 }
 //allow for drop shaddows
-.shadow,nav li.active, a.button:hover, nav li:hover:not(.active):active{
-  -webkit-box-shadow: 5px 5px 28px 2px rgba(0,0,0,0.66);
--moz-box-shadow: 5px 5px 28px 2px rgba(0,0,0,0.66);
-box-shadow: 5px 5px 28px 2px rgba(0,0,0,0.66);
+.shadow,
+nav li.active,
+a.button:hover,
+nav li:hover:not(.active):active {
+  -webkit-box-shadow: 5px 5px 28px 2px rgba(0, 0, 0, 0.66);
+  -moz-box-shadow: 5px 5px 28px 2px rgba(0, 0, 0, 0.66);
+  box-shadow: 5px 5px 28px 2px rgba(0, 0, 0, 0.66);
 }
-.shadow-inner{
-  -webkit-box-shadow:inset 5px 5px 28px 2px rgba(0,0,0,0.66);
--moz-box-shadow:inset 5px 5px 28px 2px rgba(0,0,0,0.66);
-box-shadow:inset 5px 5px 28px 2px rgba(0,0,0,0.66);
+.shadow-inner {
+  -webkit-box-shadow: inset 5px 5px 28px 2px rgba(0, 0, 0, 0.66);
+  -moz-box-shadow: inset 5px 5px 28px 2px rgba(0, 0, 0, 0.66);
+  box-shadow: inset 5px 5px 28px 2px rgba(0, 0, 0, 0.66);
 }
 //consistant padding for containers
-.container{
-  padding: 0.5em 5%;
+.container {
+  padding: 0 5%;
 }
 //style the nav bar
-nav img{
-  display:block;
-  max-height: 1.5em;
+nav img {
+  height: 1.5em;
   min-height: 1.5em;
-  width:auto;
+  width: auto;
+  display: block;
+  float: left;
 }
-  
-nav>a{
-  left:5%;
-  position:absolute;
-  top:0.35em;
+nav > a {
+  &::after {
+    content: "";
+    clear: both;
+    display: table;
+  }
 }
-nav ul{
+nav ul {
   margin: 0;
   padding: 0;
+}
+nav li {
   display: inline-block;
-}
-nav li{
-  display: inline;
-  padding:0.15em 0.25em;
+  padding: 0.15em 0.25em;
   transition-property: background, box-shadow;
-  transition-duration:0.5s;
-  transition-timing-function:ease;
-  border-radius:0.35em;
+  transition-duration: 0.5s;
+  transition-timing-function: ease;
+  border-radius: 0.35em;
 }
-nav li.active,nav li:active{
+nav li.active,
+nav li:active {
   background-image: linear-gradient(to bottom right, $green, $teal);
-  padding:0.15em 0.25em;
+  padding: 0.15em 0.25em;
 }
 
-nav li:hover:not(.active):not(:active), .project a:hover:not(:active){
-  background-color:$black;
-  -webkit-box-shadow: inset 0px 0px 0px 3px $white, 5px 5px 28px 2px rgba(0,0,0,0.66);
-  -moz-box-shadow: inset 0px 0px 0px 3px $white, 5px 5px 28px 2px rgba(0,0,0,0.66);
-  box-shadow: inset 0px 0px 0px 3px $white, 5px 5px 28px 2px rgba(0,0,0,0.66);
+nav li:hover:not(.active):not(:active),
+.project a:hover:not(:active) {
+  background-color: $black;
+  -webkit-box-shadow: inset 0px 0px 0px 3px $white,
+    5px 5px 28px 2px rgba(0, 0, 0, 0.66);
+  -moz-box-shadow: inset 0px 0px 0px 3px $white,
+    5px 5px 28px 2px rgba(0, 0, 0, 0.66);
+  box-shadow: inset 0px 0px 0px 3px $white, 5px 5px 28px 2px rgba(0, 0, 0, 0.66);
 }
-nav a{
+nav a {
   text-decoration: none;
   color: $white;
 }
-nav, .nav-height{
-  font-size: 1.3rem;
+nav,
+.nav-height {
+  font-size: 1.2rem;
 }
 //scale the nav bar and containers for larger devices
 @media only screen and (min-width: 600px) {
   /* For tablets: */
-  nav, .nav-height{
-  font-size: 1.5rem;
+  nav,
+  .nav-height {
+    font-size: 1.4rem;
+  }
+  .container {
+    padding: 0 10%;
+  }
 }
-.container{
-  padding: 0.5em 10%;
+@media only screen and (min-width: 768px) {
+  /* For desktop: */
+  nav,
+  .nav-height {
+    font-size: 1.5rem;
+  }
+  .container {
+    padding: 0 20%;
+  }
+  nav > a {
+    left: 20%;
+  }
 }
+//vertical paddding for the navbar
+nav {
+  $nav-padding: 0.2em;
+  padding-top: $nav-padding;
+  padding-bottom: $nav-padding;
 }
-@media only screen and (min-width: 768px){
-    /* For desktop: */
-  nav, .nav-height{
-  font-size: 1.6rem;
-}
-.container{
-  padding: 0.5em 20%;
-}
-nav>a{
-  left:20%;
-}
-}
-
 //custom headings syll with undeline
-h1,h2{
-  font-family: 'Oswald', sans-serif;
+h1,
+h2 {
+  font-family: "Oswald", sans-serif;
   margin: 0.3em 0;
 }
-h1{
-    font-size:3rem;
+h1 {
+  font-size: 3rem;
 }
-h2{
-    font-size:2.5rem;
+h2 {
+  font-size: 2.5rem;
 }
 
-h1,h2,a.underline{
-display:inline-block;
-position:relative;
-text-decoration:none;
+h1,
+h2,
+a.underline {
+  display: inline-block;
+  position: relative;
+  text-decoration: none;
 
   &::after {
     $height: 0.1em;
-    position:absolute;
-    content: '';    
-    left:0;
-    bottom:-$height;
+    position: absolute;
+    content: "";
+    left: 0;
+    bottom: -$height;
     background-image: linear-gradient(to bottom right, $green, $teal);
     height: $height;
     width: 100%;
@@ -151,29 +185,31 @@ text-decoration:none;
 }
 
 //footer styling
-footer,.footer-height{
-  font-size:1rem;
+footer,
+.footer-height {
+  font-size: 1rem;
 }
-footer, footer>a{
-  color:$white;
-  background-color:$black;
+footer,
+footer > a {
+  color: $white;
+  background-color: $black;
   text-decoration: none;
 }
-footer img{
+footer img {
   margin: 0 0.2em;
   display: inline-flex;
   vertical-align: middle;
-  max-height:1em;
-  width:auto;
+  max-height: 1em;
+  width: auto;
 }
-footer.fixed{
-  position:fixed;
-  bottom:0;
+footer.fixed {
+  position: fixed;
+  bottom: 0;
   left: 0;
   right: 0;
   z-index: 99;
 }
-// link styling 
+// link styling
 // a{
 //  text-decoration: none;
 //  color: $red;
@@ -188,36 +224,39 @@ footer.fixed{
 // box-shadow: 0px 3px 0px 0px $red;
 // }
 
-a.button{
+a.button {
   $border: 0.2em;
   position: relative;
-  padding:$border;
+  padding: $border;
   box-sizing: border-box;
   text-decoration: none;
   color: $white;
   background: $black;
   background-clip: padding-box; /* !importanté */
   border: solid $border transparent; /* !importanté */
-  border-radius:  2 * $border;
-  display:inline-block;
+  border-radius: 2 * $border;
+  display: inline-block;
   transition: box-shadow ease 1s;
-  margin:0 auto;
+  margin: 0 auto;
   //background-color:darken($black,5);
   &::before {
-    content: '';
-    background-color:$white;
+    content: "";
+    background-color: $white;
     position: absolute;
-    top: 0; right: 0; bottom: 0; left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     z-index: -1;
     margin: -$border; /* !importanté */
     border-radius: inherit; /* !importanté */
     background: linear-gradient(to right, $green, $teal);
   }
-  &:active{
+  &:active {
     background: linear-gradient(to right, $green, $teal);
     background-clip: padding-box;
   }
-  &>span{
+  & > span {
     display: inline-block;
     vertical-align: middle;
   }
@@ -227,15 +266,4 @@ a.button{
 .responsive {
   max-width: 100%;
   height: auto;
-}
-//fullheight pages 
-.page{
- min-height: 100vh;
- display: flex;
- flex-direction: column;
- align-items: stretch;
- justify-content: space-between;
-}
-.spacer{
-  flex-grow: 1;
 }
