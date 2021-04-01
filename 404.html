@@ -6,50 +6,36 @@
   <title>404 - Cougar Tasker</title>
   <meta name="description" content="error 404. Sorry, the page you are looking for does not exist">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="manifest" href="site.webmanifest">
 
   <!-- add the relavent icons -->
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2">
-<link rel="icon" type="/image/png" sizes="32x32" href="/favicon-32x32.png?v=2">
-<link rel="icon" type="/image/png" sizes="16x16" href="/favicon-16x16.png?v=2">
-<link rel="manifest" href="/site.webmanifest">
-<link rel="mask-icon" href="/safari-pinned-tab.svg?v=2" color="#5bbad5">
-<meta name="msapplication-TileColor" content="#2b5797">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg?v=2" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#2b5797">
 
-  <link rel="stylesheet" href="/css/normalize.css">
-  <link rel="stylesheet" href="/css/mainalt.css">
-
+  <link rel="stylesheet" href="css/normalize.min.css">
+  <link rel="stylesheet" href="css/mainalt.css">
   <!-- include fonts and icon set from google -->
-  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500&family=Roboto&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap"
-      rel="stylesheet">
-  <meta name="theme-color" content="#292e1e">
-  <style type="text/css">
-    .main{
-      height:100vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction:column;
-  justify-content: space-between;
-  align-items:flex-start;
-  padding-bottom: 0;
-  padding-top: 0;
-  overflow: hidden;
-    }
-    main>*{
-      margin:0;
-    }
-    .center{
-      width: 100%;
-    }
-  </style>
+  <link rel="dns-prefetch" href="//fonts.googleapis.com">
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500&family=Roboto&display=swap"
+    as="style" onload="this.onload=null;this.rel='stylesheet'" />
+  <link rel="preload" href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" as="style"
+    onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500&family=Roboto&display=swap" rel="stylesheet"
+      type="text/css" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" rel="stylesheet">
+  </noscript>
+
+  <meta name="theme-color" content="#ed254e">
 </head>
 
 <body style="overflow: hidden;">
   <!--[if IE]>
     <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
   <![endif]-->
-  
+
   <nav class="container shadow">
     <a href="/"><img src="/img/icon2alt.svg" alt="CT homepage"></a>
     <ul>
@@ -59,36 +45,42 @@
     </ul>
   </nav>
 
-  <div class="main container">
-    <div id="nav-spacer" class="nav-height container">
-      <br/>
-    </div>
-    <h1 id="">Error 404</h1>
-    <p>Sorry, something has gone wrong. You have slipped into an alternate reality where this page does not exist, the colour scheme is better, and the velociraptor is king.</p>
-    <div class="center">
-      <a class="button" href="/">
-        <span class="material-icons">arrow_back</span>
-        return to your reality
-      </a>
-    </div>
-    <div id="footer-spacer" class="footer-height container">
-      <br/>
-    </div>
+  <div id="nav-spacer" class="nav-height container">
+    <br />
   </div>
-  <footer class="container fixed">
-        <a href="https://creativecommons.org/licenses/by-sa/4.0/">
-          <img src="/img/ccheart_red.svg" alt="creative commons shareAlike 4.0">
-       Cougar Tasker 2020</a>
+  <div class="container">
+    <h1 id="">Error 404</h1>
+  </div>
+  <div class="container">
+    <p>Sorry, something has gone wrong. You have slipped into an alternate reality where this page does not exist, the
+      colour scheme is better, and the velociraptor is king.</p>
+  </div>
+
+
+  <div class="center">
+    <a class="button" href="/">
+      <span class="material-icons">arrow_back</span>
+      return to your reality
+    </a>
+  </div>
+  <div id="footer-spacer" class="footer-height container">
+    <br />
+  </div>
+  <footer class="container">
+    <a href="https://creativecommons.org/licenses/by-sa/4.0/">
+      <img src="/img/ccheart_red.svg" alt="creative commons shareAlike 4.0">
+      Cougar Tasker 2020</a>
   </footer>
-  <script src="js/vendor/modernizr-3.8.0.min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+  <script src="/js/vendor/modernizr-3.8.0.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
   <script>window.jQuery || document.write('<script src="js/vendor/jquery-3.4.1.min.js"><\/script>')</script>
 
 
   <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
   <script>
     window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
-    ga('create', 'UA-XXXXX-Y', 'auto'); ga('set','transport','beacon'); ga('send', 'pageview')
+    ga('create', 'UA-XXXXX-Y', 'auto'); ga('set', 'transport', 'beacon'); ga('send', 'pageview')
   </script>
   <script src="https://www.google-analytics.com/analytics.js" async></script>
 </body>
