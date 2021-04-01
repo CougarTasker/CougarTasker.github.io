@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+
+<head manifest="cache.appcache">
+  <!-- Compiled and minified CSS -->
+  <link rel="stylesheet" href="min/materialize.min.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="manifest" href="/manifest.webmanifest" crossorigin="use-credentials">
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <!-- Compiled and minified JavaScript -->
+  <meta name="theme-color" content="#B71C1C">
+  <meta charset="utf-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bus Timetable</title>
+  <style type="text/css">
+    .tiny .input-field {
+      margin-bottom: 0 !important;
+    }
+
+    .row {
+      margin-bottom: 0 !important;
+
+    }
+
+    .input-field {
+      margin-top: 0 !important;
+    }
+
+    .btn {
+
+      width: 100%;
+    }
+
+    .input-field label {
+      color: white;
+    }
+
+    .input-field input[type=text]:focus {
+      border-bottom: 1px solid #f9a825;
+      color: white;
+    }
+
+    .input-field input[type=text]:hover {
+      border-bottom: 1px solid #f9a825;
+      color: white;
+    }
+
+    .input-field input[type=text] {
+      border-bottom: 1px solid white;
+      color: white;
+    }
+
+    .caret {
+      fill: white !important;
+    }
+
+    .dropdown-content li>a,
+    .dropdown-content li>span {
+      color: white;
+    }
+
+    .dropdown-content {
+      background-color: #D32F2F;
+    }
+
+    .select-dropdown.dropdown-content li.selected {
+      background-color: #f9a825 !important;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.6rem;
+      line-height: 100%;
+      margin-top: 1rem !important;
+      margin-bottom: 2rem !important;
+    }
+
+    .navbar {
+      position: fixed;
+      width: 100%;
+      z-index: 100;
+      top: 0;
+      border-radius: 0 0 4px 4px;
+    }
+
+    #rides {
+      padding-top: 0.5rem;
+    }
+
+    .card {
+      border-radius: 4px;
+    }
+
+    .pgfooter {
+      width: 100%;
+      padding: 1rem;
+      border-radius: 4px 4px 0 0;
+      bottom: 0;
+    }
+  </style>
+</head>
+
+<body class="red darken-2 white-text">
+
+  <div class="red darken-4 navbar">
+    <h1>Bus Timetable</h1>
+    <div class="row">
+
+      <div class="input-field col s7 m9 l10 white-text"><select id="from" class="white-text"></select><label
+          class="white-text">From</label></div>
+
+      <div class="col s5 m3 l2"><button id="swap" class="btn waves-effect yellow darken-3"><i
+            class="material-icons left">swap_vert</i>swap</button></div>
+    </div>
+    <div class="row">
+
+      <div class="input-field col s7 m9 l10"><select id="to"></select><label>To</label></div>
+
+      <div class="col s5 m3 l2"><button id="live" class="btn waves-effect yellow darken-3"><i
+            class="material-icons left">calendar_today</i>All</button></div>
+    </div>
+    <div class="row tiny" style="height: 0; overflow: hidden;">
+      <div class="input-field col s7 m9 l10 "><select id="day"></select><label>Day</label></div>
+    </div>
+
+  </div>
+  <!--feel free to tell me of any bugs i prob wont fix it -->
+  <div id="rides" class="container"></div>
+  <div class="pgfooter red darken-4 white-text">Made by Cougar Tasker. 2019</div>
+  <script src="min/jquery.min.js"></script>
+  <script type="text/javascript" src="script.js"></script>
+
+  <script src="min/materialize.min.js"></script>
+</body>
+
+</html>
