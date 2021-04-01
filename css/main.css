@@ -10,7 +10,8 @@ body,
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  justify-content: space-between; }
+  justify-content: space-between;
+  font-size: 1.3rem; }
 
 body {
   min-height: 100vh; }
@@ -119,9 +120,7 @@ nav,
     font-size: 1.5rem; }
   .container {
     padding-left: 20%;
-    padding-right: 20%; }
-  nav > a {
-    left: 20%; } }
+    padding-right: 20%; } }
 
 nav {
   padding-top: 0.2em;
@@ -155,9 +154,10 @@ a.underline {
     height: 0.1em;
     width: 100%; }
 
-footer,
-.footer-height {
-  font-size: 1rem; }
+footer {
+  font-size: 1rem;
+  padding-top: 0.2em;
+  padding-bottom: 0.2em; }
 
 footer,
 footer > a {
@@ -171,13 +171,6 @@ footer img {
   vertical-align: middle;
   max-height: 1em;
   width: auto; }
-
-footer.fixed {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 99; }
 
 a.button {
   position: relative;
