@@ -235,7 +235,6 @@ a.button {
   border-radius: 2 * $border;
   display: inline-block;
   transition: box-shadow ease 1s;
-  margin: 0 auto;
   //background-color:darken($black,5);
   &::before {
     content: "";
