@@ -1,14 +1,15 @@
 //for consistant colors
-$black: #292e1e!default;
-$white: #f7fff7!default;
-$blue: #7bdff2!default;
-$green: #9cde9f!default;
-$teal: #48a9a6!default;
-$orange: #ff8811!default;
-$red: #ed254e!default;
+$black: #292e1e !default;
+$white: #f7fff7 !default;
+$blue: #7bdff2 !default;
+$green: #9cde9f !default;
+$teal: #48a9a6 !default;
+$orange: #ff8811 !default;
+$red: #ed254e !default;
 //generic setup stuff
 html {
   scroll-behavior: smooth;
+  height: -webkit-fill-available;
 }
 body,
 .page {
@@ -25,6 +26,7 @@ body,
 //fullheight pages
 body {
   min-height: 100vh;
+  min-height: -webkit-fill-available;
 }
 .spacer {
   flex-grow: 1;
@@ -124,6 +126,17 @@ nav a {
 nav,
 .nav-height {
   font-size: 1.2rem;
+  $nav-padding: 0.3em;
+  padding-top: $nav-padding;
+  padding-bottom: $nav-padding;
+}
+.nav-height {
+  &::after {
+    content: " ";
+    min-height: 1.5em;
+    height: 1.5em;
+    display: block;
+  }
 }
 //scale the nav bar and containers for larger devices
 @media only screen and (min-width: 600px) {
@@ -149,12 +162,6 @@ nav,
     padding-left: $container-padding;
     padding-right: $container-padding;
   }
-}
-//vertical paddding for the navbar
-nav {
-  $nav-padding: 0.3em;
-  padding-top: $nav-padding;
-  padding-bottom: $nav-padding;
 }
 //custom headings syll with undeline
 h1,
@@ -259,7 +266,7 @@ a.button {
   }
 }
 
-.responsive{
+.responsive {
   width: 100%;
   height: auto;
 }

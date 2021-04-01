@@ -4,145 +4,31 @@
 <head>
   <meta charset="utf-8">
   <title>Minesweeper AI - Cougar Tasker</title>
-  <meta name="description" content="error 404. Sorry, the page you are looking for does not exist">
+  <meta name="description" content="AI program for beating minesweeper">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="manifest" href="site.webmanifest">
 
   <!-- add the relavent icons -->
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2">
-  <link rel="icon" type="/image/png" sizes="32x32" href="/favicon-32x32.png?v=2">
-  <link rel="icon" type="/image/png" sizes="16x16" href="/favicon-16x16.png?v=2">
-  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2">
   <link rel="mask-icon" href="/safari-pinned-tab.svg?v=2" color="#5bbad5">
   <meta name="msapplication-TileColor" content="#2b5797">
 
-  <link rel="stylesheet" href="/css/normalize.css">
-  <link rel="stylesheet" href="/css/main.css">
-
+  <link rel="stylesheet" href="/css/normalize.min.css">
+  <link rel="stylesheet" href="css/mine.css">
   <!-- include fonts and icon set from google -->
-  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500&family=Roboto&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" rel="stylesheet">
+  <link rel="dns-prefetch" href="//fonts.googleapis.com">
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500&family=Roboto&display=swap"
+    as="style" onload="this.onload=null;this.rel='stylesheet'" />
+  <link rel="preload" href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" as="style"
+    onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500&family=Roboto&display=swap" rel="stylesheet"
+      type="text/css" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" rel="stylesheet">
+  </noscript>
+
   <meta name="theme-color" content="#292e1e">
-  <style type="text/css">
-    .main {
-      min-height: 100vh;
-      min-height: -webkit-fill-available;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      align-items: stretch;
-      padding-bottom: 0;
-      padding-top: 0;
-      overflow: hidden;
-    }
-
-    main>* {
-      margin: 0;
-    }
-
-    .center {
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-    }
-
-    #inputs {
-      width: inherit;
-    }
-
-    #game {
-      flex-grow: 1;
-      max-width: 75vh;
-      display: grid;
-      grid-template-columns: repeat(16, 1fr);
-      grid-auto-rows: 1fr;
-      justify-items: stretch;
-      align-items: stretch;
-      border-radius: 6px;
-      padding: 10px;
-    }
-
-    @media only screen and (max-width: 500px) {
-      #game {
-        font-size: 1.2rem;
-      }
-    }
-
-    @media only screen and (max-width: 400px) {
-      #game {
-        font-size: 1rem;
-      }
-    }
-
-    #game::before {
-      content: '';
-      width: 0;
-      padding-bottom: 100%;
-      grid-row: 1 / 1;
-      grid-column: 1 / 1;
-
-    }
-
-
-
-    #gameMessage {
-      grid-column-start: 1;
-      grid-column-end: -1;
-      grid-row-start: 1;
-      display: flex;
-      margin: 0;
-      padding: 0;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Oswald', sans-serif;
-    }
-
-    #game>* {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transition: background ease 350ms;
-    }
-
-    @keyframes flagged {
-      from {
-        transform: none;
-      }
-
-      to {
-        transform: scale(0.8);
-      }
-    }
-
-    #game>*[game-is-known="false"],
-    #game>*[game-is-known="true"][game-is-bomb="true"] {
-      background-color: #292e1e;
-      color: #f7fff7;
-    }
-
-    #game.fail {
-      background: linear-gradient(to bottom right, #ED254E, #FF8811);
-    }
-
-    #game.pass {
-      background: linear-gradient(to bottom right, #48a9a6, #9cde9f);
-    }
-
-    #game>*[game-is-known="true"][game-is-bomb="true"] {
-      border-radius: 100%;
-      margin: 1px;
-    }
-
-
-    #game>*[game-is-known="false"][game-is-marked="true"] {
-      animation-name: flagged;
-      animation-direction: alternate;
-      animation-duration: 250ms;
-      animation-timing-function: ease;
-      animation-iteration-count: 2;
-    }
-  </style>
 </head>
 
 <body>
@@ -151,61 +37,59 @@
 	<![endif]-->
 
   <nav class="container shadow">
-    <a href="/"><img src="/img/icon2.svg" alt="CT homepage"></a>
+    <a href="/"><img src="/img/icon2.svg" width="20" height="20" alt="CT homepage"></a>
     <ul>
       <li><a href="/">About</a></li>
-      <li><a href="/projects">Projects</a></li>
+      <li class="active"><a href="/projects">Projects</a></li>
       <li><a href="/contact">Contact</a></li>
     </ul>
   </nav>
 
-  <div class="main">
-    <div id="nav-spacer" class="nav-height container">
-      <br />
-    </div>
-    <div id="intro" class="container">
-      <h1>Minesweeper AI</h1>
-      <p>Here is an AI for solving minesweeper that I made based on what i have learnt in my CS2910 AI module about
-        symbolic AI. This JS implemnntation was based on a FOL prolog psuedocode where for all the unknown cells
-        adjacent to a known square are grouped together into a range. if a range is full or empty we can be certain of
-        its cells value. expanding this knowledge base is done by removing known elements from from ranges to create
-        smaller ones and splitting a range in two where one is a subset of another. I havent proven this to be correct
-        but intuativly it seems right. occasionally there isn't enough data to deduce the correct value and at this
-        point the AI will take a guess. in a future version this guess can be wieghted towards the cells that are most
-        probable but at the moment it is not.</p>
-      <p>press the step button to move forward one step in the cycle, this is resolving one certain range and marking
-        the relevent squares or making a guess if it has too. </p>
-      <p>the AI has no inside knowledge of the actual arrangments of the mines it knows as much as you can see, that
-        said it will retry the first move untill it succeeds otherwise there is about 11% chance of it failing of the
-        first go</p>
-      <p>you can also make moved manually if you would just like to play the game or see how the AI will react to
-        different choices</p>
-    </div>
-
-
-    <div id="inputs" class="center container">
-      <a class="button" id="startButton">
-        restart
-        <span class="material-icons">play_arrow</span>
-      </a>
-      <a class="button" id="stepButton">
-        step
-        <span class="material-icons">play_arrow</span>
-      </a>
-    </div>
-    <div class="container center">
-      <div id="game">
-        <b id="gameMessage"></b>
-      </div>
-    </div>
-    <footer class="container">
-      <a href="https://creativecommons.org/licenses/by-sa/4.0/">
-        <img src="/img/ccheart_red.svg" alt="creative commons shareAlike 4.0">
-        Cougar Tasker 2020</a>
-    </footer>
+  <div id="nav-spacer" class="nav-height container"></div>
+  <div id="intro" class="container">
+    <h1>Minesweeper AI</h1>
+    <p>Here is an AI for solving minesweeper that I made based on what i have learnt in my CS2910 AI module about
+      symbolic AI. Press the step button to move forward one step in the cycle, this is resolving one certain range
+      and marking
+      the relevent squares or making a guess if it has too. </p>
+    <p>the AI has no inside knowledge of the actual arrangments of the mines it knows as much as you can see, that
+      said it will retry the first move untill it succeeds otherwise there is about 11% chance of it failing of the
+      first go</p>
+    <p>you can also make moved manually if you would just like to play the game or see how the AI will react to
+      different choices</p>
   </div>
 
-  <script src="js/vendor/modernizr-3.8.0.min.js"></script>
+
+  <div id="inputs" class="center container">
+    <a class="button" id="startButton">
+      restart
+      <span class="material-icons">refresh</span>
+    </a>
+    <a class="button" id="stepButton">
+      step
+      <span class="material-icons">play_arrow</span>
+    </a>
+  </div>
+  <div class="container center">
+    <div id="game">
+      <b id="gameMessage"></b>
+    </div>
+  </div>
+  <div class="container">
+    <p>This JS implemnntation was based on a FOL prolog psuedocode where for all the unknown cells
+      adjacent to a known square are grouped together into a range. if a range is full or empty we can be certain of
+      its cells value. expanding this knowledge base is done by removing known elements from from ranges to create
+      smaller ones and splitting a range in two where one is a subset of another. I havent proven this to be correct
+      but intuativly it seems right. occasionally there isn't enough data to deduce the correct value and at this
+      point the AI will take a guess. in a future version this guess can be wieghted towards the cells that are most
+      probable but at the moment it is not.</p>
+  </div>
+  <footer class="container">
+    <a href="https://creativecommons.org/licenses/by-sa/4.0/">
+      <img src="/img/ccheart_red.svg" alt="creative commons shareAlike 4.0" width="18" height="18">
+      Cougar Tasker 2020</a>
+  </footer>
+
   <script src="mine.js"></script>
 
   <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->

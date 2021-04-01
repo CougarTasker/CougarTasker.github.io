@@ -1,0 +1,46 @@
+@import "../../../css/main.scss";
+
+.center {
+  width: 100%;
+}
+.canvas {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 1em;
+  border-radius: 0.5em;
+  background: #292e1e;
+  outline: none;
+}
+.slider:hover::-webkit-slider-thumb {
+  -webkit-box-shadow: inset 0px 0px 0px 6px $green;
+  -moz-box-shadow: inset 0px 0px 0px 6px $green;
+  box-shadow: inset 0px 0px 0px 6px $green;
+}
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 3em;
+  height: 1em;
+  border-radius: 0.5em;
+  -webkit-box-shadow: inset 0px 0px 0px 4px $green;
+  -moz-box-shadow: inset 0px 0px 0px 4px $green;
+  box-shadow: inset 0px 0px 0px 4px $green;
+  transition: box-shadow ease 0.5s;
+  /*  background: linear-gradient(to bottom right, $green, #48a9a6);*/
+  cursor: pointer;
+}
+#inputs {
+  width: inherit;
+}
+.slider::-moz-range-thumb {
+  width: 2.5em;
+  height: 1em;
+  border-radius: 0.5em;
+  /* background: linear-gradient(to bottom right, $green, #48a9a6);*/
+  cursor: pointer;
+}
