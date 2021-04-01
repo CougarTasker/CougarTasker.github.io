@@ -255,13 +255,7 @@ a.button {
     background-clip: padding-box;
   }
   & > span {
-    display: inline-block;
     vertical-align: middle;
   }
 }
 
-//responsive images
-.responsive {
-  max-width: 100%;
-  height: auto;
-}

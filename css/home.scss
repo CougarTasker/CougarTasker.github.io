@@ -1,16 +1,21 @@
 @import "main.scss";
 //style sheat for the home page
-
-#intro{
-  min-height: 50vh;
-}
-#about {
+body,
+.page {
   background-color: $black;
   color: $white;
+}
+#intro {
+  min-height: 50vh;
+  background-color: $white;
+  color: $black;
+}
+#about {
   flex-grow: 1;
+  background-color: unset;
 }
 
-#intro>*{
+#intro > * {
   margin-bottom: 3rem;
 }
 #uparrow {
@@ -31,14 +36,14 @@
   }
 }
 
-footer{
+footer {
   border-top: 1px solid $green;
 }
-#header-text{
+#header-text {
   font-size: 1.2em;
   font-family: "Oswald", sans-serif;
 }
-#nameimg{
+#nameimg {
   display: flex;
   justify-content: center;
   align-items: center;
