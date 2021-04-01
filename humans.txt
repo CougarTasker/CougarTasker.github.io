@@ -3,11 +3,10 @@
 
 # TEAM
 
-    <name> -- <role> -- <twitter>
+    Cougar Tasker 
+    I mean I don't really think thats much of a surprise ;)
+    
 
-# THANKS
-
-    <name>
 
 # TECHNOLOGY COLOPHON
 
