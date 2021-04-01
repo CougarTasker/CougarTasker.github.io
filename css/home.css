@@ -123,8 +123,8 @@ nav,
     padding-right: 20%; } }
 
 nav {
-  padding-top: 0.2em;
-  padding-bottom: 0.2em; }
+  padding-top: 0.3em;
+  padding-bottom: 0.3em; }
 
 h1,
 h2 {
@@ -156,8 +156,8 @@ a.underline {
 
 footer {
   font-size: 1rem;
-  padding-top: 0.2em;
-  padding-bottom: 0.2em; }
+  padding-top: 0.5em;
+  padding-bottom: 0.5em; }
 
 footer,
 footer > a {
@@ -237,3 +237,10 @@ a.button {
   /* For desktop: */
   #uparrow {
     height: 80px; } }
+
+footer {
+  border-top: 1px solid #9cde9f; }
+
+#header-text {
+  font-size: 1.2em;
+  font-family: "Oswald", sans-serif; }

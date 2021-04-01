@@ -152,7 +152,7 @@ nav,
 }
 //vertical paddding for the navbar
 nav {
-  $nav-padding: 0.2em;
+  $nav-padding: 0.3em;
   padding-top: $nav-padding;
   padding-bottom: $nav-padding;
 }
@@ -191,8 +191,8 @@ a.underline {
 //footer styling
 footer {
   font-size: 1rem;
-  padding-top: 0.2em;
-  padding-bottom: 0.2em;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
 }
 footer,
 footer > a {
