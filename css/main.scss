@@ -11,6 +11,7 @@ html {
   scroll-behavior: smooth;
   height: -webkit-fill-available;
 }
+
 body,
 .page {
   font-family: "Roboto", sans-serif;
@@ -152,6 +153,9 @@ nav,
   }
 }
 @media only screen and (min-width: 768px) {
+  html{
+    height: 100vh;
+  }
   /* For desktop: */
   nav,
   .nav-height {
