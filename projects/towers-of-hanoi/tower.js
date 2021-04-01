@@ -23,6 +23,7 @@
       document.querySelector(".slider").addEventListener("input",event=>{
 				s.end(function(){
 					number = Number(event.target.value);
+          document.querySelector("#count").textContent = number;
 					count = [0,0,0];
 					nb = new block(number,s.b.x.get(),0);
 					c.updateBlocks(nb);
@@ -94,6 +95,7 @@
 				self.ctx.fillStyle = grd;
 
 				self.blocks.draw(self);
+        requestAnimationFrame(self.update);
 			}
 			this.updateBlocks =function(b){
 				self.blocks = b;
@@ -128,7 +130,7 @@
 				this.ctx.stroke();
 			}
 			this.start = function(){
-				setInterval(this.update,1000/60);
+        requestAnimationFrame(self.update);
 			}
 		};
 		function anim(v){
