@@ -240,6 +240,7 @@ a.button {
   padding: $border;
   box-sizing: border-box;
   text-decoration: none;
+  cursor: pointer;
   color: $white;
   background: $black;
   background-clip: padding-box; /* !importanté */
