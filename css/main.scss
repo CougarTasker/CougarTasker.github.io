@@ -111,8 +111,7 @@ nav li:active {
   padding: 0.15em 0.25em;
 }
 
-nav li:hover:not(.active):not(:active),
-.project a:hover:not(:active) {
+nav li:hover:not(.active):not(:active) {
   background-color: $black;
   -webkit-box-shadow: inset 0px 0px 0px 3px $white,
     5px 5px 28px 2px rgba(0, 0, 0, 0.66);
@@ -153,7 +152,7 @@ nav,
   }
 }
 @media only screen and (min-width: 768px) {
-  html{
+  html {
     height: 100vh;
   }
   /* For desktop: */

@@ -40,15 +40,35 @@
   <div id="nav-spacer" class="nav-height container">
     <br />
   </div>
-  <div class="container">
-    <h1 id="projects">Projects</h1>
-    <br />
-    <b>Page is under construction</b>
-    <ul>
-      <li><a href="./minesweeper/">Minesweeper AI</a></li>
-      <li><a href="./towers-of-hanoi/">Towers of Hanoi</a></li>
+  <div class="container project">
+    <h2>Minesweeper AI</h2>
+    <ul class="tags">
+      <li>JS</li>
+      <li>CSS</li>
     </ul>
+    <p>
+      Inspired by a Video by code bullet on his AI that solves minesweeper via brute-forcing all the different
+      combinations of mines and recording what spaces are safe. I thought that I could improve upon this approach by
+      avoiding the brute-forcing and instead just keep track of different ranges of unknown cells until the probability
+      of there being a mine in that cell is either certainly a mine or certainly not.
+    </p>
+    <a href="./minesweeper/" class="button">TRY IT</a>
   </div>
+  <div class="container project">
+    <h2>Towers of Hanoi</h2>
+    <ul class="tags">
+      <li>JS</li>
+      <li>HTML5 Canvas</li>
+    </ul>
+    <p>
+      This is an algorithm that recursively solves the Tower of Hanoi problem and visualizes the solution. This
+      algorithm uses JS Promises to slow down the execution of the solution to allow it to be animated.
+    </p>
+    <a href="./towers-of-hanoi/" class="button">SEE IT</a>
+  </div>
+  </div>
+
+
   <div class="spacer"></div>
 
   <footer class="container">
