@@ -54,7 +54,7 @@ const createView = (dimentions, bombCount) => {
   let { rows, cols } = dimentions
   let stage = [];
   let changedCells = [];
-
+  let safeCells = dimentions.rows * dimentions.cols - bombCount
   let blankCell = { state: cellStates.unknown, count: 0, steps: 0 };
   for (let x = 0; x < cols; x++) {
     let row = [];
@@ -77,6 +77,7 @@ const createView = (dimentions, bombCount) => {
     // the cells state, unknown, marked, known
     state: gameStates.start,
     changedCells,
+    safeCells,
     dimentions: { rows, cols },
     bombCount,
     markedCount: 0,
@@ -112,6 +113,9 @@ const createBombs = ({ stage, bombCount, dimentions: { rows, cols } }, clickLoca
 const reset = (view) => {
   const { rows, cols } = view.dimentions;
   view.state = gameStates.start;
+  view.markedCount = 0;
+  view.correctlyMarkedCount = 0;
+  view.safeCells = rows * cols - view.bombCount
   updateStage(view);
   for (let x = 0; x < cols; x++) {
     for (let y = 0; y < rows; y++) {
@@ -222,7 +226,7 @@ const markCellAsBomb = (view, { x, y }) => {
     return;
   }
   let cell = view.stage[x][y];
-  if (view.markedCount < view.bombCount && cell.state != cellStates.marked) {
+  if (view.markedCount < view.bombCount && cell.state == cellStates.unknown) {
     cell.state = cellStates.marked
     view.markedCount += 1;
     if (cell.count <= 0) {
@@ -250,10 +254,15 @@ const makeCellKnown = (view, { x, y }) => {
   let cell = view.stage[x][y];
 
   cell.state = cellStates.known;
+  view.safeCells -= 1;
   if (cell.count < 0) {
     view.state = gameStates.lost;
+    view.safeCells = 1;
   } else if (cell.count === 0) {
     floodFill(view, { x, y })
+  }
+  if(view.safeCells == 0){
+    view.state = gameStates.won;
   }
   view.changedCells.push(cell);
   updateStage(view);
@@ -285,6 +294,7 @@ const floodFill = (view, start) => {
       let newCell = stage[x][y];
       if (newCell.state == cellStates.unknown) {
         newCell.state = cellStates.known;
+        view.safeCells -= 1;
         changedCells.push(newCell);
         newCell.steps = nextSteps;
         if (newCell.count === 0) {
@@ -297,7 +307,8 @@ const floodFill = (view, start) => {
 }
 const dimentions = { rows: 16, cols: 16 };
 
-const view = createView(dimentions, 10);
+const view = createView(dimentions, 30);
 createStage(view);
+
 
 
