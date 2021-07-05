@@ -1,0 +1,14 @@
+@import "../../css/main.scss";
+
+
+.project{
+  
+}
+
+.project > h2{
+  font-family: "Oswald", sans-serif;
+  font-size: 2rem;
+  &::after {
+    content: none;
+  }
+}
