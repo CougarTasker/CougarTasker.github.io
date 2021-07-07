@@ -1,13 +1,40 @@
 @import "../../css/main.scss";
 
-
-.project  h2 {
+.project h2 {
   font-family: "Oswald", sans-serif;
   font-size: 2rem;
   &::after {
     content: none;
   }
 }
+hr {
+  position: relative;
+}
+hr::before {
+  content: "";
+  display: block;
+  background-color: $white;
+  height: 20px;
+  width: 20px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+hr::after {
+  content: "";
+  display: block;
+  background-color: $black;
+  height: 12.5px;
+  width: 12.5px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%) rotate(45deg);
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
 .project .top {
   display: flex;
   flex-direction: row;
@@ -15,7 +42,7 @@
   justify-content: space-between;
   flex-wrap: wrap;
   & > ul.tags {
-    list-style-type:none;
+    list-style-type: none;
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
@@ -27,11 +54,11 @@
       display: block;
       margin: 0;
       padding: 0;
-      &::before{
+      &::before {
         content: "/";
-        margin:  0 0.4ch;
+        margin: 0 0.4ch;
       }
-      &:last-child::after{
+      &:last-child::after {
         content: "/";
         margin: 0 0.4ch;
       }
