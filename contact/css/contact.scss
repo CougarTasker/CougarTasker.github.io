@@ -126,22 +126,4 @@ nav {
     min-height: 3.2em;
   }
 }
-hr {
-  border: 0;
-  border-top: 4px solid $black;
-  border-style: dotted;
-  margin: 10px 0;
-}
 
-@media only screen and (min-width: 600px) {
-  /* For tablets: */
-  hr {
-    margin: 20px 0;
-  }
-}
-@media only screen and (min-width: 768px) {
-  /* For desktop: */
-  hr {
-    margin: 25px 0;
-  }
-}
