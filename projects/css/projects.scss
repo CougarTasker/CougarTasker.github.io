@@ -1,14 +1,40 @@
 @import "../../css/main.scss";
 
 
-.project{
-  
-}
-
-.project > h2{
+.project  h2 {
   font-family: "Oswald", sans-serif;
   font-size: 2rem;
   &::after {
     content: none;
+  }
+}
+.project .top {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  & > ul.tags {
+    list-style-type:none;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    & > li {
+      font-size: 1.1rem;
+      display: block;
+      margin: 0;
+      padding: 0;
+      &::before{
+        content: "/";
+        margin:  0 0.4ch;
+      }
+      &:last-child::after{
+        content: "/";
+        margin: 0 0.4ch;
+      }
+    }
   }
 }
