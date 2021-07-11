@@ -232,7 +232,9 @@ footer img {
 // -moz-box-shadow: 0px 3px 0px 0px $red;
 // box-shadow: 0px 3px 0px 0px $red;
 // }
-
+a{
+  color: $orange;
+}
 a.button {
   $border: 0.2em;
   position: relative;
