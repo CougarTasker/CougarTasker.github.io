@@ -5,14 +5,30 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Sass Compile",
+      "label": "Sass Compile all",
       "type": "shell",
       "command": "for name in $(find . -regextype posix-egrep -regex '.*\\.scss' | grep -oP '.*(?=\\.)'); do node-sass -x --output-style compressed $name.scss $name.css; done",
       "group": {
         "kind": "build",
         "isDefault": true
       },
-      "problemMatcher": []
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "never"
+      }
+    },
+    {
+      "label": "Sass Compile this",
+      "type": "shell",
+      "command": "name=$(echo ${file} | grep -oP '.*(?=\\.)');node-sass $name.scss $name.css",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "never"
+      }
     }
   ]
 }//for name in $(find . -regextype posix-egrep -regex '.*\\.scss' | grep -oP '.*(?=\\.)'); do node-sass $name.scss $name.css;
