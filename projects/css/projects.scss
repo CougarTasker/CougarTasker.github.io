@@ -35,6 +35,7 @@ hr::after {
   transform: translate(-50%, -50%) rotate(45deg);
 }
 
+
 .project .top {
   display: flex;
   flex-direction: row;
@@ -63,5 +64,26 @@ hr::after {
         margin: 0 0.4ch;
       }
     }
+  }
+}
+
+.align-button{
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  &>.button{
+    max-width: 50%;
+    flex-grow: 1;
+    flex-basis: 0;
+    display: flex;
+    flex-direction: row;
+    &>.text{
+      flex-grow: 1;
+      text-align: center;
+    }
+    
+  }
+  &>.button:not(:first-child){
+    margin-left: 1ch;
   }
 }
