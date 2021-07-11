@@ -5,7 +5,12 @@
 nav {
   position: static;
 }
-
+.main{
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
 .account img {
   max-height: 3.2em;
   min-height: 2.7em;
