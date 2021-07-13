@@ -108,7 +108,6 @@ drawRightCorner = (cell, startSize, endSize) => {
     endPosRGuide.x, endPosRGuide.y,
     startPosRGuide.x, startPosRGuide.y,
     startPosR.x, startPosR.y);
-  ctx.stroke();
 
   //create the outer side
     //start posL to end posL
@@ -132,13 +131,12 @@ drawRightCorner = (cell, startSize, endSize) => {
   })
 
 
-  ctx.beginPath();
-  ctx.moveTo(startPosL.x, startPosL.y);
+  ctx.lineTo(startPosL.x, startPosL.y);
   ctx.bezierCurveTo(
     startPosLGuide.x, startPosLGuide.y,
     endPosLGuide.x, endPosLGuide.y,
     endPosL.x, endPosL.y);
-  ctx.stroke();
+  ctx.fill();
 
 }
 
