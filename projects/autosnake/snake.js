@@ -62,9 +62,9 @@ computeDirections = (snake, nextHead) => {
   }
   return out;
 }
-
-drawCorner = (cell, startSize, endSize) => {
-  const strength = 0.2;
+drawRightCorner = (cell, startSize, endSize) => {
+  const innerStrength = 0.5;
+  const outerStrength = 0.5;
   const center = {
     x: cell.x + 0.5,
     y: cell.y + 0.5
@@ -77,14 +77,73 @@ drawCorner = (cell, startSize, endSize) => {
     x: center.x + cell.dir.x / 2,
     y: center.y + cell.dir.y / 2
   }
+
   const centerT = transform(center);
-  const startPosT = transform(startPos)
-  const endPosT = transform(endPos)
+  const startPosT = transform(startPos);
+  const endPosT = transform(endPos);
+
+
+  //draw the inner bit 
+  // endpos right to start pos right 
+  const endPosR = transform({
+    x: endPos.x - cell.preDir.x * endSize / 2,
+    y: endPos.y - cell.preDir.y * endSize / 2
+  });
+  const endPosRGuide = transform({
+    x: endPos.x - cell.preDir.x * endSize / 2 - cell.dir.x * (0.5 - startSize / 2) * innerStrength,
+    y: endPos.y - cell.preDir.y * endSize / 2 - cell.dir.y * (0.5 - startSize / 2) * innerStrength
+  });
+  const startPosR = transform({
+    x: startPos.x + cell.dir.x * startSize / 2,
+    y: startPos.y + cell.dir.y * startSize / 2
+  })
+  const startPosRGuide = transform({
+    x: startPos.x + cell.dir.x * startSize / 2 + cell.preDir.x * (0.5 - endSize / 2) * innerStrength,
+    y: startPos.y + cell.dir.y * startSize / 2 + cell.preDir.y * (0.5 - endSize / 2) * innerStrength
+  })
 
   ctx.beginPath();
-  ctx.moveTo(startPosT.x, startPosT.y);
-  ctx.bezierCurveTo(centerT.x, centerT.y, centerT.x, centerT.y, endPosT.x, endPosT.y);
+  ctx.moveTo(endPosR.x, endPosR.y);
+  ctx.bezierCurveTo(
+    endPosRGuide.x, endPosRGuide.y,
+    startPosRGuide.x, startPosRGuide.y,
+    startPosR.x, startPosR.y);
   ctx.stroke();
+
+  //create the outer side
+    //start posL to end posL
+
+
+  const endPosL = transform({
+    x: endPos.x + cell.preDir.x * endSize / 2,
+    y: endPos.y + cell.preDir.y * endSize / 2
+  });
+  const endPosLGuide = transform({
+    x: endPos.x + cell.preDir.x * endSize / 2 - cell.dir.x * (0.5 + startSize / 2) * outerStrength,
+    y: endPos.y + cell.preDir.y * endSize / 2 - cell.dir.y * (0.5 + startSize / 2) * outerStrength
+  });
+  const startPosL = transform({
+    x: startPos.x - cell.dir.x * startSize / 2,
+    y: startPos.y - cell.dir.y * startSize / 2
+  })
+  const startPosLGuide = transform({
+    x: startPos.x - cell.dir.x * startSize / 2 + cell.preDir.x * (0.5 + endSize / 2) * outerStrength,
+    y: startPos.y - cell.dir.y * startSize / 2 + cell.preDir.y * (0.5 + endSize / 2) * outerStrength
+  })
+
+
+  ctx.beginPath();
+  ctx.moveTo(startPosL.x, startPosL.y);
+  ctx.bezierCurveTo(
+    startPosLGuide.x, startPosLGuide.y,
+    endPosLGuide.x, endPosLGuide.y,
+    endPosL.x, endPosL.y);
+  ctx.stroke();
+
+}
+
+drawCorner = (cell, startSize, endSize) => {
+  drawRightCorner(cell, startSize, endSize);
 }
 // i am going to create a grid cordinates to canvas coridnates function 
 const transform = ({ x: xin, y: yin, width: widthin, height: heightin }) => {
@@ -156,7 +215,10 @@ drawInstance = ({ snake }, { snake: nextSnake }, progress) => {
   });
 
 
-  drawCorner(corners[0], lerp(snakeTailSize, snakeHeadSize, corners[0].order - 0.5 - progress, corners[0].order + 0.5 - progress))
+  drawCorner(corners[0],
+    lerp(snakeTailSize, snakeHeadSize, (corners[0].order - 0.5 - progress) / snake.length),
+    lerp(snakeTailSize, snakeHeadSize, (corners[0].order + 0.5 - progress) / snake.length)
+  )
 
 }
 
