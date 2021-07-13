@@ -110,7 +110,7 @@ drawRightCorner = (cell, startSize, endSize) => {
     startPosR.x, startPosR.y);
 
   //create the outer side
-    //start posL to end posL
+  //start posL to end posL
 
 
   const endPosL = transform({
@@ -213,10 +213,13 @@ drawInstance = ({ snake }, { snake: nextSnake }, progress) => {
   });
 
 
-  drawCorner(corners[0],
-    lerp(snakeTailSize, snakeHeadSize, (corners[0].order - 0.5 - progress) / snake.length),
-    lerp(snakeTailSize, snakeHeadSize, (corners[0].order + 0.5 - progress) / snake.length)
-  )
+  corners.forEach(corner=>{
+    drawCorner(corner,
+      lerp(snakeTailSize, snakeHeadSize, (corner.order - 0.5 - progress) / snake.length),
+      lerp(snakeTailSize, snakeHeadSize, (corner.order + 0.5 - progress) / snake.length)
+    );
+  })
+  
 
 }
 
@@ -234,8 +237,8 @@ const setCanvasSize = () => {
 window.addEventListener("resize", setCanvasSize);
 setCanvasSize();
 
-const fakeCurrentInstance = { snake: [{ x: 3, y: 1 }, { x: 4, y: 1 }, { x: 5, y: 1 }, { x: 6, y: 1 }] }
-const fakeNextInstance = { snake: [{ x: 4, y: 1 }, { x: 5, y: 1 }, { x: 6, y: 1 }, { x: 6, y: 2 }] }
+const fakeCurrentInstance = { snake: [{ x: 3, y: 1 }, { x: 4, y: 1 }, { x: 4, y: 2 }, { x: 5, y: 2 }] }
+const fakeNextInstance = { snake: [{ x: 4, y: 1 }, { x: 4, y: 2 }, { x: 5, y: 2 }, { x: 6, y: 2 }] }
 
 let start = Date.now();
 const renderLoop = () => {
