@@ -121,7 +121,7 @@ drawCorner = (cell, progress, snakeLenght) => {
     y: startPos.y + cell.dir.y * startSize / 2 + cell.preDir.y * (0.5 - endSize / 2) * innerStrength
   })
 
-  
+
 
   //create the outer side
   //start posL to end posL
@@ -148,6 +148,7 @@ drawCorner = (cell, progress, snakeLenght) => {
 
   ctx.save();
   if (cell.order == 1 && progress >= 0.5) {
+    //clip the part of the snake that shouldnt be seen.
     ctx.beginPath();
     const cutofR = getBezierXY(
       progress - 0.5,
@@ -180,20 +181,60 @@ drawCorner = (cell, progress, snakeLenght) => {
     ctx.lineTo(endPosCellL.x, endPosCellL.y);
     ctx.lineTo(startPosCellR.x, startPosCellR.y);
     ctx.clip();
+
+    //draw the tail as usual 
+    ctx.beginPath();
+    ctx.moveTo(endPosR.x, endPosR.y);
+    ctx.bezierCurveTo(
+      endPosRGuide.x, endPosRGuide.y,
+      startPosRGuide.x, startPosRGuide.y,
+      startPosR.x, startPosR.y);
+    ctx.lineTo(startPosL.x, startPosL.y);
+    ctx.bezierCurveTo(
+      startPosLGuide.x, startPosLGuide.y,
+      endPosLGuide.x, endPosLGuide.y,
+      endPosL.x, endPosL.y);
+    ctx.fill();
+
+    //remove the clipping mask
+    ctx.restore();
+
+    //draw the endcap
+
+    const rToL = {
+      x: cutofL.x - cutofR.x,
+      y: cutofL.y - cutofR.y
+    }
+    angle = rToL.x === 0 ? Math.PI / 2 : Math.atan(rToL.y / rToL.x);
+    const capCenter = {
+      x: cutofR.x + rToL.x / 2,
+      y: cutofR.y + rToL.y / 2,
+    }
+    const capR = Math.sqrt(Math.pow(rToL.x, 2) + Math.pow(rToL.y, 2)) / 2
+    ctx.beginPath();
+    ctx.arc(
+      capCenter.x, capCenter.y,
+      capR,
+      angle - Math.PI,
+      angle
+    )
+    ctx.fill();
+  } else {
+    ctx.beginPath();
+    ctx.moveTo(endPosR.x, endPosR.y);
+    ctx.bezierCurveTo(
+      endPosRGuide.x, endPosRGuide.y,
+      startPosRGuide.x, startPosRGuide.y,
+      startPosR.x, startPosR.y);
+    ctx.lineTo(startPosL.x, startPosL.y);
+    ctx.bezierCurveTo(
+      startPosLGuide.x, startPosLGuide.y,
+      endPosLGuide.x, endPosLGuide.y,
+      endPosL.x, endPosL.y);
+    ctx.fill();
   }
-  ctx.beginPath();
-  ctx.moveTo(endPosR.x, endPosR.y);
-  ctx.bezierCurveTo(
-    endPosRGuide.x, endPosRGuide.y,
-    startPosRGuide.x, startPosRGuide.y,
-    startPosR.x, startPosR.y);
-  ctx.lineTo(startPosL.x, startPosL.y);
-  ctx.bezierCurveTo(
-    startPosLGuide.x, startPosLGuide.y,
-    endPosLGuide.x, endPosLGuide.y,
-    endPosL.x, endPosL.y);
-  ctx.fill();
-  ctx.restore();
+
+
 }
 
 
@@ -253,45 +294,48 @@ drawInstance = ({ snake }, { snake: nextSnake }, progress) => {
   const nextHead = nextSnake[nextSnake.length - 1];
   const corners = computeDirections(snake, nextHead);
 
-  snake.forEach(part => {
-    ctx.fillStyle = colors.red;
-    ctx.beginPath();
-    const box = transform({
-      x: (part.x + part.dir.x * progress) + 0.5,
-      y: (part.y + part.dir.y * progress) + 0.5,
-      width: 0.5 * size,
-    })
-    ctx.arc(
-      box.x,
-      box.y,
-      box.width,
-      part.dir.angle - Math.PI / 2,
-      part.dir.angle + Math.PI / 2);
-    ctx.fill();
-    size += snakeStepSize;
-  });
 
   ctx.fillStyle = colors.green;
   //tail
   ctx.beginPath();
-  const box = transform({
+  let box = transform({
     x: (tail.x + tail.dir.x * progress) + 0.5,
     y: (tail.y + tail.dir.y * progress) + 0.5,
     width: 0.5 * snakeTailSize,
   })
-  ctx.arc(
-    box.x,
-    box.y,
-    box.width,
-    tail.dir.angle + Math.PI / 2,
-    tail.dir.angle - Math.PI / 2);
-  ctx.fill();
+  if (progress <= 0.5 || !snake[1].corner) {
+    ctx.arc(
+      box.x,
+      box.y,
+      box.width,
+      tail.dir.angle + Math.PI / 2,
+      tail.dir.angle - Math.PI / 2);
+    ctx.fill();
+  }
 
+
+
+  // corners 
   corners.forEach(corner => {
     drawCorner(corner, progress, snake.length);
   })
 
 
+  //head 
+  ctx.beginPath();
+  box = transform({
+    x: (head.x + head.dir.x * progress) + 0.5,
+    y: (head.y + head.dir.y * progress) + 0.5,
+    width: 0.5 * snakeHeadSize,
+  })
+  ctx.arc(
+    box.x,
+    box.y,
+    box.width,
+    head.dir.angle - Math.PI / 2,
+    head.dir.angle + Math.PI / 2);
+  ctx.fill();
+  size += snakeStepSize;
 }
 
 
