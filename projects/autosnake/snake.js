@@ -85,32 +85,32 @@ function drawBezierControls({ s, c1, c2, e }) {
   ctx.strokeStyle = colors.orange;
   ctx.stroke();
 }
-drawEndCap = (cutofR, cutofL, backwards = false) => {
+drawEndCap = (start, end, clockwize = true) => {
   const rToL = {
-    x: cutofL.x - cutofR.x,
-    y: cutofL.y - cutofR.y
+    x: end.x - start.x,
+    y: end.y - start.y
   }
-  angle = rToL.x === 0 ? Math.PI / 2 : Math.atan(rToL.y / rToL.x);
-  if (backwards) {
-    angle -= Math.PI;
-  }
+
+  angle = rToL.x === 0 ? 
+  (clockwize ? 0 : Math.PI) : 
+    (rToL.x < 0 ? (Math.atan(rToL.y / rToL.x) + Math.PI / 2):
+    (Math.atan(rToL.y / rToL.x) - Math.PI / 2));
   const capCenter = {
-    x: cutofR.x + rToL.x / 2,
-    y: cutofR.y + rToL.y / 2,
+    x: start.x + rToL.x / 2,
+    y: start.y + rToL.y / 2,
   }
   const capR = Math.sqrt(Math.pow(rToL.x, 2) + Math.pow(rToL.y, 2)) / 2
   ctx.arc(
     capCenter.x, capCenter.y,
     capR,
-    angle,
-    angle + Math.PI
+    angle - Math.PI/2,
+    angle + Math.PI/2,
+    clockwize
   )
 }
 drawCorner = (cell, progress, snakeLenght) => {
   //if this curve includes the tail 
-
-
-
+  const rightHand = cell.preDir.x == -cell.dir.y && cell.preDir.y == cell.dir.x
 
   startSize = lerp(snakeTailSize, snakeHeadSize, (cell.order - 0.5 - progress) / (snakeLenght - 1)),
     endSize = lerp(snakeTailSize, snakeHeadSize, (cell.order + 0.5 - progress) / (snakeLenght - 1))
@@ -200,12 +200,12 @@ drawCorner = (cell, progress, snakeLenght) => {
       curveL.c1.x, curveL.c1.y,
       curveL.s.x, curveL.s.y)
     //draw the endcap
-    drawEndCap(curveR.s, curveL.s, true);
+    drawEndCap(curveL.s, curveR.s, !rightHand);
     ctx.fill();
   } else if (cell.order == snakeLenght - 1 && progress <= 0.5) {
     curveR = splitBezierCurve(progress + 0.5, startPosR, startPosRGuide, endPosRGuide, endPosR, true);
     curveL = splitBezierCurve(progress + 0.5, startPosL, startPosLGuide, endPosLGuide, endPosL, true);
-
+    drawBezierControls(curveL);
 
     ctx.beginPath();
     ctx.moveTo(curveR.s.x, curveR.s.y);
@@ -214,12 +214,13 @@ drawCorner = (cell, progress, snakeLenght) => {
       curveR.c2.x, curveR.c2.y,
       curveR.e.x, curveR.e.y);
 
-    drawEndCap(curveR.e, curveL.e, false);
+    drawEndCap(curveR.e, curveL.e, !rightHand);
     ctx.bezierCurveTo(
       curveL.c2.x, curveL.c2.y,
       curveL.c1.x, curveL.c1.y,
       curveL.s.x, curveL.s.y);
     ctx.lineTo(curveR.s.x, curveR.s.y);
+    ctx.fill();
   } else {
     ctx.beginPath();
     ctx.moveTo(endPosR.x, endPosR.y);
@@ -354,7 +355,7 @@ window.addEventListener("resize", setCanvasSize);
 setCanvasSize();
 
 const fakeCurrentInstance = { snake: [{ x: 3, y: 1 }, { x: 4, y: 1 }, { x: 4, y: 2 }] }
-const fakeNextInstance = { snake: [{ x: 4, y: 1 }, { x: 4, y: 2 }, { x: 5, y: 2 }] }
+const fakeNextInstance = { snake: [{ x: 4, y: 1 }, { x: 4, y: 2 }, { x: 3, y: 2 }] }
 
 let start = Date.now();
 const renderLoop = () => {
