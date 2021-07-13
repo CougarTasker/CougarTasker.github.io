@@ -39,8 +39,8 @@ function dir(cur, next) {
   }
   this.add
 }
-computeDirections = (snake, nextHead) => {
-  previous = null;
+computeDirections = (lastTail, snake, nextHead) => {
+  previous = new dir(lastTail, snake[0]);
   let i;
   let out = []
   for (i = 0; i < snake.length - 1; i++) {
@@ -91,10 +91,10 @@ drawEndCap = (start, end, clockwize = true) => {
     y: end.y - start.y
   }
 
-  angle = rToL.x === 0 ? 
-  (clockwize ? 0 : Math.PI) : 
-    (rToL.x < 0 ? (Math.atan(rToL.y / rToL.x) + Math.PI / 2):
-    (Math.atan(rToL.y / rToL.x) - Math.PI / 2));
+  angle = rToL.x === 0 ?
+    (clockwize ? 0 : Math.PI) :
+    (rToL.x < 0 ? (Math.atan(rToL.y / rToL.x) + Math.PI / 2) :
+      (Math.atan(rToL.y / rToL.x) - Math.PI / 2));
   const capCenter = {
     x: start.x + rToL.x / 2,
     y: start.y + rToL.y / 2,
@@ -103,8 +103,8 @@ drawEndCap = (start, end, clockwize = true) => {
   ctx.arc(
     capCenter.x, capCenter.y,
     capR,
-    angle - Math.PI/2,
-    angle + Math.PI/2,
+    angle - Math.PI / 2,
+    angle + Math.PI / 2,
     clockwize
   )
 }
@@ -263,7 +263,7 @@ const transform = ({ x: xin, y: yin, width: widthin, height: heightin }) => {
 const snakeTailSize = 0.4;
 const snakeHeadSize = 0.8;
 
-drawInstance = ({ snake }, { snake: nextSnake }, progress) => {
+drawInstance = ({ snake: lastSnake }, { snake }, { snake: nextSnake }, progress) => {
 
   //draw grid
   for (var x = 0; x < gameDimentions.x; x++) {
@@ -281,19 +281,14 @@ drawInstance = ({ snake }, { snake: nextSnake }, progress) => {
     }
   }
 
-
-
-
-
-
-
   //draw a ciricle for each of the pars of the snake 
 
   //add moving head and tail
   const tail = snake[0];
   const head = snake[snake.length - 1];
   const nextHead = nextSnake[nextSnake.length - 1];
-  const corners = computeDirections(snake, nextHead);
+  const lastTail = lastSnake[0]
+  const corners = computeDirections(lastTail, snake, nextHead);
 
 
   ctx.fillStyle = colors.green;
@@ -314,8 +309,6 @@ drawInstance = ({ snake }, { snake: nextSnake }, progress) => {
       tail.dir.angle - Math.PI / 2);
     ctx.fill();
   }
-
-
 
   // corners 
   corners.forEach(corner => {
@@ -354,14 +347,34 @@ const setCanvasSize = () => {
 window.addEventListener("resize", setCanvasSize);
 setCanvasSize();
 
-const fakeCurrentInstance = { snake: [{ x: 3, y: 1 }, { x: 4, y: 1 }, { x: 4, y: 2 }] }
-const fakeNextInstance = { snake: [{ x: 4, y: 1 }, { x: 4, y: 2 }, { x: 3, y: 2 }] }
+const fakePreviousInstance = {
+  snake: [
+    { x: 3, y: 0 }, { x: 3, y: 1 },
+    { x: 4, y: 1 }, { x: 5, y: 2 },
+    { x: 5, y: 3 }, { x: 5, y: 4 },
+    { x: 5, y: 5 }, { x: 6, y: 5 }]
+}
+const fakeCurrentInstance = {
+  snake: [
+    { x: 3, y: 1 },
+    { x: 4, y: 1 }, { x: 5, y: 2 },
+    { x: 5, y: 3 }, { x: 5, y: 4 },
+    { x: 5, y: 5 }, { x: 6, y: 5 },
+    { x: 6, y: 4 }]
+}
+const fakeNextInstance = {
+  snake: [
+    { x: 4, y: 1 }, { x: 5, y: 2 },
+    { x: 5, y: 3 }, { x: 5, y: 4 },
+    { x: 5, y: 5 }, { x: 6, y: 5 },
+    { x: 6, y: 4 }, { x: 7, y: 4 }]
+}
 
 let start = Date.now();
 const renderLoop = () => {
   const progressDuration = 5000;
   const progress = ((Date.now() - start) % progressDuration) / progressDuration;
-  drawInstance(fakeCurrentInstance, fakeNextInstance, progress);
+  drawInstance(fakePreviousInstance,fakeCurrentInstance, fakeNextInstance, progress);
   window.requestAnimationFrame(renderLoop);
 
 }
