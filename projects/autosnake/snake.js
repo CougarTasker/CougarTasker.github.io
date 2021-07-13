@@ -19,6 +19,21 @@ lerp = (start, end, factor) => {
 function dir(cur, next) {
   this.x = next.x - cur.x;
   this.y = next.y - cur.y;
+  switch (10 * this.x + this.y) {
+    case -1:
+      this.angle = 1.5 * Math.PI;
+      break;
+    case 1:
+      this.angle = 0.5 * Math.PI;
+      break;
+    case -10:
+      this.angle = Math.PI;
+      break;
+    case 10:
+    default:
+      this.angle = 0;
+      break;
+  }
   this.equals = (k) => {
     return k != null && k.x === this.x && k.y === this.y
   }
@@ -26,14 +41,22 @@ function dir(cur, next) {
 computeDirections = (snake, nextHead) => {
   previous = null;
   let i;
+  let out = []
   for (i = 0; i < snake.length - 1; i++) {
     snake[i].dir = new dir(snake[i], snake[i + 1]);
-    snake.corner = !snake[i].dir.equals(previous);
+    snake[i].preDir = previous;
+    snake[i].corner = !snake[i].dir.equals(previous);
+    snake[i].order = i;
+    if (snake[i].corner) {
+      out.push(snake[i])
+    }
     previous = snake[i].dir;
   }
   snake[i].dir = new dir(snake[i], nextHead);
   snake.corner = !snake[i].dir.equals(previous);
+  return out;
 }
+
 
 drawInstance = ({ snake }, { snake: nextSnake }, progress) => {
   offset = {
@@ -73,17 +96,22 @@ drawInstance = ({ snake }, { snake: nextSnake }, progress) => {
   const tail = snake[0];
   const head = snake[snake.length - 1];
   const nextHead = nextSnake[nextSnake.length - 1];
-  computeDirections(snake, nextHead);
+  const corners = computeDirections(snake, nextHead);
+
   snake.forEach(part => {
     ctx.fillStyle = colors.red;
     ctx.beginPath();
     ctx.arc(
       cellSize.x * (part.x + part.dir.x * progress) + offset.x + cellSize.x / 2,
       cellSize.y * (part.y + part.dir.y * progress) + offset.x + offset.y + cellSize.y / 2,
-      cellSize.x * 0.5 * size, 0, 2 * Math.PI);
+      cellSize.x * 0.5 * size,
+      part.dir.angle - Math.PI / 2,
+      part.dir.angle + Math.PI / 2);
     ctx.fill();
     size += snakeStepSize;
   });
+
+
 
 
 }
@@ -102,8 +130,8 @@ const setCanvasSize = () => {
 window.addEventListener("resize", setCanvasSize);
 setCanvasSize();
 
-const fakeCurrentInstance = { snake: [{ x: 3, y: 1 }, { x: 4, y: 1 }, { x: 5, y: 1 }] }
-const fakeNextInstance = { snake: [{ x: 4, y: 1 }, { x: 5, y: 1 }, { x: 5, y: 2 },] }
+const fakeCurrentInstance = { snake: [{ x: 3, y: 1 }, { x: 4, y: 1 }, { x: 5, y: 1 }, { x: 6, y: 1 }] }
+const fakeNextInstance = { snake: [{ x: 4, y: 1 }, { x: 5, y: 1 }, { x: 6, y: 1 }, { x: 6, y: 2 }] }
 
 let start = Date.now();
 const renderLoop = () => {
