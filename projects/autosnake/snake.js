@@ -73,14 +73,47 @@ function getBezierXY(t, sx, sy, cp1x, cp1y, cp2x, cp2y, ex, ey) {
   };
 }
 
+
+drawEndCap = (cutofR, cutofL, backwards = false) => {
+  const rToL = {
+    x: cutofL.x - cutofR.x,
+    y: cutofL.y - cutofR.y
+  }
+  angle = rToL.x === 0 ? Math.PI / 2 : Math.atan(rToL.y / rToL.x);
+  if (backwards) {
+    angle -= Math.PI;
+  }
+  const capCenter = {
+    x: cutofR.x + rToL.x / 2,
+    y: cutofR.y + rToL.y / 2,
+  }
+  const capR = Math.sqrt(Math.pow(rToL.x, 2) + Math.pow(rToL.y, 2)) / 2
+  ctx.beginPath();
+  ctx.arc(
+    capCenter.x, capCenter.y,
+    capR,
+    angle,
+    angle + Math.PI
+  )
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(cutofR.x, cutofR.y)
+  ctx.lineTo(
+    cutofL.x, cutofL.y
+  );
+  ctx.strokeStyle = colors.green;
+  ctx.stroke();
+}
 drawCorner = (cell, progress, snakeLenght) => {
   //if this curve includes the tail 
 
 
 
 
-  startSize = lerp(snakeTailSize, snakeHeadSize, (cell.order - 0.5 - progress) / snakeLenght),
-    endSize = lerp(snakeTailSize, snakeHeadSize, (cell.order + 0.5 - progress) / snakeLenght)
+  startSize = lerp(snakeTailSize, snakeHeadSize, (cell.order - 0.5 - progress) / (snakeLenght - 1)),
+    endSize = lerp(snakeTailSize, snakeHeadSize, (cell.order + 0.5 - progress) / (snakeLenght - 1))
+
+
   const innerStrength = 0.5;
   const outerStrength = 0.5;
   const center = {
@@ -148,6 +181,7 @@ drawCorner = (cell, progress, snakeLenght) => {
 
   ctx.save();
   if (cell.order == 1 && progress >= 0.5) {
+
     //clip the part of the snake that shouldnt be seen.
     ctx.beginPath();
     const cutofR = getBezierXY(
@@ -172,7 +206,7 @@ drawCorner = (cell, progress, snakeLenght) => {
     });
     const corner = transform({
       x: center.x - cell.dir.x / 2 + cell.preDir.x / 2,
-      y: startPos.y - cell.dir.y / 2 + cell.preDir.y / 2
+      y: center.y - cell.dir.y / 2 + cell.preDir.y / 2
     });
 
     ctx.moveTo(cutofR.x, cutofR.y);
@@ -200,25 +234,66 @@ drawCorner = (cell, progress, snakeLenght) => {
     ctx.restore();
 
     //draw the endcap
+    drawEndCap(cutofR, cutofL, backwards = true);
 
-    const rToL = {
-      x: cutofL.x - cutofR.x,
-      y: cutofL.y - cutofR.y
-    }
-    angle = rToL.x === 0 ? Math.PI / 2 : Math.atan(rToL.y / rToL.x);
-    const capCenter = {
-      x: cutofR.x + rToL.x / 2,
-      y: cutofR.y + rToL.y / 2,
-    }
-    const capR = Math.sqrt(Math.pow(rToL.x, 2) + Math.pow(rToL.y, 2)) / 2
+  } else if (cell.order == snakeLenght - 1 && progress <= 0.5) {
     ctx.beginPath();
-    ctx.arc(
-      capCenter.x, capCenter.y,
-      capR,
-      angle - Math.PI,
-      angle
-    )
+    const cutofR = getBezierXY(
+      progress + 0.5,
+      startPosR.x, startPosR.y,
+      startPosRGuide.x, startPosRGuide.y,
+      endPosRGuide.x, endPosRGuide.y,
+      endPosR.x, endPosR.y)
+    const cutofL = getBezierXY(
+      progress + 0.5,
+      startPosL.x, startPosL.y,
+      startPosLGuide.x, startPosLGuide.y,
+      endPosLGuide.x, endPosLGuide.y,
+      endPosL.x, endPosL.y)
+    const startPosCellL = transform({
+      x: startPos.x - cell.dir.x / 2,
+      y: startPos.y - cell.dir.y / 2
+    });
+    const startPosCellR = transform({
+      x: startPos.x + cell.dir.x / 2,
+      y: startPos.y + cell.dir.y / 2
+    });
+    const corner = transform({
+      x: center.x - cell.dir.x / 2 + cell.preDir.x / 2,
+      y: center.y - cell.dir.y / 2 + cell.preDir.y / 2
+    });
+
+
+    ctx.moveTo(cutofL.x, cutofL.y);
+    ctx.lineTo(cutofR.x, cutofR.y);
+
+    ctx.lineTo(startPosCellR.x, startPosCellR.y);
+    ctx.lineTo(startPosCellL.x, startPosCellL.y);
+    ctx.lineTo(corner.x, corner.y);
+
+    ctx.strokeStyle = colors.orange;
+
+    ctx.clip();
+
+
+    //draw the tail as usual 
+    ctx.beginPath();
+    ctx.moveTo(endPosR.x, endPosR.y);
+    ctx.bezierCurveTo(
+      endPosRGuide.x, endPosRGuide.y,
+      startPosRGuide.x, startPosRGuide.y,
+      startPosR.x, startPosR.y);
+    ctx.lineTo(startPosL.x, startPosL.y);
+    ctx.bezierCurveTo(
+      startPosLGuide.x, startPosLGuide.y,
+      endPosLGuide.x, endPosLGuide.y,
+      endPosL.x, endPosL.y);
     ctx.fill();
+
+    ctx.restore();
+
+    drawEndCap(cutofL, cutofR);
+
   } else {
     ctx.beginPath();
     ctx.moveTo(endPosR.x, endPosR.y);
@@ -279,9 +354,8 @@ drawInstance = ({ snake }, { snake: nextSnake }, progress) => {
     }
   }
 
-  const snakeStepSize = (snakeHeadSize - snakeTailSize) / (snake.length - 1);
 
-  let size = snakeTailSize;
+
 
 
 
@@ -297,13 +371,14 @@ drawInstance = ({ snake }, { snake: nextSnake }, progress) => {
 
   ctx.fillStyle = colors.green;
   //tail
-  ctx.beginPath();
-  let box = transform({
-    x: (tail.x + tail.dir.x * progress) + 0.5,
-    y: (tail.y + tail.dir.y * progress) + 0.5,
-    width: 0.5 * snakeTailSize,
-  })
+
   if (progress <= 0.5 || !snake[1].corner) {
+    ctx.beginPath();
+    let box = transform({
+      x: (tail.x + tail.dir.x * progress) + 0.5,
+      y: (tail.y + tail.dir.y * progress) + 0.5,
+      width: 0.5 * snakeTailSize,
+    })
     ctx.arc(
       box.x,
       box.y,
@@ -320,22 +395,22 @@ drawInstance = ({ snake }, { snake: nextSnake }, progress) => {
     drawCorner(corner, progress, snake.length);
   })
 
-
-  //head 
-  ctx.beginPath();
-  box = transform({
-    x: (head.x + head.dir.x * progress) + 0.5,
-    y: (head.y + head.dir.y * progress) + 0.5,
-    width: 0.5 * snakeHeadSize,
-  })
-  ctx.arc(
-    box.x,
-    box.y,
-    box.width,
-    head.dir.angle - Math.PI / 2,
-    head.dir.angle + Math.PI / 2);
-  ctx.fill();
-  size += snakeStepSize;
+  if (progress >= 0.5 || !snake[snake.length - 2].corner) {
+    //head 
+    ctx.beginPath();
+    box = transform({
+      x: (head.x + head.dir.x * progress) + 0.5,
+      y: (head.y + head.dir.y * progress) + 0.5,
+      width: 0.5 * snakeHeadSize,
+    })
+    ctx.arc(
+      box.x,
+      box.y,
+      box.width,
+      head.dir.angle - Math.PI / 2,
+      head.dir.angle + Math.PI / 2);
+    ctx.fill();
+  }
 }
 
 
@@ -352,12 +427,12 @@ const setCanvasSize = () => {
 window.addEventListener("resize", setCanvasSize);
 setCanvasSize();
 
-const fakeCurrentInstance = { snake: [{ x: 3, y: 1 }, { x: 4, y: 1 }, { x: 4, y: 2 }, { x: 5, y: 2 }] }
-const fakeNextInstance = { snake: [{ x: 4, y: 1 }, { x: 4, y: 2 }, { x: 5, y: 2 }, { x: 6, y: 2 }] }
+const fakeCurrentInstance = { snake: [{ x: 3, y: 1 }, { x: 4, y: 1 }, { x: 4, y: 2 }] }
+const fakeNextInstance = { snake: [{ x: 4, y: 1 }, { x: 4, y: 2 }, { x: 5, y: 2 }] }
 
 let start = Date.now();
 const renderLoop = () => {
-  const progressDuration = 1000;
+  const progressDuration = 5000;
   const progress = ((Date.now() - start) % progressDuration) / progressDuration;
   drawInstance(fakeCurrentInstance, fakeNextInstance, progress);
   window.requestAnimationFrame(renderLoop);
