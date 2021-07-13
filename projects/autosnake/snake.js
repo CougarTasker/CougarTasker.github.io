@@ -37,6 +37,7 @@ function dir(cur, next) {
   this.equals = (k) => {
     return k != null && k.x === this.x && k.y === this.y
   }
+  this.add
 }
 computeDirections = (snake, nextHead) => {
   previous = null;
@@ -45,7 +46,7 @@ computeDirections = (snake, nextHead) => {
   for (i = 0; i < snake.length - 1; i++) {
     snake[i].dir = new dir(snake[i], snake[i + 1]);
     snake[i].preDir = previous;
-    snake[i].corner = !snake[i].dir.equals(previous);
+    snake[i].corner = previous !== null && !snake[i].dir.equals(previous);
     snake[i].order = i;
     if (snake[i].corner) {
       out.push(snake[i])
@@ -53,12 +54,40 @@ computeDirections = (snake, nextHead) => {
     previous = snake[i].dir;
   }
   snake[i].dir = new dir(snake[i], nextHead);
-  snake.corner = !snake[i].dir.equals(previous);
+  snake[i].preDir = previous;
+  snake[i].corner = !snake[i].dir.equals(previous);
+  snake[i].order = i;
+  if (snake[i].corner) {
+    out.push(snake[i])
+  }
   return out;
 }
 
+drawCorner = (cell, startSize, endSize) => {
+  const strength = 0.2;
+  const center = {
+    x: cell.x + 0.5,
+    y: cell.y + 0.5
+  }
+  const startPos = {
+    x: center.x - cell.preDir.x / 2,
+    y: center.y - cell.preDir.y / 2
+  }
+  const endPos = {
+    x: center.x + cell.dir.x / 2,
+    y: center.y + cell.dir.y / 2
+  }
+  const centerT = transform(center);
+  const startPosT = transform(startPos)
+  const endPosT = transform(endPos)
 
-drawInstance = ({ snake }, { snake: nextSnake }, progress) => {
+  ctx.beginPath();
+  ctx.moveTo(startPosT.x, startPosT.y);
+  ctx.bezierCurveTo(centerT.x, centerT.y, centerT.x, centerT.y, endPosT.x, endPosT.y);
+  ctx.stroke();
+}
+// i am going to create a grid cordinates to canvas coridnates function 
+const transform = ({ x: xin, y: yin, width: widthin, height: heightin }) => {
   offset = {
     x: Math.floor(canvas.width % gameDimentions.x / 2),
     y: Math.floor(canvas.width % gameDimentions.x / 2),
@@ -67,6 +96,15 @@ drawInstance = ({ snake }, { snake: nextSnake }, progress) => {
     x: Math.floor(canvas.width / gameDimentions.x),
     y: Math.floor(canvas.height / gameDimentions.y)
   }
+  return {
+    x: cellSize.x * xin + offset.x,
+    y: cellSize.y * yin + offset.y,
+    width: cellSize.x * (widthin ?? 0),
+    height: cellSize.y * (heightin ?? 0)
+  }
+}
+drawInstance = ({ snake }, { snake: nextSnake }, progress) => {
+
   //draw grid
   for (var x = 0; x < gameDimentions.x; x++) {
     for (var y = 0; y < gameDimentions.y; y++) {
@@ -78,7 +116,8 @@ drawInstance = ({ snake }, { snake: nextSnake }, progress) => {
           ctx.fillStyle = colors.white;
           break;
       }
-      ctx.fillRect(cellSize.x * x + offset.x, cellSize.y * y + offset.y, cellSize.x, cellSize.y);
+      const box = transform({ x, y, width: 1, height: 1 });
+      ctx.fillRect(box.x, box.y, box.width, box.height);
     }
   }
   const snakeTailSize = 0.4;
@@ -101,10 +140,15 @@ drawInstance = ({ snake }, { snake: nextSnake }, progress) => {
   snake.forEach(part => {
     ctx.fillStyle = colors.red;
     ctx.beginPath();
+    const box = transform({
+      x: (part.x + part.dir.x * progress) + 0.5,
+      y: (part.y + part.dir.y * progress) + 0.5,
+      width: 0.5 * size,
+    })
     ctx.arc(
-      cellSize.x * (part.x + part.dir.x * progress) + offset.x + cellSize.x / 2,
-      cellSize.y * (part.y + part.dir.y * progress) + offset.x + offset.y + cellSize.y / 2,
-      cellSize.x * 0.5 * size,
+      box.x,
+      box.y,
+      box.width,
       part.dir.angle - Math.PI / 2,
       part.dir.angle + Math.PI / 2);
     ctx.fill();
@@ -112,7 +156,7 @@ drawInstance = ({ snake }, { snake: nextSnake }, progress) => {
   });
 
 
-
+  drawCorner(corners[0], lerp(snakeTailSize, snakeHeadSize, corners[0].order - 0.5 - progress, corners[0].order + 0.5 - progress))
 
 }
 
