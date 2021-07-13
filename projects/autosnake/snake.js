@@ -16,6 +16,24 @@ const gameDimentions = { x: 10, y: 10 };
 lerp = (start, end, factor) => {
   return start + (end - start) * factor;
 }
+function dir(cur, next) {
+  this.x = next.x - cur.x;
+  this.y = next.y - cur.y;
+  this.equals = (k) => {
+    return k != null && k.x === this.x && k.y === this.y
+  }
+}
+computeDirections = (snake, nextHead) => {
+  previous = null;
+  let i;
+  for (i = 0; i < snake.length - 1; i++) {
+    snake[i].dir = new dir(snake[i], snake[i + 1]);
+    snake.corner = !snake[i].dir.equals(previous);
+    previous = snake[i].dir;
+  }
+  snake[i].dir = new dir(snake[i], nextHead);
+  snake.corner = !snake[i].dir.equals(previous);
+}
 
 drawInstance = ({ snake }, { snake: nextSnake }, progress) => {
   offset = {
@@ -26,6 +44,7 @@ drawInstance = ({ snake }, { snake: nextSnake }, progress) => {
     x: Math.floor(canvas.width / gameDimentions.x),
     y: Math.floor(canvas.height / gameDimentions.y)
   }
+  //draw grid
   for (var x = 0; x < gameDimentions.x; x++) {
     for (var y = 0; y < gameDimentions.y; y++) {
       switch ((x + y) % 2) {
@@ -45,49 +64,28 @@ drawInstance = ({ snake }, { snake: nextSnake }, progress) => {
 
   let size = snakeTailSize;
 
+
+
+
+  //draw a ciricle for each of the pars of the snake 
+
+  //add moving head and tail
+  const tail = snake[0];
+  const head = snake[snake.length - 1];
+  const nextHead = nextSnake[nextSnake.length - 1];
+  computeDirections(snake, nextHead);
   snake.forEach(part => {
-    ctx.fillStyle = colors.green;
+    ctx.fillStyle = colors.red;
     ctx.beginPath();
     ctx.arc(
-      cellSize.x * part.x + offset.x + cellSize.x / 2,
-      cellSize.y * part.y + offset.y + cellSize.y / 2,
+      cellSize.x * (part.x + part.dir.x * progress) + offset.x + cellSize.x / 2,
+      cellSize.y * (part.y + part.dir.y * progress) + offset.x + offset.y + cellSize.y / 2,
       cellSize.x * 0.5 * size, 0, 2 * Math.PI);
     ctx.fill();
     size += snakeStepSize;
   });
 
-  //add moving head and tail
-  const tail = snake[0];
-  const head = snake[snake.length - 1];
-  const nextTail = nextSnake[0];
-  const nextHead = nextSnake[nextSnake.length - 1];
 
-  //head 
-  midHead = {
-    x: lerp(head.x, nextHead.x, progress),
-    y: lerp(head.y, nextHead.y, progress)
-  }
-  ctx.fillStyle = colors.red;
-  ctx.beginPath();
-  ctx.arc(
-    cellSize.x * midHead.x + offset.x + cellSize.x / 2,
-    cellSize.y * midHead.y + offset.y + cellSize.y / 2,
-    cellSize.x * 0.5 * snakeHeadSize, 0, 2 * Math.PI);
-  ctx.fill();
-
-
-  //tail 
-  midTail = {
-    x: lerp(tail.x, nextTail.x, progress),
-    y: lerp(tail.y, nextTail.y, progress)
-  }
-  ctx.fillStyle = colors.red;
-  ctx.beginPath();
-  ctx.arc(
-    cellSize.x * midTail.x + offset.x + cellSize.x / 2,
-    cellSize.y * midTail.y + offset.y + cellSize.y / 2,
-    cellSize.x * 0.5 * snakeTailSize, 0, 2 * Math.PI);
-  ctx.fill();
 }
 
 
@@ -105,7 +103,7 @@ window.addEventListener("resize", setCanvasSize);
 setCanvasSize();
 
 const fakeCurrentInstance = { snake: [{ x: 3, y: 1 }, { x: 4, y: 1 }, { x: 5, y: 1 }] }
-const fakeNextInstance = { snake: [{ x: 4, y: 1 }, { x: 5, y: 1 }, { x: 6, y: 1 },] }
+const fakeNextInstance = { snake: [{ x: 4, y: 1 }, { x: 5, y: 1 }, { x: 5, y: 2 },] }
 
 let start = Date.now();
 const renderLoop = () => {
