@@ -62,18 +62,29 @@ computeDirections = (snake, nextHead) => {
   }
   return out;
 }
-//http://www.independent-software.com/determining-coordinates-on-a-html-canvas-bezier-curve.html
 
-function getBezierXY(t, sx, sy, cp1x, cp1y, cp2x, cp2y, ex, ey) {
-  return {
-    x: Math.pow(1 - t, 3) * sx + 3 * t * Math.pow(1 - t, 2) * cp1x
-      + 3 * t * t * (1 - t) * cp2x + t * t * t * ex,
-    y: Math.pow(1 - t, 3) * sy + 3 * t * Math.pow(1 - t, 2) * cp1y
-      + 3 * t * t * (1 - t) * cp2y + t * t * t * ey
-  };
+lerpVec = (s, e, t) => {
+  return { x: lerp(s.x, e.x, t), y: lerp(s.y, e.y, t) }
 }
-
-
+function splitBezierCurve(t, s, c1, c2, e, firstHalf = true) {
+  const m = [lerpVec(s, c1, t), lerpVec(c1, c2, t), lerpVec(c2, e, t)]
+  const q = [lerpVec(m[0], m[1], t), lerpVec(m[1], m[2], t)]
+  const b = lerpVec(q[0], q[1], t);
+  if (firstHalf) {
+    return { s: s, c1: m[0], c2: q[0], e: b }
+  } else {
+    return { s: b, c1: q[1], c2: m[2], e: e }
+  }
+}
+function drawBezierControls({ s, c1, c2, e }) {
+  ctx.beginPath();
+  ctx.moveTo(s.x, s.y);
+  ctx.lineTo(c1.x, c1.y);
+  ctx.lineTo(c2.x, c2.y);
+  ctx.lineTo(e.x, e.y);
+  ctx.strokeStyle = colors.orange;
+  ctx.stroke();
+}
 drawEndCap = (cutofR, cutofL, backwards = false) => {
   const rToL = {
     x: cutofL.x - cutofR.x,
@@ -88,21 +99,12 @@ drawEndCap = (cutofR, cutofL, backwards = false) => {
     y: cutofR.y + rToL.y / 2,
   }
   const capR = Math.sqrt(Math.pow(rToL.x, 2) + Math.pow(rToL.y, 2)) / 2
-  ctx.beginPath();
   ctx.arc(
     capCenter.x, capCenter.y,
     capR,
     angle,
     angle + Math.PI
   )
-  ctx.fill();
-  ctx.beginPath();
-  ctx.moveTo(cutofR.x, cutofR.y)
-  ctx.lineTo(
-    cutofL.x, cutofL.y
-  );
-  ctx.strokeStyle = colors.green;
-  ctx.stroke();
 }
 drawCorner = (cell, progress, snakeLenght) => {
   //if this curve includes the tail 
@@ -179,121 +181,45 @@ drawCorner = (cell, progress, snakeLenght) => {
 
 
 
-  ctx.save();
   if (cell.order == 1 && progress >= 0.5) {
 
-    //clip the part of the snake that shouldnt be seen.
+    curveR = splitBezierCurve(progress - 0.5, startPosR, startPosRGuide, endPosRGuide, endPosR, false);
+    curveL = splitBezierCurve(progress - 0.5, startPosL, startPosLGuide, endPosLGuide, endPosL, false);
+
+
     ctx.beginPath();
-    const cutofR = getBezierXY(
-      progress - 0.5,
-      startPosR.x, startPosR.y,
-      startPosRGuide.x, startPosRGuide.y,
-      endPosRGuide.x, endPosRGuide.y,
-      endPosR.x, endPosR.y)
-    const cutofL = getBezierXY(
-      progress - 0.5,
-      startPosL.x, startPosL.y,
-      startPosLGuide.x, startPosLGuide.y,
-      endPosLGuide.x, endPosLGuide.y,
-      endPosL.x, endPosL.y)
-    const endPosCellL = transform({
-      x: endPos.x + cell.preDir.x / 2,
-      y: endPos.y + cell.preDir.y / 2
-    });
-    const startPosCellR = transform({
-      x: startPos.x + cell.dir.x / 2,
-      y: startPos.y + cell.dir.y / 2
-    });
-    const corner = transform({
-      x: center.x - cell.dir.x / 2 + cell.preDir.x / 2,
-      y: center.y - cell.dir.y / 2 + cell.preDir.y / 2
-    });
-
-    ctx.moveTo(cutofR.x, cutofR.y);
-    ctx.lineTo(cutofL.x, cutofL.y);
-    ctx.lineTo(corner.x, corner.y);
-    ctx.lineTo(endPosCellL.x, endPosCellL.y);
-    ctx.lineTo(startPosCellR.x, startPosCellR.y);
-    ctx.clip();
-
-    //draw the tail as usual 
-    ctx.beginPath();
-    ctx.moveTo(endPosR.x, endPosR.y);
+    ctx.moveTo(curveR.s.x, curveR.s.y);
     ctx.bezierCurveTo(
-      endPosRGuide.x, endPosRGuide.y,
-      startPosRGuide.x, startPosRGuide.y,
-      startPosR.x, startPosR.y);
-    ctx.lineTo(startPosL.x, startPosL.y);
+      curveR.c1.x, curveR.c1.y,
+      curveR.c2.x, curveR.c2.y,
+      curveR.e.x, curveR.e.y);
+
+    ctx.lineTo(curveL.e.x, curveL.e.y);
     ctx.bezierCurveTo(
-      startPosLGuide.x, startPosLGuide.y,
-      endPosLGuide.x, endPosLGuide.y,
-      endPosL.x, endPosL.y);
-    ctx.fill();
-
-    //remove the clipping mask
-    ctx.restore();
-
+      curveL.c2.x, curveL.c2.y,
+      curveL.c1.x, curveL.c1.y,
+      curveL.s.x, curveL.s.y)
     //draw the endcap
-    drawEndCap(cutofR, cutofL, backwards = true);
-
-  } else if (cell.order == snakeLenght - 1 && progress <= 0.5) {
-    ctx.beginPath();
-    const cutofR = getBezierXY(
-      progress + 0.5,
-      startPosR.x, startPosR.y,
-      startPosRGuide.x, startPosRGuide.y,
-      endPosRGuide.x, endPosRGuide.y,
-      endPosR.x, endPosR.y)
-    const cutofL = getBezierXY(
-      progress + 0.5,
-      startPosL.x, startPosL.y,
-      startPosLGuide.x, startPosLGuide.y,
-      endPosLGuide.x, endPosLGuide.y,
-      endPosL.x, endPosL.y)
-    const startPosCellL = transform({
-      x: startPos.x - cell.dir.x / 2,
-      y: startPos.y - cell.dir.y / 2
-    });
-    const startPosCellR = transform({
-      x: startPos.x + cell.dir.x / 2,
-      y: startPos.y + cell.dir.y / 2
-    });
-    const corner = transform({
-      x: center.x - cell.dir.x / 2 + cell.preDir.x / 2,
-      y: center.y - cell.dir.y / 2 + cell.preDir.y / 2
-    });
-
-
-    ctx.moveTo(cutofL.x, cutofL.y);
-    ctx.lineTo(cutofR.x, cutofR.y);
-
-    ctx.lineTo(startPosCellR.x, startPosCellR.y);
-    ctx.lineTo(startPosCellL.x, startPosCellL.y);
-    ctx.lineTo(corner.x, corner.y);
-
-    ctx.strokeStyle = colors.orange;
-
-    ctx.clip();
-
-
-    //draw the tail as usual 
-    ctx.beginPath();
-    ctx.moveTo(endPosR.x, endPosR.y);
-    ctx.bezierCurveTo(
-      endPosRGuide.x, endPosRGuide.y,
-      startPosRGuide.x, startPosRGuide.y,
-      startPosR.x, startPosR.y);
-    ctx.lineTo(startPosL.x, startPosL.y);
-    ctx.bezierCurveTo(
-      startPosLGuide.x, startPosLGuide.y,
-      endPosLGuide.x, endPosLGuide.y,
-      endPosL.x, endPosL.y);
+    drawEndCap(curveR.s, curveL.s, true);
     ctx.fill();
+  } else if (cell.order == snakeLenght - 1 && progress <= 0.5) {
+    curveR = splitBezierCurve(progress + 0.5, startPosR, startPosRGuide, endPosRGuide, endPosR, true);
+    curveL = splitBezierCurve(progress + 0.5, startPosL, startPosLGuide, endPosLGuide, endPosL, true);
 
-    ctx.restore();
 
-    drawEndCap(cutofL, cutofR);
+    ctx.beginPath();
+    ctx.moveTo(curveR.s.x, curveR.s.y);
+    ctx.bezierCurveTo(
+      curveR.c1.x, curveR.c1.y,
+      curveR.c2.x, curveR.c2.y,
+      curveR.e.x, curveR.e.y);
 
+    drawEndCap(curveR.e, curveL.e, false);
+    ctx.bezierCurveTo(
+      curveL.c2.x, curveL.c2.y,
+      curveL.c1.x, curveL.c1.y,
+      curveL.s.x, curveL.s.y);
+    ctx.lineTo(curveR.s.x, curveR.s.y);
   } else {
     ctx.beginPath();
     ctx.moveTo(endPosR.x, endPosR.y);
