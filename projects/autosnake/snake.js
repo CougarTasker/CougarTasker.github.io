@@ -17,27 +17,67 @@ lerp = (start, end, factor) => {
   return start + (end - start) * factor;
 }
 function dir(cur, next) {
-  this.x = next.x - cur.x;
-  this.y = next.y - cur.y;
-  switch (10 * this.x + this.y) {
-    case -1:
-      this.angle = 1.5 * Math.PI;
-      break;
-    case 1:
-      this.angle = 0.5 * Math.PI;
-      break;
-    case -10:
-      this.angle = Math.PI;
-      break;
-    case 10:
-    default:
-      this.angle = 0;
-      break;
+
+  if (typeof cur === "string") {
+    this.number = 0;
+    this.name = cur;
+    switch (cur) {
+      case "up":
+        this.x = 0;
+        this.y = -1;
+        this.angle = 1.5 * Math.PI;
+        this.number = 0;
+        break;
+      case "down":
+        this.x = 0;
+        this.y = 1;
+        this.angle = 0.5 * Math.PI;
+        this.number = 1;
+        break;
+      case "left":
+        this.x = -1;
+        this.y = 0;
+        this.angle = Math.PI;
+        this.number = 2;
+        break;
+      case "right":
+        this.x = 1;
+        this.y = 0;
+        this.angle = 0;
+        this.number = 3;
+        break;
+    }
+  } else {
+    this.x = next.x - cur.x;
+    this.y = next.y - cur.y;
+    switch (10 * this.x + this.y) {
+      case -1:
+        this.angle = 1.5 * Math.PI;
+        this.number = 0;
+        this.name = "up";
+        break;
+      case 1:
+        this.angle = 0.5 * Math.PI;
+        this.number = 1;
+        this.name = "down";
+        break;
+      case -10:
+        this.angle = Math.PI;
+        this.number = 2;
+        this.name = "left";
+        break;
+      case 10:
+      default:
+        this.angle = 0;
+        this.number = 3;
+        this.name = "right";
+        break;
+    }
   }
+
   this.equals = (k) => {
-    return k != null && k.x === this.x && k.y === this.y
+    return k != null && k.number === this.number
   }
-  this.add
 }
 computeDirections = (lastTail, snake, nextHead) => {
   previous = new dir(lastTail, snake[0]);
@@ -85,6 +125,21 @@ function drawBezierControls({ s, c1, c2, e }) {
   ctx.strokeStyle = colors.orange;
   ctx.stroke();
 }
+function drawCornerControls(corner) {
+  for (key in corner) {
+    if (key.includes("R")) {
+      ctx.fillStyle = colors.red;
+    } else {
+      ctx.fillStyle = colors.blue;
+      
+    }
+    if ("x" in corner[key]) {
+      ctx.fillRect(corner[key].x, corner[key].x, 3);
+    }
+
+  }
+}
+
 drawEndCap = (start, end, clockwize = true) => {
   const rToL = {
     x: end.x - start.x,
@@ -178,8 +233,8 @@ drawCorner = (cell, progress, snakeLenght) => {
     const cellProgress = cell.order == 1 ? progress - 0.5 : progress + 0.5
     curveR = splitBezierCurve(cellProgress, startPosR, startPosRGuide, endPosRGuide, endPosR, false);
     curveL = splitBezierCurve(cellProgress, startPosL, startPosLGuide, endPosLGuide, endPosL, false);
-    //drawBezierControls(curveL);
-    //drawBezierControls(curveR);
+    drawBezierControls(curveL);
+    drawBezierControls(curveR);
 
     ctx.beginPath();
     ctx.moveTo(curveR.s.x, curveR.s.y);
@@ -196,13 +251,14 @@ drawCorner = (cell, progress, snakeLenght) => {
     //draw the endcap
     drawEndCap(curveL.s, curveR.s, !rightHand);
     ctx.fill();
+    ctx.stroke();
   } else if (cell.order == 0 && progress >= 0.5) {
     //it has left the square so dont draw anything 
   } else if (cell.order == snakeLenght - 1 && progress <= 0.5) {
     curveR = splitBezierCurve(progress + 0.5, startPosR, startPosRGuide, endPosRGuide, endPosR, true);
     curveL = splitBezierCurve(progress + 0.5, startPosL, startPosLGuide, endPosLGuide, endPosL, true);
-    //drawBezierControls(curveL);
-    //drawBezierControls(curveR);
+    drawBezierControls(curveL);
+    drawBezierControls(curveR);
     ctx.beginPath();
     ctx.moveTo(curveR.s.x, curveR.s.y);
     ctx.bezierCurveTo(
@@ -217,6 +273,7 @@ drawCorner = (cell, progress, snakeLenght) => {
       curveL.s.x, curveL.s.y);
     ctx.lineTo(curveR.s.x, curveR.s.y);
     ctx.fill();
+    ctx.stroke();
   } else {
     ctx.beginPath();
     ctx.moveTo(endPosR.x, endPosR.y);
@@ -231,11 +288,9 @@ drawCorner = (cell, progress, snakeLenght) => {
       endPosL.x, endPosL.y);
     ctx.fill();
   }
-  if (rightHand) {
-    return { startPosL: startPosR, startPosR: startPosL, endPosL: endPosR, endPosR: endPosL, order: cell.order };
-  } else {
-    return { startPosL, startPosR, endPosL, endPosR, order: cell.order };
-  }
+
+  return { startPosL, startPosR, endPosL, endPosR, order: cell.order };
+
 
 }
 
@@ -263,7 +318,7 @@ const transform = ({ x: xin, y: yin, width: widthin, height: heightin }) => {
 const snakeTailSize = 0.4;
 const snakeHeadSize = 0.8;
 
-drawInstance = ({ snake: lastSnake }, { snake }, { snake: nextSnake }, progress) => {
+drawInstance = (lastTail, { snake }, nextHead, progress) => {
 
   //draw grid
   for (var x = 0; x < gameDimentions.x; x++) {
@@ -286,8 +341,6 @@ drawInstance = ({ snake: lastSnake }, { snake }, { snake: nextSnake }, progress)
   //add moving head and tail
   const tail = snake[0];
   const head = snake[snake.length - 1];
-  const nextHead = nextSnake[nextSnake.length - 1];
-  const lastTail = lastSnake[0]
   const corners = computeDirections(lastTail, snake, nextHead);
 
 
@@ -317,7 +370,7 @@ drawInstance = ({ snake: lastSnake }, { snake }, { snake: nextSnake }, progress)
 
   //tail
   if (progress <= 0.5 && !snake[0].corner || progress >= 0.5 && !snake[1].corner) {
-    
+
     let box = transform({
       x: (tail.x + tail.dir.x * progress) + 0.5,
       y: (tail.y + tail.dir.y * progress) + 0.5,
@@ -325,6 +378,7 @@ drawInstance = ({ snake: lastSnake }, { snake }, { snake: nextSnake }, progress)
     })
 
     if (firstCorner == null) {
+      //there are no corners
       ctx.beginPath();
       ctx.arc(
         box.x,
@@ -332,8 +386,20 @@ drawInstance = ({ snake: lastSnake }, { snake }, { snake: nextSnake }, progress)
         box.width,
         tail.dir.angle + Math.PI / 2,
         tail.dir.angle - Math.PI / 2);
+      //create the last positions for the head to fill in the body
+      lastCorner = {
+        endPosR: {
+          x: box.x + Math.cos(head.dir.angle + Math.PI / 2) * box.width,
+          y: box.y + Math.sin(head.dir.angle + Math.PI / 2) * box.width
+        },
+        endPosL: {
+          x: box.x + Math.cos(head.dir.angle - Math.PI / 2) * box.width,
+          y: box.y + Math.sin(head.dir.angle - Math.PI / 2) * box.width
+        }
+      }
       ctx.fill();
-    }else{
+      ctx.stroke();
+    } else {
       ctx.beginPath();
       ctx.moveTo(firstCorner.startPosR.x, firstCorner.startPosR.y);
       ctx.lineTo(
@@ -348,10 +414,11 @@ drawInstance = ({ snake: lastSnake }, { snake }, { snake: nextSnake }, progress)
         tail.dir.angle - Math.PI / 2);
       ctx.lineTo(firstCorner.startPosL.x, firstCorner.startPosL.y);
       ctx.fill();
+      ctx.stroke();
     }
 
 
-    
+
   }
 
 
@@ -376,20 +443,21 @@ drawInstance = ({ snake: lastSnake }, { snake }, { snake: nextSnake }, progress)
       head.dir.angle + Math.PI / 2);
     ctx.lineTo(lastCorner.endPosR.x, lastCorner.endPosR.y);
     ctx.fill();
+    ctx.stroke();
   }
 
 
-  // snake.forEach(part => {
-  //   ctx.fillStyle = colors.red;
-  //   ctx.beginPath();
-  //   ctx.arc(
-  //     cellSize.x * (part.x + part.dir.x * progress) + offset.x + cellSize.x / 2,
-  //     cellSize.y * (part.y + part.dir.y * progress) + offset.x + offset.y + cellSize.y / 2,
-  //     cellSize.x * 0.5 * 0.5,
-  //     part.dir.angle - Math.PI / 2,
-  //     part.dir.angle + Math.PI / 2);
-  //   ctx.fill();
-  // });
+  snake.forEach(part => {
+    ctx.fillStyle = colors.red;
+    ctx.beginPath();
+    ctx.arc(
+      cellSize.x * (part.x + part.dir.x * progress) + offset.x + cellSize.x / 2,
+      cellSize.y * (part.y + part.dir.y * progress) + offset.x + offset.y + cellSize.y / 2,
+      cellSize.x * 0.5 * 0.5,
+      part.dir.angle - Math.PI / 2,
+      part.dir.angle + Math.PI / 2);
+    ctx.fill();
+  });
 }
 
 
@@ -406,35 +474,43 @@ const setCanvasSize = () => {
 window.addEventListener("resize", setCanvasSize);
 setCanvasSize();
 
-const fakePreviousInstance = {
-  snake: [
-    { x: 2, y: 1 }, { x: 3, y: 1 },
-    { x: 4, y: 1 }, { x: 4, y: 2 }, { x: 5, y: 2 },
-    { x: 5, y: 3 }, { x: 5, y: 4 },
-    { x: 5, y: 5 }, { x: 6, y: 5 }]
+const gameCenter = {
+  x: Math.floor(gameDimentions.x / 2),
+  y: Math.floor(gameDimentions.y / 2)
 }
-const fakeCurrentInstance = {
-  snake: [
-    { x: 3, y: 1 },
-    { x: 4, y: 1 }, { x: 4, y: 2 }, { x: 5, y: 2 },
-    { x: 5, y: 3 }, { x: 5, y: 4 },
-    { x: 5, y: 5 }, { x: 6, y: 5 },
-    { x: 6, y: 4 }]
-}
-const fakeNextInstance = {
-  snake: [
-    { x: 4, y: 1 }, { x: 5, y: 2 },
-    { x: 5, y: 3 }, { x: 4, y: 2 }, { x: 5, y: 4 },
-    { x: 5, y: 5 }, { x: 6, y: 5 },
-    { x: 6, y: 4 }, { x: 7, y: 4 }]
-}
+let previousTail = { x: gameCenter.x - 2, y: gameCenter.y };
+let currentInstance = { snake: [{ x: gameCenter.x - 1, y: gameCenter.y }, gameCenter, { x: gameCenter.x + 1, y: gameCenter.y }] }
+let nextHead = { x: gameCenter.x + 2, y: gameCenter.y };
+
+const loopSteps = ["up", "right", "down", "right", "down", "down", "left", "up", "left", "down", "left", "left", "up", "up", "right", "right"];
+let nextSteps = [...loopSteps];
 
 let start = Date.now();
+let lastProgress = 0;
 const renderLoop = () => {
-  const progressDuration = 5000;
+  const progressDuration = 10000;
   const progress = ((Date.now() - start) % progressDuration) / progressDuration;
-  drawInstance(fakePreviousInstance, fakeCurrentInstance, fakeNextInstance, progress);
+  if (progress < lastProgress) {
+
+    //we have made a step
+    if (nextSteps.length > 0) {
+      //make a step if there is one to make;
+      previousTail = currentInstance.snake.shift();
+      currentInstance.snake.push(nextHead);
+      const mov = new dir(nextSteps.shift());
+      const oldHead = currentInstance.snake[currentInstance.snake.length - 1];
+      nextHead = {
+        x: oldHead.x + mov.x,
+        y: oldHead.y + mov.y
+      }
+    } else {
+      nextSteps = [...loopSteps];
+    }
+
+  }
+  drawInstance(previousTail, currentInstance, nextHead, progress);
   window.requestAnimationFrame(renderLoop);
 
+  lastProgress = progress;
 }
 renderLoop();
