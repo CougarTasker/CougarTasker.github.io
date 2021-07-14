@@ -106,7 +106,7 @@ computeDirections = (lastTail, snake, nextHead) => {
 lerpVec = (s, e, t) => {
   return { x: lerp(s.x, e.x, t), y: lerp(s.y, e.y, t) }
 }
-function splitBezierCurve(t, s, c1, c2, e, firstHalf = true) {
+function splitBezierCurve(t, { s, c1, c2, e }, firstHalf = true) {
   const m = [lerpVec(s, c1, t), lerpVec(c1, c2, t), lerpVec(c2, e, t)]
   const q = [lerpVec(m[0], m[1], t), lerpVec(m[1], m[2], t)]
   const b = lerpVec(q[0], q[1], t);
@@ -131,10 +131,10 @@ function drawCornerControls(corner) {
       ctx.fillStyle = colors.red;
     } else {
       ctx.fillStyle = colors.blue;
-      
+
     }
-    if ("x" in corner[key]) {
-      ctx.fillRect(corner[key].x, corner[key].x, 3);
+    if (typeof corner[key] == "object" && "x" in corner[key]) {
+      ctx.fillRect(corner[key].x, corner[key].y, 3, 3);
     }
 
   }
@@ -165,14 +165,17 @@ drawEndCap = (start, end, clockwize = true) => {
 }
 drawCorner = (cell, progress, snakeLenght) => {
   //if this curve includes the tail 
-  const rightHand = cell.preDir.x == -cell.dir.y && cell.preDir.y == cell.dir.x
+  const rightHand = cell.preDir.x == cell.dir.y && -cell.preDir.y == cell.dir.x
+
+  const startRightHand = rightHand ? cell.dir : { x: -cell.dir.x, y: -cell.dir.y }
+  const endRightHand = rightHand ? { x: -cell.preDir.x, y: -cell.preDir.y } : cell.preDir
+
 
   startSize = lerp(snakeTailSize, snakeHeadSize, (cell.order - 0.5 - progress) / (snakeLenght - 1)),
     endSize = lerp(snakeTailSize, snakeHeadSize, (cell.order + 0.5 - progress) / (snakeLenght - 1))
 
 
-  const innerStrength = 0.5;
-  const outerStrength = 0.5;
+  const strength = 0.5
   const center = {
     x: cell.x + 0.5,
     y: cell.y + 0.5
@@ -186,110 +189,120 @@ drawCorner = (cell, progress, snakeLenght) => {
     y: center.y + cell.dir.y / 2
   }
 
-  //draw the inner bit 
-  // endpos right to start pos right 
-  const endPosR = transform({
-    x: endPos.x - cell.preDir.x * endSize / 2,
-    y: endPos.y - cell.preDir.y * endSize / 2
+  const startRInnerCornerDistance = rightHand ? (0.5 - startSize / 2) * strength : (0.5 + startSize / 2) * strength
+  const endRInnerCornerDistance = rightHand ? (0.5 - endSize / 2) * strength : (0.5 + endSize / 2) * strength
+  const startLInnerCornerDistance = rightHand ? (0.5 + startSize / 2) * strength : (0.5 - startSize / 2) * strength
+  const endLInnerCornerDistance = rightHand ? (0.5 + endSize / 2) * strength : (0.5 - endSize / 2) * strength
+
+  //calculate control points 
+  const endPosR = {
+    x: endPos.x + endRightHand.x * endSize / 2,
+    y: endPos.y + endRightHand.y * endSize / 2
+  }
+
+
+  const endPosRGuide = {
+    x: endPosR.x - cell.dir.x * startRInnerCornerDistance,
+    y: endPosR.y - cell.dir.y * startRInnerCornerDistance
+  }
+  const startPosR = {
+    x: startPos.x + startRightHand.x * startSize / 2,
+    y: startPos.y + startRightHand.y * startSize / 2
+  }
+  const startPosRGuide = {
+    x: startPosR.x + cell.preDir.x * endRInnerCornerDistance,
+    y: startPosR.y + cell.preDir.y * endRInnerCornerDistance
+  }
+
+
+  const endPosL = {
+    x: endPos.x - endRightHand.x * endSize / 2,
+    y: endPos.y - endRightHand.y * endSize / 2
+  }
+  const endPosLGuide = {
+    x: endPosL.x - cell.dir.x * startLInnerCornerDistance,
+    y: endPosL.y - cell.dir.y * startLInnerCornerDistance
+  }
+  const startPosL = {
+    x: startPos.x - startRightHand.x * startSize / 2,
+    y: startPos.y - startRightHand.y * startSize / 2
+  }
+  const startPosLGuide = {
+    x: startPosL.x + cell.preDir.x * endLInnerCornerDistance,
+    y: startPosL.y + cell.preDir.y * endLInnerCornerDistance
+  }
+
+
+  endPosRT = transform(endPosR);
+  endPosRGuideT = transform(endPosRGuide);
+  startPosRT = transform(startPosR);
+  startPosRGuideT = transform(startPosRGuide);
+  endPosLT = transform(endPosL);
+  endPosLGuideT = transform(endPosLGuide);
+  startPosLT = transform(startPosL);
+  startPosLGuideT = transform(startPosLGuide);
+  //translate the control Points
+
+  fullCurveR = { s: startPosRT, c1: startPosRGuideT, c2: endPosRGuideT, e: endPosRT };
+  fullCurveL = { s: startPosLT, c1: startPosLGuideT, c2: endPosLGuideT, e: endPosLT };
+
+  drawCornerControls({
+    endPosRT, endPosRGuideT, startPosRT, startPosRGuideT, endPosLT, endPosLGuideT, startPosLT, startPosLGuideT
   });
-  const endPosRGuide = transform({
-    x: endPos.x - cell.preDir.x * endSize / 2 - cell.dir.x * (0.5 - startSize / 2) * innerStrength,
-    y: endPos.y - cell.preDir.y * endSize / 2 - cell.dir.y * (0.5 - startSize / 2) * innerStrength
-  });
-  const startPosR = transform({
-    x: startPos.x + cell.dir.x * startSize / 2,
-    y: startPos.y + cell.dir.y * startSize / 2
-  })
-  const startPosRGuide = transform({
-    x: startPos.x + cell.dir.x * startSize / 2 + cell.preDir.x * (0.5 - endSize / 2) * innerStrength,
-    y: startPos.y + cell.dir.y * startSize / 2 + cell.preDir.y * (0.5 - endSize / 2) * innerStrength
-  })
 
-
-
-  //create the outer side
-  //start posL to end posL
-
-
-  const endPosL = transform({
-    x: endPos.x + cell.preDir.x * endSize / 2,
-    y: endPos.y + cell.preDir.y * endSize / 2
-  });
-  const endPosLGuide = transform({
-    x: endPos.x + cell.preDir.x * endSize / 2 - cell.dir.x * (0.5 + startSize / 2) * outerStrength,
-    y: endPos.y + cell.preDir.y * endSize / 2 - cell.dir.y * (0.5 + startSize / 2) * outerStrength
-  });
-  const startPosL = transform({
-    x: startPos.x - cell.dir.x * startSize / 2,
-    y: startPos.y - cell.dir.y * startSize / 2
-  })
-  const startPosLGuide = transform({
-    x: startPos.x - cell.dir.x * startSize / 2 + cell.preDir.x * (0.5 + endSize / 2) * outerStrength,
-    y: startPos.y - cell.dir.y * startSize / 2 + cell.preDir.y * (0.5 + endSize / 2) * outerStrength
-  })
-
-
+  drawBezerCurve = (curve, line = false, reverse = false) => {
+    if (reverse) {
+      curve = { s: curve.e, c1: curve.c2, c2: curve.c1, e: curve.s }
+    }
+    if (line) {
+      ctx.lineTo(curve.s.x, curve.s.y);
+    } else {
+      ctx.moveTo(curve.s.x, curve.s.y);
+    }
+    ctx.bezierCurveTo(
+      curve.c1.x, curve.c1.y,
+      curve.c2.x, curve.c2.y,
+      curve.e.x, curve.e.y);
+  }
   if (cell.order == 1 && progress >= 0.5 || cell.order == 0 && progress <= 0.5) {
     const cellProgress = cell.order == 1 ? progress - 0.5 : progress + 0.5
-    curveR = splitBezierCurve(cellProgress, startPosR, startPosRGuide, endPosRGuide, endPosR, false);
-    curveL = splitBezierCurve(cellProgress, startPosL, startPosLGuide, endPosLGuide, endPosL, false);
+    curveR = splitBezierCurve(cellProgress, fullCurveR, false);
+    curveL = splitBezierCurve(cellProgress, fullCurveL, false);
     drawBezierControls(curveL);
     drawBezierControls(curveR);
 
     ctx.beginPath();
-    ctx.moveTo(curveR.s.x, curveR.s.y);
-    ctx.bezierCurveTo(
-      curveR.c1.x, curveR.c1.y,
-      curveR.c2.x, curveR.c2.y,
-      curveR.e.x, curveR.e.y);
-
-    ctx.lineTo(curveL.e.x, curveL.e.y);
-    ctx.bezierCurveTo(
-      curveL.c2.x, curveL.c2.y,
-      curveL.c1.x, curveL.c1.y,
-      curveL.s.x, curveL.s.y)
+    drawBezerCurve(curveR);
+    drawBezerCurve(curveL, true, true);//the way back
     //draw the endcap
-    drawEndCap(curveL.s, curveR.s, !rightHand);
+    drawEndCap(curveL.s, curveR.s);
     ctx.fill();
     ctx.stroke();
   } else if (cell.order == 0 && progress >= 0.5) {
     //it has left the square so dont draw anything 
   } else if (cell.order == snakeLenght - 1 && progress <= 0.5) {
-    curveR = splitBezierCurve(progress + 0.5, startPosR, startPosRGuide, endPosRGuide, endPosR, true);
-    curveL = splitBezierCurve(progress + 0.5, startPosL, startPosLGuide, endPosLGuide, endPosL, true);
+    curveR = splitBezierCurve(progress + 0.5, fullCurveR, true);
+    curveL = splitBezierCurve(progress + 0.5, fullCurveL, true);
     drawBezierControls(curveL);
     drawBezierControls(curveR);
     ctx.beginPath();
-    ctx.moveTo(curveR.s.x, curveR.s.y);
-    ctx.bezierCurveTo(
-      curveR.c1.x, curveR.c1.y,
-      curveR.c2.x, curveR.c2.y,
-      curveR.e.x, curveR.e.y);
-
-    drawEndCap(curveR.e, curveL.e, !rightHand);
-    ctx.bezierCurveTo(
-      curveL.c2.x, curveL.c2.y,
-      curveL.c1.x, curveL.c1.y,
-      curveL.s.x, curveL.s.y);
-    ctx.lineTo(curveR.s.x, curveR.s.y);
+    drawBezerCurve(curveR);
+    drawEndCap(curveR.e, curveL.e);
+    drawBezerCurve(curveL, true, true);
     ctx.fill();
     ctx.stroke();
   } else {
+    drawBezierControls(fullCurveR);
+    drawBezierControls(fullCurveL);
+
     ctx.beginPath();
-    ctx.moveTo(endPosR.x, endPosR.y);
-    ctx.bezierCurveTo(
-      endPosRGuide.x, endPosRGuide.y,
-      startPosRGuide.x, startPosRGuide.y,
-      startPosR.x, startPosR.y);
-    ctx.lineTo(startPosL.x, startPosL.y);
-    ctx.bezierCurveTo(
-      startPosLGuide.x, startPosLGuide.y,
-      endPosLGuide.x, endPosLGuide.y,
-      endPosL.x, endPosL.y);
+    drawBezerCurve(fullCurveR);
+    drawBezerCurve(fullCurveL, true, true);
     ctx.fill();
+
   }
 
-  return { startPosL, startPosR, endPosL, endPosR, order: cell.order };
+  return { startPosLT, startPosRT, endPosLT, endPosRT, order: cell.order };
 
 
 }
@@ -351,18 +364,21 @@ drawInstance = (lastTail, { snake }, nextHead, progress) => {
 
   // corners 
   let lastCorner = null
-  let firstCorner = null;
+  let firstCorner = null; //first corner that is not the tail 
   corners.forEach(corner => {
 
     const thisCorner = drawCorner(corner, progress, snake.length);
-    if (lastCorner == null) {
+    if (firstCorner == null && thisCorner.order !== 0) {
       firstCorner = thisCorner;
-    } else if (thisCorner.order > lastCorner.order + 1) {
+    }
+    if (lastCorner != null && thisCorner.order > lastCorner.order + 1 && !(lastCorner.order == 0 && progress >= 0.5)) {
+      //connect the sreight gaps between corners. 
+      // except when the last corner is acctually a tail that has left its curve 
       ctx.beginPath();
-      ctx.moveTo(lastCorner.endPosL.x, lastCorner.endPosL.y);
-      ctx.lineTo(thisCorner.startPosL.x, thisCorner.startPosL.y);
-      ctx.lineTo(thisCorner.startPosR.x, thisCorner.startPosR.y);
-      ctx.lineTo(lastCorner.endPosR.x, lastCorner.endPosR.y);
+      ctx.moveTo(lastCorner.endPosLT.x, lastCorner.endPosLT.y);
+      ctx.lineTo(thisCorner.startPosLT.x, thisCorner.startPosLT.y);
+      ctx.lineTo(thisCorner.startPosRT.x, thisCorner.startPosRT.y);
+      ctx.lineTo(lastCorner.endPosRT.x, lastCorner.endPosRT.y);
       ctx.fill();
     }
     lastCorner = thisCorner;
@@ -388,23 +404,23 @@ drawInstance = (lastTail, { snake }, nextHead, progress) => {
         tail.dir.angle - Math.PI / 2);
       //create the last positions for the head to fill in the body
       lastCorner = {
-        endPosR: {
-          x: box.x + Math.cos(head.dir.angle + Math.PI / 2) * box.width,
-          y: box.y + Math.sin(head.dir.angle + Math.PI / 2) * box.width
+        endPosRT: {
+          x: box.x + Math.cos(tail.dir.angle + Math.PI / 2) * box.width,
+          y: box.y + Math.sin(tail.dir.angle + Math.PI / 2) * box.width
         },
-        endPosL: {
-          x: box.x + Math.cos(head.dir.angle - Math.PI / 2) * box.width,
-          y: box.y + Math.sin(head.dir.angle - Math.PI / 2) * box.width
+        endPosLT: {
+          x: box.x + Math.cos(tail.dir.angle - Math.PI / 2) * box.width,
+          y: box.y + Math.sin(tail.dir.angle - Math.PI / 2) * box.width
         }
       }
       ctx.fill();
       ctx.stroke();
     } else {
       ctx.beginPath();
-      ctx.moveTo(firstCorner.startPosR.x, firstCorner.startPosR.y);
+      ctx.moveTo(firstCorner.startPosRT.x, firstCorner.startPosRT.y);
       ctx.lineTo(
-        box.x + Math.cos(head.dir.angle + Math.PI / 2) * box.width,
-        box.y + Math.sin(head.dir.angle + Math.PI / 2) * box.width
+        box.x + Math.cos(tail.dir.angle + Math.PI / 2) * box.width,
+        box.y + Math.sin(tail.dir.angle + Math.PI / 2) * box.width
       )
       ctx.arc(
         box.x,
@@ -412,7 +428,7 @@ drawInstance = (lastTail, { snake }, nextHead, progress) => {
         box.width,
         tail.dir.angle + Math.PI / 2,
         tail.dir.angle - Math.PI / 2);
-      ctx.lineTo(firstCorner.startPosL.x, firstCorner.startPosL.y);
+      ctx.lineTo(firstCorner.startPosLT.x, firstCorner.startPosLT.y);
       ctx.fill();
       ctx.stroke();
     }
@@ -422,7 +438,7 @@ drawInstance = (lastTail, { snake }, nextHead, progress) => {
   }
 
 
-  if (progress >= 0.5 || !snake[snake.length - 2].corner) {
+  if (progress >= 0.5 || progress <= 0.5 && !snake[snake.length - 1].corner) {
     //head 
     ctx.beginPath();
     box = transform({
@@ -430,7 +446,7 @@ drawInstance = (lastTail, { snake }, nextHead, progress) => {
       y: (head.y + head.dir.y * progress) + 0.5,
       width: 0.5 * snakeHeadSize,
     })
-    ctx.moveTo(lastCorner.endPosL.x, lastCorner.endPosL.y);
+    ctx.moveTo(lastCorner.endPosLT.x, lastCorner.endPosLT.y);
     ctx.lineTo(
       box.x + Math.cos(head.dir.angle - Math.PI / 2) * box.width,
       box.y + Math.sin(head.dir.angle - Math.PI / 2) * box.width
@@ -441,23 +457,23 @@ drawInstance = (lastTail, { snake }, nextHead, progress) => {
       box.width,
       head.dir.angle - Math.PI / 2,
       head.dir.angle + Math.PI / 2);
-    ctx.lineTo(lastCorner.endPosR.x, lastCorner.endPosR.y);
+    ctx.lineTo(lastCorner.endPosRT.x, lastCorner.endPosRT.y);
     ctx.fill();
     ctx.stroke();
   }
 
 
-  snake.forEach(part => {
-    ctx.fillStyle = colors.red;
-    ctx.beginPath();
-    ctx.arc(
-      cellSize.x * (part.x + part.dir.x * progress) + offset.x + cellSize.x / 2,
-      cellSize.y * (part.y + part.dir.y * progress) + offset.x + offset.y + cellSize.y / 2,
-      cellSize.x * 0.5 * 0.5,
-      part.dir.angle - Math.PI / 2,
-      part.dir.angle + Math.PI / 2);
-    ctx.fill();
-  });
+  // snake.forEach(part => {
+  //   ctx.fillStyle = colors.red;
+  //   ctx.beginPath();
+  //   ctx.arc(
+  //     cellSize.x * (part.x + part.dir.x * progress) + offset.x + cellSize.x / 2,
+  //     cellSize.y * (part.y + part.dir.y * progress) + offset.x + offset.y + cellSize.y / 2,
+  //     cellSize.x * 0.5 * 0.5,
+  //     part.dir.angle - Math.PI / 2,
+  //     part.dir.angle + Math.PI / 2);
+  //   ctx.fill();
+  // });
 }
 
 
@@ -487,15 +503,25 @@ let nextSteps = [...loopSteps];
 
 let start = Date.now();
 let lastProgress = 0;
+
+let paused = false;
+
 const renderLoop = () => {
-  const progressDuration = 10000;
-  const progress = ((Date.now() - start) % progressDuration) / progressDuration;
+  const progressDuration = 1000;
+  let progress = ((Date.now() - start) % progressDuration) / progressDuration;
+  if (paused) {
+    progress = lastProgress;
+    start = Date.now() - progress;
+  }
   if (progress < lastProgress) {
 
     //we have made a step
     if (nextSteps.length > 0) {
       //make a step if there is one to make;
-      previousTail = currentInstance.snake.shift();
+      if (currentInstance.snake.length > 5) {
+        previousTail = currentInstance.snake.shift();
+      }
+
       currentInstance.snake.push(nextHead);
       const mov = new dir(nextSteps.shift());
       const oldHead = currentInstance.snake[currentInstance.snake.length - 1];
