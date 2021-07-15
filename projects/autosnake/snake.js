@@ -163,7 +163,7 @@ drawEndCap = (start, end, clockwize = true) => {
     clockwize
   )
 }
-drawCorner = (cell, progress, snakeLenght) => {
+drawCorner = (cell, progress, snakeLenght, hitApple) => {
   //if this curve includes the tail 
   const rightHand = cell.preDir.x == cell.dir.y && -cell.preDir.y == cell.dir.x
 
@@ -171,8 +171,17 @@ drawCorner = (cell, progress, snakeLenght) => {
   const endRightHand = rightHand ? { x: -cell.preDir.x, y: -cell.preDir.y } : cell.preDir
 
 
-  startSize = lerp(snakeTailSize, snakeHeadSize, (cell.order - 0.5 - progress) / (snakeLenght - 1)),
-    endSize = lerp(snakeTailSize, snakeHeadSize, (cell.order + 0.5 - progress) / (snakeLenght - 1))
+  let startSize, endSize;
+  if (hitApple) {
+    //progress the snake lenght 
+    startSize = lerp(snakeTailSize, snakeHeadSize, (cell.order - 0.5) / (snakeLenght + progress - 1)),
+      endSize = lerp(snakeTailSize, snakeHeadSize, (cell.order + 0.5) / (snakeLenght + progress - 1))
+  } else {
+    //ofset the where in the snake this is.
+    startSize = lerp(snakeTailSize, snakeHeadSize, (cell.order - 0.5 - progress) / (snakeLenght - 1)),
+      endSize = lerp(snakeTailSize, snakeHeadSize, (cell.order + 0.5 - progress) / (snakeLenght - 1))
+  }
+
 
 
   const strength = 0.5
@@ -264,8 +273,14 @@ drawCorner = (cell, progress, snakeLenght) => {
       curve.c2.x, curve.c2.y,
       curve.e.x, curve.e.y);
   }
-  if (cell.order == 1 && progress >= 0.5 || cell.order == 0 && progress <= 0.5) {
-    const cellProgress = cell.order == 1 ? progress - 0.5 : progress + 0.5
+  if (cell.order == 1 && progress >= 0.5 && !hitApple || cell.order == 0 && (progress <= 0.5 || hitApple)) {
+    //tail rendering 
+
+    //the tail will never leave the corner 0 if it has eaten an apple 
+    //the tail will never enter the corner 1 if it has eaten an apple 
+
+    const cellProgress = cell.order == 1 ? progress - 0.5 : (hitApple ? 0.5 : progress + 0.5);
+    // keep the tail still if the tail is within the curve and it has hit the apple 
     curveR = splitBezierCurve(cellProgress, fullCurveR, false);
     curveL = splitBezierCurve(cellProgress, fullCurveL, false);
     drawBezierControls(curveL);
@@ -279,8 +294,10 @@ drawCorner = (cell, progress, snakeLenght) => {
     ctx.fill();
     ctx.stroke();
   } else if (cell.order == 0 && progress >= 0.5) {
+    //tail rendering when it has left 
     //it has left the square so dont draw anything 
   } else if (cell.order == snakeLenght - 1 && progress <= 0.5) {
+    //head rendering 
     curveR = splitBezierCurve(progress + 0.5, fullCurveR, true);
     curveL = splitBezierCurve(progress + 0.5, fullCurveL, true);
     drawBezierControls(curveL);
@@ -331,7 +348,7 @@ const transform = ({ x: xin, y: yin, width: widthin, height: heightin }) => {
 const snakeTailSize = 0.4;
 const snakeHeadSize = 0.8;
 
-drawInstance = (lastTail, { snake }, nextHead, progress) => {
+drawInstance = (lastTail, { snake, hitApple }, nextHead, progress) => {
 
   //draw grid
   for (var x = 0; x < gameDimentions.x; x++) {
@@ -367,11 +384,11 @@ drawInstance = (lastTail, { snake }, nextHead, progress) => {
   let firstCorner = null; //first corner that is not the tail 
   corners.forEach(corner => {
 
-    const thisCorner = drawCorner(corner, progress, snake.length);
+    const thisCorner = drawCorner(corner, progress, snake.length, hitApple);
     if (firstCorner == null && thisCorner.order !== 0) {
       firstCorner = thisCorner;
     }
-    if (lastCorner != null && thisCorner.order > lastCorner.order + 1 && !(lastCorner.order == 0 && progress >= 0.5)) {
+    if (lastCorner != null && thisCorner.order > lastCorner.order + 1 && (lastCorner.order !== 0 || progress <= 0.5 || hitApple)) {
       //connect the sreight gaps between corners. 
       // except when the last corner is acctually a tail that has left its curve 
       ctx.beginPath();
@@ -383,15 +400,25 @@ drawInstance = (lastTail, { snake }, nextHead, progress) => {
     }
     lastCorner = thisCorner;
   })
-
   //tail
-  if (progress <= 0.5 && !snake[0].corner || progress >= 0.5 && !snake[1].corner) {
-
-    let box = transform({
-      x: (tail.x + tail.dir.x * progress) + 0.5,
-      y: (tail.y + tail.dir.y * progress) + 0.5,
-      width: 0.5 * snakeTailSize,
-    })
+  if ((progress <= 0.5 || hitApple) && !snake[0].corner || (progress >= 0.5 && !snake[1].corner && !hitApple)) {
+    // draw the end when it is in a square and has hit an
+    //if hit apple the tail doesnt move
+    let boxLocation = null
+    if (hitApple) {
+      boxLocation = {
+        x: tail.x + 0.5,
+        y: tail.y + 0.5,
+        width: 0.5 * snakeTailSize,
+      }
+    } else {
+      boxLocation = {
+        x: (tail.x + tail.dir.x * progress) + 0.5,
+        y: (tail.y + tail.dir.y * progress) + 0.5,
+        width: 0.5 * snakeTailSize,
+      }
+    }
+    const box = transform(boxLocation);
 
     if (firstCorner == null) {
       //there are no corners
@@ -445,7 +472,7 @@ drawInstance = (lastTail, { snake }, nextHead, progress) => {
       x: (head.x + head.dir.x * progress) + 0.5,
       y: (head.y + head.dir.y * progress) + 0.5,
       width: 0.5 * snakeHeadSize,
-    })
+    });
     ctx.moveTo(lastCorner.endPosLT.x, lastCorner.endPosLT.y);
     ctx.lineTo(
       box.x + Math.cos(head.dir.angle - Math.PI / 2) * box.width,
@@ -469,7 +496,7 @@ drawInstance = (lastTail, { snake }, nextHead, progress) => {
   //   ctx.arc(
   //     cellSize.x * (part.x + part.dir.x * progress) + offset.x + cellSize.x / 2,
   //     cellSize.y * (part.y + part.dir.y * progress) + offset.x + offset.y + cellSize.y / 2,
-  //     cellSize.x * 0.5 * 0.5,
+  //     cellSize.x * 0.5 * 0.3,
   //     part.dir.angle - Math.PI / 2,
   //     part.dir.angle + Math.PI / 2);
   //   ctx.fill();
@@ -495,7 +522,7 @@ const gameCenter = {
   y: Math.floor(gameDimentions.y / 2)
 }
 let previousTail = { x: gameCenter.x - 2, y: gameCenter.y };
-let currentInstance = { snake: [{ x: gameCenter.x - 1, y: gameCenter.y }, gameCenter, { x: gameCenter.x + 1, y: gameCenter.y }] }
+let currentInstance = { snake: [{ x: gameCenter.x - 1, y: gameCenter.y }, gameCenter, { x: gameCenter.x + 1, y: gameCenter.y }], hitApple: false }
 let nextHead = { x: gameCenter.x + 2, y: gameCenter.y };
 
 const loopSteps = ["up", "right", "down", "right", "down", "down", "left", "up", "left", "down", "left", "left", "up", "up", "right", "right"];
@@ -504,33 +531,29 @@ let nextSteps = [...loopSteps];
 let start = Date.now();
 let lastProgress = 0;
 
-let paused = false;
+let goingTohitApple = false;
 
 const renderLoop = () => {
   const progressDuration = 1000;
-  let progress = ((Date.now() - start) % progressDuration) / progressDuration;
-  if (paused) {
-    progress = lastProgress;
-    start = Date.now() - progress;
-  }
+  const progress = ((Date.now() - start) % progressDuration) / progressDuration;
   if (progress < lastProgress) {
-
-    //we have made a step
-    if (nextSteps.length > 0) {
-      //make a step if there is one to make;
-      if (currentInstance.snake.length > 5) {
-        previousTail = currentInstance.snake.shift();
-      }
-
-      currentInstance.snake.push(nextHead);
-      const mov = new dir(nextSteps.shift());
-      const oldHead = currentInstance.snake[currentInstance.snake.length - 1];
-      nextHead = {
-        x: oldHead.x + mov.x,
-        y: oldHead.y + mov.y
-      }
-    } else {
+    if (nextSteps.length == 0) {
       nextSteps = [...loopSteps];
+    }
+    //we have made a step
+    //make a step if there is one to make;
+    
+    if (!currentInstance.hitApple) {
+      previousTail = currentInstance.snake.shift();
+    }
+    currentInstance.hitApple = goingTohitApple;
+
+    currentInstance.snake.push(nextHead);
+    const mov = new dir(nextSteps.shift());
+    const oldHead = currentInstance.snake[currentInstance.snake.length - 1];
+    nextHead = {
+      x: oldHead.x + mov.x,
+      y: oldHead.y + mov.y
     }
 
   }
