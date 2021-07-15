@@ -16,6 +16,18 @@ const gameDimentions = { x: 10, y: 10 };
 lerp = (start, end, factor) => {
   return start + (end - start) * factor;
 }
+function scaleAndTranslatePath(path, box) {
+
+}
+const appleImg = new Image();   // Create new img element
+appleImg.src = './apple.svg'; // Set source path
+function drawAnApple({ x, y }, scale) {
+
+  const finalScale = 0.8 * scale;
+  var offset = (1 - finalScale) / 2;
+  var box = transform({ x: x + offset, y: y + offset, width: finalScale, height: finalScale });
+  ctx.drawImage(appleImg, box.x, box.y, box.width, box.height);
+}
 function dir(cur, next) {
 
   if (typeof cur === "string") {
@@ -348,7 +360,8 @@ const transform = ({ x: xin, y: yin, width: widthin, height: heightin }) => {
 const snakeTailSize = 0.4;
 const snakeHeadSize = 0.8;
 
-drawInstance = (lastTail, { snake, hitApple }, nextHead, progress) => {
+drawInstance = (lastTail, { snake, appleLocation, hitApple }, nextHead, progress) => {
+
 
   //draw grid
   for (var x = 0; x < gameDimentions.x; x++) {
@@ -365,6 +378,9 @@ drawInstance = (lastTail, { snake, hitApple }, nextHead, progress) => {
       ctx.fillRect(box.x, box.y, box.width, box.height);
     }
   }
+
+  //draw the apple
+  drawAnApple(appleLocation, hitApple ? 1 - progress : 1);
 
   //draw a ciricle for each of the pars of the snake 
 
@@ -522,7 +538,7 @@ const gameCenter = {
   y: Math.floor(gameDimentions.y / 2)
 }
 let previousTail = { x: gameCenter.x - 2, y: gameCenter.y };
-let currentInstance = { snake: [{ x: gameCenter.x - 1, y: gameCenter.y }, gameCenter, { x: gameCenter.x + 1, y: gameCenter.y }], hitApple: false }
+let currentInstance = { snake: [{ x: gameCenter.x - 1, y: gameCenter.y }, gameCenter, { x: gameCenter.x + 1, y: gameCenter.y }], hitApple: false, appleLocation: { x: 0, y: 0 } }
 let nextHead = { x: gameCenter.x + 2, y: gameCenter.y };
 
 const loopSteps = ["up", "right", "down", "right", "down", "down", "left", "up", "left", "down", "left", "left", "up", "up", "right", "right"];
@@ -533,6 +549,8 @@ let lastProgress = 0;
 
 let goingTohitApple = false;
 
+
+
 const renderLoop = () => {
   const progressDuration = 1000;
   const progress = ((Date.now() - start) % progressDuration) / progressDuration;
@@ -542,7 +560,7 @@ const renderLoop = () => {
     }
     //we have made a step
     //make a step if there is one to make;
-    
+
     if (!currentInstance.hitApple) {
       previousTail = currentInstance.snake.shift();
     }
@@ -562,4 +580,5 @@ const renderLoop = () => {
 
   lastProgress = progress;
 }
-renderLoop();
+// once everything has loaded start rendering
+appleImg.addEventListener('load', renderLoop, false);
