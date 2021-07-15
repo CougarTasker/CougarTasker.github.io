@@ -267,9 +267,9 @@ drawCorner = (cell, progress, snakeLenght, hitApple) => {
   fullCurveR = { s: startPosRT, c1: startPosRGuideT, c2: endPosRGuideT, e: endPosRT };
   fullCurveL = { s: startPosLT, c1: startPosLGuideT, c2: endPosLGuideT, e: endPosLT };
 
-  drawCornerControls({
-    endPosRT, endPosRGuideT, startPosRT, startPosRGuideT, endPosLT, endPosLGuideT, startPosLT, startPosLGuideT
-  });
+  // drawCornerControls({
+  //   endPosRT, endPosRGuideT, startPosRT, startPosRGuideT, endPosLT, endPosLGuideT, startPosLT, startPosLGuideT
+  // });
 
   drawBezerCurve = (curve, line = false, reverse = false) => {
     if (reverse) {
@@ -295,8 +295,8 @@ drawCorner = (cell, progress, snakeLenght, hitApple) => {
     // keep the tail still if the tail is within the curve and it has hit the apple 
     curveR = splitBezierCurve(cellProgress, fullCurveR, false);
     curveL = splitBezierCurve(cellProgress, fullCurveL, false);
-    drawBezierControls(curveL);
-    drawBezierControls(curveR);
+    // drawBezierControls(curveL);
+    // drawBezierControls(curveR);
 
     ctx.beginPath();
     drawBezerCurve(curveR);
@@ -304,7 +304,6 @@ drawCorner = (cell, progress, snakeLenght, hitApple) => {
     //draw the endcap
     drawEndCap(curveL.s, curveR.s);
     ctx.fill();
-    ctx.stroke();
   } else if (cell.order == 0 && progress >= 0.5) {
     //tail rendering when it has left 
     //it has left the square so dont draw anything 
@@ -312,17 +311,16 @@ drawCorner = (cell, progress, snakeLenght, hitApple) => {
     //head rendering 
     curveR = splitBezierCurve(progress + 0.5, fullCurveR, true);
     curveL = splitBezierCurve(progress + 0.5, fullCurveL, true);
-    drawBezierControls(curveL);
-    drawBezierControls(curveR);
+    // drawBezierControls(curveL);
+    // drawBezierControls(curveR);
     ctx.beginPath();
     drawBezerCurve(curveR);
     drawEndCap(curveR.e, curveL.e);
     drawBezerCurve(curveL, true, true);
     ctx.fill();
-    ctx.stroke();
   } else {
-    drawBezierControls(fullCurveR);
-    drawBezierControls(fullCurveL);
+    // drawBezierControls(fullCurveR);
+    // drawBezierControls(fullCurveL);
 
     ctx.beginPath();
     drawBezerCurve(fullCurveR);
@@ -360,7 +358,7 @@ const transform = ({ x: xin, y: yin, width: widthin, height: heightin }) => {
 const snakeTailSize = 0.4;
 const snakeHeadSize = 0.7;
 
-drawInstance = (lastTail, { snake, appleLocation, }, nextHead, progress) => {
+drawInstance = (lastTail, { snake, appleLocation, newApple }, nextHead, progress) => {
 
   hitApple = nextHead.x == appleLocation.x && nextHead.y == appleLocation.y;
   //draw grid
@@ -380,7 +378,7 @@ drawInstance = (lastTail, { snake, appleLocation, }, nextHead, progress) => {
   }
 
   //draw the apple
-  drawAnApple(appleLocation, hitApple ? 1 - progress : 1);
+  drawAnApple(appleLocation, hitApple ? 1 - progress : (newApple ? progress : 1));
 
   //draw a ciricle for each of the pars of the snake 
 
@@ -457,7 +455,6 @@ drawInstance = (lastTail, { snake, appleLocation, }, nextHead, progress) => {
         }
       }
       ctx.fill();
-      ctx.stroke();
     } else {
       ctx.beginPath();
       ctx.moveTo(firstCorner.startPosRT.x, firstCorner.startPosRT.y);
@@ -473,7 +470,6 @@ drawInstance = (lastTail, { snake, appleLocation, }, nextHead, progress) => {
         tail.dir.angle - Math.PI / 2);
       ctx.lineTo(firstCorner.startPosLT.x, firstCorner.startPosLT.y);
       ctx.fill();
-      ctx.stroke();
     }
 
 
@@ -502,7 +498,6 @@ drawInstance = (lastTail, { snake, appleLocation, }, nextHead, progress) => {
       head.dir.angle + Math.PI / 2);
     ctx.lineTo(lastCorner.endPosRT.x, lastCorner.endPosRT.y);
     ctx.fill();
-    ctx.stroke();
   }
 
 
@@ -533,6 +528,21 @@ const setCanvasSize = () => {
 window.addEventListener("resize", setCanvasSize);
 setCanvasSize();
 
+function createNewApple() {
+  do {
+    currentInstance.appleLocation = {
+      x: Math.round(Math.random() * (gameDimentions.x - 1)),
+      y: Math.round(Math.random() * (gameDimentions.y - 1))
+    };
+  } while (currentInstance.snake.some(({ x, y }) => x == currentInstance.appleLocation.x && y == currentInstance.appleLocation.y));
+  currentInstance.newApple = true;
+  appleListners.forEach(l => { l(appleLocation, currentInstance.snake); });
+}
+
+let appleListners = []
+const addNewAppleListner = (listner) => {
+  appleListners.add(listner);
+};
 
 
 const gameCenter = {
@@ -540,8 +550,9 @@ const gameCenter = {
   y: Math.floor(gameDimentions.y / 2)
 }
 let previousTail = { x: gameCenter.x - 2, y: gameCenter.y };
-let currentInstance = { snake: [{ x: gameCenter.x - 1, y: gameCenter.y }, gameCenter, { x: gameCenter.x + 1, y: gameCenter.y }], appleLocation: { x: 5, y: 5 } }
+let currentInstance = { snake: [{ x: gameCenter.x - 1, y: gameCenter.y }, gameCenter, { x: gameCenter.x + 1, y: gameCenter.y }], appleLocation: null, newApple: false }
 let nextHead = { x: gameCenter.x + 2, y: gameCenter.y };
+createNewApple();
 
 const loopSteps = ["up", "right", "down", "right", "down", "down", "left", "up", "left", "down", "left", "left", "up", "up", "right", "right"];
 let nextSteps = [...loopSteps];
@@ -563,7 +574,7 @@ const renderLoop = () => {
     //we have made a step
     //make a step if there is one to make;
 
-
+    currentInstance.newApple = false;
 
     currentInstance.snake.push(nextHead);
     const mov = new dir(nextSteps.shift());
@@ -574,6 +585,9 @@ const renderLoop = () => {
     }
     if (!(oldHead.x == currentInstance.appleLocation.x && oldHead.y == currentInstance.appleLocation.y)) {
       previousTail = currentInstance.snake.shift();
+    } else {
+      //apple has been hit
+      createNewApple();
     }
 
   }
