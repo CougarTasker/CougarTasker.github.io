@@ -186,12 +186,12 @@ drawCorner = (cell, progress, snakeLenght, hitApple) => {
   let startSize, endSize;
   if (hitApple) {
     //progress the snake lenght 
-    startSize = lerp(snakeTailSize, snakeHeadSize, (cell.order - 0.5) / (snakeLenght + progress - 1)),
-      endSize = lerp(snakeTailSize, snakeHeadSize, (cell.order + 0.5) / (snakeLenght + progress - 1))
+    startSize = lerp(snakeTailSize, snakeHeadSize, (cell.order - 0.5) / (snakeLenght + progress - 1));
+    endSize = lerp(snakeTailSize, snakeHeadSize, (cell.order + 0.5) / (snakeLenght + progress - 1));
   } else {
     //ofset the where in the snake this is.
-    startSize = lerp(snakeTailSize, snakeHeadSize, (cell.order - 0.5 - progress) / (snakeLenght - 1)),
-      endSize = lerp(snakeTailSize, snakeHeadSize, (cell.order + 0.5 - progress) / (snakeLenght - 1))
+    startSize = lerp(snakeTailSize, snakeHeadSize, (cell.order - 0.5 - progress) / (snakeLenght - 1));
+    endSize = lerp(snakeTailSize, snakeHeadSize, (cell.order + 0.5 - progress) / (snakeLenght - 1));
   }
 
 
@@ -414,6 +414,28 @@ drawInstance = (lastTail, { snake, appleLocation, newApple }, nextHead, progress
     }
     lastCorner = thisCorner;
   })
+  if (firstCorner == null) {
+    //no corners so make a fake corner 
+    size = lerp(snakeTailSize, snakeHeadSize, (1.5 - progress) / (snake.length - 1)) / 2;
+    console.log({ progress, size, fract: (1.5 - progress) / (snake.length - 1), fullSize: size * 2 })
+    const mid = {
+      x: snake[0].dir.x * 1.5 + snake[0].x + 0.5,
+      y: snake[0].dir.y * 1.5 + snake[0].y + 0.5
+    }
+
+    firstCorner = {
+      startPosLT: transform({
+        x: mid.x + snake[0].dir.y * size,
+        y: mid.y - snake[0].dir.x * size
+      }),
+      startPosRT: transform({
+        x: mid.x - snake[0].dir.y * size,
+        y: mid.y + snake[0].dir.x * size
+      })
+    }
+    lastCorner = { endPosLT: firstCorner.startPosLT, endPosRT: firstCorner.startPosRT };
+  }
+
   //tail
   if ((progress <= 0.5 || hitApple) && !snake[0].corner || (progress >= 0.5 && !snake[1].corner && !hitApple)) {
     // draw the end when it is in a square and has hit an
@@ -434,43 +456,21 @@ drawInstance = (lastTail, { snake, appleLocation, newApple }, nextHead, progress
     }
     const box = transform(boxLocation);
 
-    if (firstCorner == null) {
-      //there are no corners
-      ctx.beginPath();
-      ctx.arc(
-        box.x,
-        box.y,
-        box.width,
-        tail.dir.angle + Math.PI / 2,
-        tail.dir.angle - Math.PI / 2);
-      //create the last positions for the head to fill in the body
-      lastCorner = {
-        endPosRT: {
-          x: box.x + Math.cos(tail.dir.angle + Math.PI / 2) * box.width,
-          y: box.y + Math.sin(tail.dir.angle + Math.PI / 2) * box.width
-        },
-        endPosLT: {
-          x: box.x + Math.cos(tail.dir.angle - Math.PI / 2) * box.width,
-          y: box.y + Math.sin(tail.dir.angle - Math.PI / 2) * box.width
-        }
-      }
-      ctx.fill();
-    } else {
-      ctx.beginPath();
-      ctx.moveTo(firstCorner.startPosRT.x, firstCorner.startPosRT.y);
-      ctx.lineTo(
-        box.x + Math.cos(tail.dir.angle + Math.PI / 2) * box.width,
-        box.y + Math.sin(tail.dir.angle + Math.PI / 2) * box.width
-      )
-      ctx.arc(
-        box.x,
-        box.y,
-        box.width,
-        tail.dir.angle + Math.PI / 2,
-        tail.dir.angle - Math.PI / 2);
-      ctx.lineTo(firstCorner.startPosLT.x, firstCorner.startPosLT.y);
-      ctx.fill();
-    }
+    ctx.beginPath();
+    ctx.moveTo(firstCorner.startPosRT.x, firstCorner.startPosRT.y);
+    ctx.lineTo(
+      box.x + Math.cos(tail.dir.angle + Math.PI / 2) * box.width,
+      box.y + Math.sin(tail.dir.angle + Math.PI / 2) * box.width
+    )
+    ctx.arc(
+      box.x,
+      box.y,
+      box.width,
+      tail.dir.angle + Math.PI / 2,
+      tail.dir.angle - Math.PI / 2);
+    ctx.lineTo(firstCorner.startPosLT.x, firstCorner.startPosLT.y);
+    ctx.fill();
+
 
 
 
