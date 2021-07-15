@@ -538,20 +538,48 @@ function createNewApple() {
   appleListners.forEach(l => { l(appleLocation, currentInstance.snake); });
 }
 
-let appleListners = []
-const addNewAppleListner = (listner) => {
-  appleListners.add(listner);
-};
 
 
 const gameCenter = {
   x: Math.floor(gameDimentions.x / 2),
   y: Math.floor(gameDimentions.y / 2)
 }
-let previousTail = { x: gameCenter.x - 2, y: gameCenter.y };
-let currentInstance = { snake: [{ x: gameCenter.x - 1, y: gameCenter.y }, gameCenter, { x: gameCenter.x + 1, y: gameCenter.y }], appleLocation: null, newApple: false }
-let nextHead = { x: gameCenter.x + 2, y: gameCenter.y };
-createNewApple();
+
+let appleListners = [];
+let moveListners = [];
+let previousTail, currentInstance, nextHead;
+
+const game = {
+  addNewAppleListner: (listner) => {
+    appleListners.add(listner);
+  },
+  getCurrentAppleLocation: () => {
+    return currentInstance.appleLocation;
+  },
+  getCurrentSnake: () => {
+    return currentInstance.snake;
+  },
+  reset: () => {
+    previousTail = { x: gameCenter.x - 2, y: gameCenter.y };
+    currentInstance = { snake: [{ x: gameCenter.x - 1, y: gameCenter.y }, gameCenter, { x: gameCenter.x + 1, y: gameCenter.y }], appleLocation: null, newApple: false }
+    nextHead = { x: gameCenter.x + 2, y: gameCenter.y };
+    mainDirection = new dir("right");
+    createNewApple();
+  },
+  addNewMoveListner: (listner) => {
+    moveListners.add(listner);
+  },
+  setDirection: (dir) => {
+    headDir = currentInstance.snake[currentInstance.snake.length - 1].dir;
+    if (-dir.x !== headDir.x || -dir.y !== headDir.y) {
+      //if the asked direction is not oppsite to the main direction ie no 180 turns.
+      mainDirection = dir;
+    }
+  },
+  dimentions: gameDimentions
+}
+
+
 
 
 let nextSteps = [];
@@ -562,13 +590,12 @@ let lastProgress = 0;
 let goingTohitApple = false;
 
 let mainDirection = new dir("right");
+const isOutOfBounds = ({ x, y }) => x < 0 || y < 0 || y >= gameDimentions.y || x >= gameDimentions.x;
 
 const renderLoop = () => {
   const progressDuration = 500;
   const progress = ((Date.now() - start) % progressDuration) / progressDuration;
   if (progress < lastProgress) {
-
-
     //we have made a step
     //make a step if there is one to make;
 
@@ -587,40 +614,39 @@ const renderLoop = () => {
       //apple has been hit
       createNewApple();
     }
-
+    if (isOutOfBounds(nextHead) || currentInstance.snake.some(cur => cur.x == nextHead.x && cur.y == nextHead.y)) {
+      game.reset();
+    }
+    moveListners.forEach(l => { l(currentInstance.snake); });
   }
   drawInstance(previousTail, currentInstance, nextHead, progress);
   window.requestAnimationFrame(renderLoop);
 
   lastProgress = progress;
 }
+
+game.reset();//set everything up before rendering 
 // once everything has loaded start rendering
 appleImg.addEventListener('load', renderLoop, false);
 
 
 document.addEventListener("keydown", e => {
-  console.log(e.key);
   switch (e.key) {
     case "ArrowLeft":
     case "a":
-      mainDirection = new dir("left");
+      game.setDirection(new dir("left"));
       break;
     case "ArrowUp":
     case "w":
-      mainDirection = new dir("up");
+      game.setDirection(new dir("up"));
       break;
     case "ArrowDown":
     case "s":
-      mainDirection = new dir("down");
+      game.setDirection(new dir("down"));
       break;
     case "ArrowRight":
     case "d":
-      mainDirection = new dir("right");
+      game.setDirection(new dir("right"));
       break;
-
   }
-})
-
-document.addEventListener("keypress", function onPress(e) {
-  console.log(e.key);
 });
