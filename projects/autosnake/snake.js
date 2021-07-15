@@ -23,7 +23,7 @@ const appleImg = new Image();   // Create new img element
 appleImg.src = './apple.svg'; // Set source path
 function drawAnApple({ x, y }, scale) {
 
-  const finalScale = 0.8 * scale;
+  const finalScale = snakeHeadSize * 0.9 * scale;
   var offset = (1 - finalScale) / 2;
   var box = transform({ x: x + offset, y: y + offset, width: finalScale, height: finalScale });
   ctx.drawImage(appleImg, box.x, box.y, box.width, box.height);
@@ -358,11 +358,11 @@ const transform = ({ x: xin, y: yin, width: widthin, height: heightin }) => {
   }
 }
 const snakeTailSize = 0.4;
-const snakeHeadSize = 0.8;
+const snakeHeadSize = 0.7;
 
-drawInstance = (lastTail, { snake, appleLocation, hitApple }, nextHead, progress) => {
+drawInstance = (lastTail, { snake, appleLocation, }, nextHead, progress) => {
 
-
+  hitApple = nextHead.x == appleLocation.x && nextHead.y == appleLocation.y;
   //draw grid
   for (var x = 0; x < gameDimentions.x; x++) {
     for (var y = 0; y < gameDimentions.y; y++) {
@@ -533,12 +533,14 @@ const setCanvasSize = () => {
 window.addEventListener("resize", setCanvasSize);
 setCanvasSize();
 
+
+
 const gameCenter = {
   x: Math.floor(gameDimentions.x / 2),
   y: Math.floor(gameDimentions.y / 2)
 }
 let previousTail = { x: gameCenter.x - 2, y: gameCenter.y };
-let currentInstance = { snake: [{ x: gameCenter.x - 1, y: gameCenter.y }, gameCenter, { x: gameCenter.x + 1, y: gameCenter.y }], hitApple: false, appleLocation: { x: 0, y: 0 } }
+let currentInstance = { snake: [{ x: gameCenter.x - 1, y: gameCenter.y }, gameCenter, { x: gameCenter.x + 1, y: gameCenter.y }], appleLocation: { x: 5, y: 5 } }
 let nextHead = { x: gameCenter.x + 2, y: gameCenter.y };
 
 const loopSteps = ["up", "right", "down", "right", "down", "down", "left", "up", "left", "down", "left", "left", "up", "up", "right", "right"];
@@ -561,10 +563,7 @@ const renderLoop = () => {
     //we have made a step
     //make a step if there is one to make;
 
-    if (!currentInstance.hitApple) {
-      previousTail = currentInstance.snake.shift();
-    }
-    currentInstance.hitApple = goingTohitApple;
+
 
     currentInstance.snake.push(nextHead);
     const mov = new dir(nextSteps.shift());
@@ -572,6 +571,9 @@ const renderLoop = () => {
     nextHead = {
       x: oldHead.x + mov.x,
       y: oldHead.y + mov.y
+    }
+    if (!(oldHead.x == currentInstance.appleLocation.x && oldHead.y == currentInstance.appleLocation.y)) {
+      previousTail = currentInstance.snake.shift();
     }
 
   }
