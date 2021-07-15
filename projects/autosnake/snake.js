@@ -417,7 +417,6 @@ drawInstance = (lastTail, { snake, appleLocation, newApple }, nextHead, progress
   if (firstCorner == null) {
     //no corners so make a fake corner 
     size = lerp(snakeTailSize, snakeHeadSize, (1.5 - progress) / (snake.length - 1)) / 2;
-    console.log({ progress, size, fract: (1.5 - progress) / (snake.length - 1), fullSize: size * 2 })
     const mid = {
       x: snake[0].dir.x * 1.5 + snake[0].x + 0.5,
       y: snake[0].dir.y * 1.5 + snake[0].y + 0.5
@@ -554,30 +553,29 @@ let currentInstance = { snake: [{ x: gameCenter.x - 1, y: gameCenter.y }, gameCe
 let nextHead = { x: gameCenter.x + 2, y: gameCenter.y };
 createNewApple();
 
-const loopSteps = ["up", "right", "down", "right", "down", "down", "left", "up", "left", "down", "left", "left", "up", "up", "right", "right"];
-let nextSteps = [...loopSteps];
+
+let nextSteps = [];
 
 let start = Date.now();
 let lastProgress = 0;
 
 let goingTohitApple = false;
 
-
+let mainDirection = new dir("right");
 
 const renderLoop = () => {
-  const progressDuration = 1000;
+  const progressDuration = 500;
   const progress = ((Date.now() - start) % progressDuration) / progressDuration;
   if (progress < lastProgress) {
-    if (nextSteps.length == 0) {
-      nextSteps = [...loopSteps];
-    }
+
+
     //we have made a step
     //make a step if there is one to make;
 
     currentInstance.newApple = false;
 
     currentInstance.snake.push(nextHead);
-    const mov = new dir(nextSteps.shift());
+    const mov = mainDirection;
     const oldHead = currentInstance.snake[currentInstance.snake.length - 1];
     nextHead = {
       x: oldHead.x + mov.x,
@@ -598,3 +596,31 @@ const renderLoop = () => {
 }
 // once everything has loaded start rendering
 appleImg.addEventListener('load', renderLoop, false);
+
+
+document.addEventListener("keydown", e => {
+  console.log(e.key);
+  switch (e.key) {
+    case "ArrowLeft":
+    case "a":
+      mainDirection = new dir("left");
+      break;
+    case "ArrowUp":
+    case "w":
+      mainDirection = new dir("up");
+      break;
+    case "ArrowDown":
+    case "s":
+      mainDirection = new dir("down");
+      break;
+    case "ArrowRight":
+    case "d":
+      mainDirection = new dir("right");
+      break;
+
+  }
+})
+
+document.addEventListener("keypress", function onPress(e) {
+  console.log(e.key);
+});
