@@ -20,7 +20,7 @@ function scaleAndTranslatePath(path, box) {
 
 }
 const appleImg = new Image();   // Create new img element
-appleImg.src = './apple.svg'; // Set source path
+
 function drawAnApple({ x, y }, scale) {
 
   const finalScale = snakeHeadSize * 0.9 * scale;
@@ -661,9 +661,15 @@ const renderLoop = () => {
   lastProgress = progress;
 }
 
-game.reset();//set everything up before rendering 
-// once everything has loaded start rendering
-appleImg.addEventListener('load', renderLoop, false);
+
+window.addEventListener('load', () => {
+  game.reset();//set everything up before rendering 
+  // once everything has loaded start rendering
+  appleImg.src = './apple.svg'; // Set source path
+  appleImg.addEventListener('load', renderLoop, false);
+
+});
+
 
 
 document.addEventListener("keydown", e => {
