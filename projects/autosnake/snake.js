@@ -90,6 +90,9 @@ function dir(cur, next) {
   this.equals = (k) => {
     return k != null && k.number === this.number
   }
+  this.add = ({ x, y }) => {
+    return { x: this.x + x, y: this.y + y };
+  }
 }
 computeDirections = (lastTail, snake, nextHead) => {
   previous = new dir(lastTail, snake[0]);
@@ -395,7 +398,7 @@ drawInstance = (lastTail, { snake, appleLocation, newApple }, nextHead, progress
 
   // corners 
   let lastCorner = null
-  let firstCorner = null; //first corner that is not the tail 
+  let firstCorner = null; //first corner that is between two ends 
   corners.forEach(corner => {
 
     const thisCorner = drawCorner(corner, progress, snake.length, hitApple);
@@ -431,6 +434,15 @@ drawInstance = (lastTail, { snake, appleLocation, newApple }, nextHead, progress
         x: mid.x - snake[0].dir.y * size,
         y: mid.y + snake[0].dir.x * size
       })
+    }
+    if (lastCorner != null && (progress <= 0.5 || hitApple)) {
+      //there was a fake tail corner that is still being drawm
+      ctx.beginPath();
+      ctx.moveTo(lastCorner.endPosLT.x, lastCorner.endPosLT.y);
+      ctx.lineTo(firstCorner.startPosLT.x, firstCorner.startPosLT.y);
+      ctx.lineTo(firstCorner.startPosRT.x, firstCorner.startPosRT.y);
+      ctx.lineTo(lastCorner.endPosRT.x, lastCorner.endPosRT.y);
+      ctx.fill();
     }
     lastCorner = { endPosLT: firstCorner.startPosLT, endPosRT: firstCorner.startPosRT };
   }
@@ -469,11 +481,9 @@ drawInstance = (lastTail, { snake, appleLocation, newApple }, nextHead, progress
       tail.dir.angle - Math.PI / 2);
     ctx.lineTo(firstCorner.startPosLT.x, firstCorner.startPosLT.y);
     ctx.fill();
-
-
-
-
   }
+
+
 
 
   if (progress >= 0.5 || progress <= 0.5 && !snake[snake.length - 1].corner) {
@@ -498,7 +508,9 @@ drawInstance = (lastTail, { snake, appleLocation, newApple }, nextHead, progress
     ctx.lineTo(lastCorner.endPosRT.x, lastCorner.endPosRT.y);
     ctx.fill();
   }
-
+  if ("controlGrid" in game) {
+    drawControlGrid(game.controlGrid);
+  }
 
   // snake.forEach(part => {
   //   ctx.fillStyle = colors.red;
@@ -512,7 +524,24 @@ drawInstance = (lastTail, { snake, appleLocation, newApple }, nextHead, progress
   //   ctx.fill();
   // });
 }
+drawControlGrid = () => {
+  progress = 0;
 
+  for (let x = 0; x < game.dimentions.x; x++) {
+    for (let y = 0; y < game.dimentions.y; y++) {
+      ctx.fillStyle = colors.red;
+      ctx.beginPath();
+      box = transform({ x: x + 0.5, y: y + 0.5, width: 0.5 * 0.3, height: 0.5 * 0.3 });
+      ctx.arc(
+        box.x,
+        box.y,
+        box.width,
+        controlGrid[x][y].angle - Math.PI / 2,
+        controlGrid[x][y].angle + Math.PI / 2);
+      ctx.fill();
+    }
+  }
+}
 
 const setCanvasSize = () => {
   let size = Math.floor(canvasContainer.clientWidth);
@@ -535,7 +564,7 @@ function createNewApple() {
     };
   } while (currentInstance.snake.some(({ x, y }) => x == currentInstance.appleLocation.x && y == currentInstance.appleLocation.y));
   currentInstance.newApple = true;
-  appleListners.forEach(l => { l(appleLocation, currentInstance.snake); });
+  appleListners.forEach(l => { l(currentInstance.appleLocation, currentInstance.snake); });
 }
 
 
@@ -551,7 +580,7 @@ let previousTail, currentInstance, nextHead;
 
 const game = {
   addNewAppleListner: (listner) => {
-    appleListners.add(listner);
+    appleListners.push(listner);
   },
   getCurrentAppleLocation: () => {
     return currentInstance.appleLocation;
@@ -567,14 +596,17 @@ const game = {
     createNewApple();
   },
   addNewMoveListner: (listner) => {
-    moveListners.add(listner);
+    moveListners.push(listner);
   },
   setDirection: (dir) => {
-    headDir = currentInstance.snake[currentInstance.snake.length - 1].dir;
+    headDir = currentInstance.snake[currentInstance.snake.length - 2].dir;
     if (-dir.x !== headDir.x || -dir.y !== headDir.y) {
       //if the asked direction is not oppsite to the main direction ie no 180 turns.
       mainDirection = dir;
     }
+  },
+  getDirection: () => {
+    return mainDirection;
   },
   dimentions: gameDimentions
 }
@@ -602,22 +634,26 @@ const renderLoop = () => {
     currentInstance.newApple = false;
 
     currentInstance.snake.push(nextHead);
-    const mov = mainDirection;
     const oldHead = currentInstance.snake[currentInstance.snake.length - 1];
-    nextHead = {
-      x: oldHead.x + mov.x,
-      y: oldHead.y + mov.y
-    }
     if (!(oldHead.x == currentInstance.appleLocation.x && oldHead.y == currentInstance.appleLocation.y)) {
       previousTail = currentInstance.snake.shift();
     } else {
       //apple has been hit
       createNewApple();
     }
+
+    moveListners.forEach(l => { l(currentInstance.snake); });
+    const mov = mainDirection;
+
+    nextHead = {
+      x: oldHead.x + mov.x,
+      y: oldHead.y + mov.y
+    }
+
     if (isOutOfBounds(nextHead) || currentInstance.snake.some(cur => cur.x == nextHead.x && cur.y == nextHead.y)) {
       game.reset();
     }
-    moveListners.forEach(l => { l(currentInstance.snake); });
+
   }
   drawInstance(previousTail, currentInstance, nextHead, progress);
   window.requestAnimationFrame(renderLoop);
