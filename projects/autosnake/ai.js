@@ -228,27 +228,27 @@ function bfsToSnake(loc) {
     return [];
   }
   let frontier = [[start]];
-  let visited = new Set([start]);
+  let visited = new Set();
   let bestPath = [];
   const value = getNextQuads();
   let leastSteps = Number.MAX_SAFE_INTEGER;
   while (frontier.length > 0) {
     cur = frontier.shift();
-    basisControlGraph[cur[0]].forEach(cell => {
-      if (!visited.has(cell) && !snakeSquares.has(cell)) {
-        visited.add(cell);
-        const newPath = [cell, ...cur];
-        const thisSteps = value.get(cell)
-        if (thisSteps != undefined) {
-          if (thisSteps.count < leastSteps) {
-            leastSteps = thisSteps.count;
-            bestPath = [thisSteps.to, ...newPath];
-          }
-        } else {
-          frontier.push(newPath);
-        }
+    visited.add(cur[0]);
+
+    const thisSteps = value.get(cur[0])
+    if (thisSteps != undefined) {
+      if (thisSteps.count < leastSteps) {
+        leastSteps = thisSteps.count;
+        bestPath = [thisSteps.to, ...cur];
       }
-    });
+    } else {
+      basisControlGraph[cur[0]].forEach(cell => {
+        if (!visited.has(cell) && !snakeSquares.has(cell)) {
+          frontier.push([cell, ...cur]);
+        }
+      });
+    }
   }
   return bestPath;
 }
@@ -347,7 +347,7 @@ game.addNewMoveListner((snake) => {
         snakeSquares.delete(lastSnakeTailCellID);
         snakeSquaresMap.delete(lastSnakeTailCellID);
         //no longer contating snake 
-        if (canDeleteOldPath && currentAppleCellID != lastSnakeTailCellID && connectedQuads.get(lastSnakeTailCellID).size == 1 ) {
+        if (canDeleteOldPath && currentAppleCellID != lastSnakeTailCellID && connectedQuads.get(lastSnakeTailCellID).size == 1) {
           detachTwoQuads([lastSnakeTailCellID, gridCoridnatesToGraphID(snake[0])])
         }
       } else {
