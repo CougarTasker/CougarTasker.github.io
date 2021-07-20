@@ -369,7 +369,7 @@ drawInstance = (lastTail, { snake, appleLocation, newApple }, nextHead, progress
     for (var y = 0; y < gameDimentions.y; y++) {
       switch ((x + y) % 2) {
         case 0:
-          ctx.fillStyle = colors.black;
+          ctx.fillStyle = colors.white;
           break;
         case 1:
           ctx.fillStyle = colors.white;
@@ -511,7 +511,12 @@ drawInstance = (lastTail, { snake, appleLocation, newApple }, nextHead, progress
   if ("controlGrid" in game) {
     drawControlGrid(game.controlGrid);
   }
-
+  if ("connectedQuads" in game) {
+    drawConnectedQuads(game.connectedQuads);
+  }
+  if ("snakeSquares" in game) {
+    drawSnakeSquares(game.snakeSquares);
+  }
   // snake.forEach(part => {
   //   ctx.fillStyle = colors.red;
   //   ctx.beginPath();
@@ -524,7 +529,43 @@ drawInstance = (lastTail, { snake, appleLocation, newApple }, nextHead, progress
   //   ctx.fill();
   // });
 }
-drawControlGrid = () => {
+drawSnakeSquares = (snakeSquares) => {
+  const width = game.dimentions.x / 2;
+  toCooridnates = n => {
+    return transform({ x: (n % width) * 2 + 1, y: Math.floor(n / width) * 2 + 1, width: 0.2 });
+  }
+  ctx.fillStyle = colors.black;
+  for (square of snakeSquares.values()) {
+    const thisSquare = toCooridnates(square);
+    ctx.beginPath();
+    ctx.arc(thisSquare.x, thisSquare.y, thisSquare.width, 0, 2 * Math.PI);
+    ctx.fill()
+  }
+
+}
+drawConnectedQuads = (connectedQuads) => {
+  const width = game.dimentions.x / 2;
+  toCooridnates = n => {
+    return transform({ x: (n % width) * 2 + 1, y: Math.floor(n / width) * 2 + 1 });
+  }
+
+  ctx.beginPath();
+  for ([cell, next] of connectedQuads.entries()) {
+    home = toCooridnates(cell);
+    for (end of next.values()) {
+      endL = toCooridnates(end);
+      ctx.moveTo(home.x, home.y);
+      ctx.lineTo(endL.x, endL.y);
+    }
+  }
+  for (let n = 0; n < (gameDimentions.x * gameDimentions.y / 4); n++) {
+    const loc = toCooridnates(n)
+    ctx.fillText(n, loc.x, loc.y);
+  }
+  ctx.strokeStyle = colors.orange;
+  ctx.stroke();
+}
+drawControlGrid = (controlGrid) => {
   progress = 0;
 
   for (let x = 0; x < game.dimentions.x; x++) {
@@ -656,9 +697,8 @@ const renderLoop = () => {
 
   }
   drawInstance(previousTail, currentInstance, nextHead, progress);
-  window.requestAnimationFrame(renderLoop);
-
   lastProgress = progress;
+  window.requestAnimationFrame(renderLoop);
 }
 
 

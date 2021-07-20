@@ -36,69 +36,88 @@ const down = new dir("down");
 const left = new dir("left");
 const right = new dir("right");
 const allDirections = [up, right, down, left];
-
+const stepsAhead = 1; // the minimum number of steps ahead of the snake the search must use 
 
 const controlGrid = [];
 const basisControlGraph = [];
-const connectedQuads = new Map();//[x,y] to [[x,y],[x,y]]
-const toConnect = [];//[[x,y],[x,y]]
-const toDisconnect = []; // /[[x,y],[x,y]]
+const connectedQuads = new Map();
 
-const gridCoridnatesToGraph = ({ x, y }) => {
+const snakeSquares = new Set();
+const snakeSquaresMap = new Map();
+const toDisconnect = new Set();
+
+const gridCoridnatesToGraphID = ({ x, y }) => {
   return Math.floor(x / 2) + Math.floor(y / 2) * (game.dimentions.x / 2);
 }
-//create the basic control grid 
-for (let x = 0; x < game.dimentions.x; x++) {
-  const col = []
-  if ((x & 1) == 0) {
-    for (let y = 0; y < game.dimentions.y; y++) {
-      col[y] = (y & 1) == 0 ? right : up;
+function setupControlGrid() {
+
+  //create the basic control grid 
+  for (let x = 0; x < game.dimentions.x; x++) {
+    const col = []
+    if ((x & 1) == 0) {
+      for (let y = 0; y < game.dimentions.y; y++) {
+        col[y] = (y & 1) == 0 ? right : up;
+      }
+    } else {
+      for (let y = 0; y < game.dimentions.y; y++) {
+        col[y] = (y & 1) == 0 ? down : left;
+      }
     }
-  } else {
-    for (let y = 0; y < game.dimentions.y; y++) {
-      col[y] = (y & 1) == 0 ? down : left;
+    controlGrid[x] = col;
+  }
+  //greate basic game graph
+  const simpleConvert = (x, y) => {
+    return y * (game.dimentions.x / 2) + x;
+  }
+  for (let x = 0; x < (game.dimentions.x / 2); x++) {
+    for (let y = 0; y < (game.dimentions.y / 2); y++) {
+      const id = simpleConvert(x, y);
+      let adjacent = [];
+      if (y > 0) {
+        adjacent.push(simpleConvert(x, y - 1));
+      }
+      if (x > 0) {
+        adjacent.push(simpleConvert(x - 1, y));
+      }
+      if (y < (gameDimentions.y / 2) - 1) {
+        adjacent.push(simpleConvert(x, y + 1));
+      }
+      if (x < (gameDimentions.x / 2) - 1) {
+        adjacent.push(simpleConvert(x + 1, y));
+      }
+      basisControlGraph[id] = adjacent;
     }
   }
-  controlGrid[x] = col;
-}
-//greate basic game graph
-const simpleConvert = (x, y) => {
-  return y * (game.dimentions.x / 2) + x;
-}
-for (let x = 0; x < (game.dimentions.x / 2); x++) {
-  for (let y = 0; y < (game.dimentions.y / 2); y++) {
-    const id = simpleConvert(x, y);
-    let adjacent = [];
-    if (y > 0) {
-      adjacent.push(simpleConvert(x, y - 1));
-    }
+
+
+  //create a catcher path
+  for (let x = 0; x < (game.dimentions.x / 2); x++) {
+    //y == 0 
     if (x > 0) {
-      adjacent.push(simpleConvert(x - 1, y));
+      connectTwoQuads([simpleConvert(x - 1, 0), simpleConvert(x, 0)]);
     }
-    if (y < gameDimentions.y - 1) {
-      adjacent.push(simpleConvert(x, y + 1));
+    for (let y = 1; y < (game.dimentions.y / 2); y++) {
+      connectTwoQuads([simpleConvert(x, y - 1), simpleConvert(x, y)]);
     }
-    if (x < gameDimentions.x - 1) {
-      adjacent.push(simpleConvert(x + 1, y));
-    }
-    basisControlGraph[id] = adjacent;
   }
 }
+
+setupControlGrid();
 
 
 function connectTwoQuads([a, b]) {
   //add the connection the the graph
   const aList = connectedQuads.get(a);
   if (aList == undefined) {
-    connectedQuads.set(a, [b]);
+    connectedQuads.set(a, new Set([b]));
   } else {
-    connectedQuads.get(a).push(b);
+    connectedQuads.get(a).add(b);
   }
   const bList = connectedQuads.get(b);
   if (bList == undefined) {
-    connectedQuads.set(b, [a]);
+    connectedQuads.set(b, new Set([a]));
   } else {
-    connectedQuads.get(b).push(a);
+    connectedQuads.get(b).add(a);
   }
   const width = game.dimentions.x / 2;
   const ATopLeft = { x: a % width, y: Math.floor(a / width) };
@@ -124,12 +143,15 @@ function connectTwoQuads([a, b]) {
 }
 function detachTwoQuads([a, b]) {
   //add the connection the the graph
-  const Aconnected = connectedQuads.get(a)
-  const AindexB = Aconnected.indexOf(b);
-  Aconnected.splice(AindexB, 1);
+  const Aconnected = connectedQuads.get(a);
+  if (!Aconnected.has(b)) {
+    return false;
+  }
+  Aconnected.delete(b)
   const Bconnected = connectedQuads.get(b);
-  const BindexA = Bconnected.indexOf(b);
-  Bconnected.splice(BindexA, 1);
+  Bconnected.delete(a);
+
+
   const width = game.dimentions.x / 2;
   const ATopLeft = { x: a % width, y: Math.floor(a / width) };
   const BTopLeft = { x: b % width, y: Math.floor(b / width) };
@@ -154,12 +176,81 @@ function detachTwoQuads([a, b]) {
 }
 
 
-game.controlGrid = controlGrid;
+function bfsToSnake(loc) {
+  start = gridCoridnatesToGraphID(loc);
+  if (snakeSquares.size == 0) {
+    return [];
+  }
+  let goals = snakeSquares;
+  let frontier = [[start]];
+  let visited = new Set([start]);
+  let path = null;
+  while (path == null) {
+    cur = frontier.shift();
+    basisControlGraph[cur[0]].forEach(cell => {
+      if (!visited.has(cell)) {
+        visited.add(cell);
+        const newPath = [cell, ...cur];
+        frontier.push(newPath);
+        if (goals.has(cell)) {
+          path = newPath;
+        }
+      }
+    });
+  }
+  return path;
+}
 
+
+function connectPath(path) {
+  for (let i = 1; i < path.length; i++) {
+    connectTwoQuads([path[i], path[i - 1]]);
+  }
+}
+function simplifyPath() {
+  toPrune = []
+  for ([quad, connections] of connectedQuads.entries()) {
+    if (quad == headQuad) {
+      //skip changing the headQuad
+    } else if (snakeSquares.has(quad)) {
+      for (otherQuad of connections.values()) {
+        if (otherQuad != headQuad && !snakeSquares.has(otherQuad)) {
+          toPrune.push([quad, otherQuad]);
+        }
+      }
+    } else {
+      for (otherQuad of connections.values()) {
+        if (otherQuad != headQuad) {
+          toPrune.push([quad, otherQuad]);
+        }
+      }
+    }
+  }
+  for (prune of toPrune) {
+    detachTwoQuads(prune);
+  }
+}
+
+function getApple() {
+  setTimeout(() => {
+    simplifyPath();
+    connectPath(bfsToSnake(currentApple));
+  }, 1);
+}
+
+game.controlGrid = controlGrid;
+game.connectedQuads = connectedQuads;
+game.snakeSquares = snakeSquares;
 
 game.addNewAppleListner(apple => {
   currentApple = apple;
+  getApple();
 });
+
+let capturedTheSnake = false;
+let lastSnakeTail = null;
+let headQuad = -1;
+
 
 game.addNewMoveListner((snake) => {
   //the next move has allready been selected pick the z
@@ -168,6 +259,50 @@ game.addNewMoveListner((snake) => {
     game.setDirection(controlGrid[snakeHead.x][snakeHead.y]);
   }
 
+  const snakeSquaresLength = snakeSquares.size
+  if (snakeSquaresLength == 0) {
+    for (square of snake) {
+      const squareID = gridCoridnatesToGraphID(square);
+      if (snakeSquares.has(squareID)) {
+        snakeSquaresMap.set(squareID, 1 + snakeSquaresMap.get(squareID));
+      } else {
+        snakeSquares.add(squareID);
+        snakeSquaresMap.set(squareID, 1);
+      }
+
+    }
+    headQuad = gridCoridnatesToGraphID(snakeHead);
+  } else {
+    const canDeleteOldPath = (snakeSquaresLength - 1) * 4 > snake.length + 1;
+    const snakeHeadCellID = gridCoridnatesToGraphID(snakeHead);
+    headQuad = snakeHeadCellID;
+    const lastSnakeTailCellID = gridCoridnatesToGraphID(lastSnakeTail);
+    if (snakeSquares.has(snakeHeadCellID)) {
+      snakeSquaresMap.set(snakeHeadCellID, 1 + snakeSquaresMap.get(snakeHeadCellID));
+    } else {
+      snakeSquares.add(snakeHeadCellID);
+      snakeSquaresMap.set(snakeHeadCellID, 1);
+    }
+
+    if (lastSnakeTail.x != snake[0].x || lastSnakeTail.y != snake[0].y) {
+      oldTailCount = snakeSquaresMap.get(lastSnakeTailCellID);
+      if (oldTailCount <= 1) {
+        snakeSquares.delete(lastSnakeTailCellID);
+        snakeSquaresMap.delete(lastSnakeTailCellID);
+        //no longer contating snake 
+        if (canDeleteOldPath && connectedQuads.get(lastSnakeTailCellID).size == 1) {
+          detachTwoQuads([lastSnakeTailCellID, gridCoridnatesToGraphID(snake[0])])
+        }
+      } else {
+        snakeSquaresMap.set(
+          lastSnakeTailCellID,
+          snakeSquaresMap.get(lastSnakeTailCellID) - 1
+        );
+      }
+    }
+  }
+
+  lastSnakeTail = snake[0];
 
 
 });
