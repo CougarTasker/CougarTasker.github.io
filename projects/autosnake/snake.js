@@ -534,14 +534,17 @@ drawSnakeSquares = (snakeSquares) => {
   toCooridnates = n => {
     return transform({ x: (n % width) * 2 + 1, y: Math.floor(n / width) * 2 + 1, width: 0.2 });
   }
+
+
+
   ctx.fillStyle = colors.black;
   for (square of snakeSquares.values()) {
     const thisSquare = toCooridnates(square);
     ctx.beginPath();
     ctx.arc(thisSquare.x, thisSquare.y, thisSquare.width, 0, 2 * Math.PI);
-    ctx.fill()
-  }
+    ctx.fill();
 
+  }
 }
 drawConnectedQuads = (connectedQuads) => {
   const width = game.dimentions.x / 2;
@@ -666,7 +669,7 @@ let mainDirection = new dir("right");
 const isOutOfBounds = ({ x, y }) => x < 0 || y < 0 || y >= gameDimentions.y || x >= gameDimentions.x;
 
 const renderLoop = () => {
-  const progressDuration = 500;
+  const progressDuration = 50;
   const progress = ((Date.now() - start) % progressDuration) / progressDuration;
   if (progress < lastProgress) {
     //we have made a step

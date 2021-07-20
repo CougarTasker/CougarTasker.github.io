@@ -30,13 +30,14 @@
 
 let moves = []
 let currentApple = null;
+let currentAppleCellID = -1;
 
 const up = new dir("up");
 const down = new dir("down");
 const left = new dir("left");
 const right = new dir("right");
 const allDirections = [up, right, down, left];
-const stepsAhead = 1; // the minimum number of steps ahead of the snake the search must use 
+
 
 const controlGrid = [];
 const basisControlGraph = [];
@@ -44,6 +45,8 @@ const connectedQuads = new Map();
 
 const snakeSquares = new Set();
 const snakeSquaresMap = new Map();
+
+
 const toDisconnect = new Set();
 
 const gridCoridnatesToGraphID = ({ x, y }) => {
@@ -174,31 +177,80 @@ function detachTwoQuads([a, b]) {
   controlGrid[aCenter.x + bOffset.x][aCenter.y + bOffset.y] = allDirections[left];
   controlGrid[aCenter.x + aOffset.x][aCenter.y + aOffset.y] = allDirections[right];
 }
+function getQuadToSquare({ x, y }) {
+  const toDir = (x & 1) == 0 ?
+    ((y & 1) == 0 ? right : up) :
+    ((y & 1) == 0 ? down : left)
 
+  const newPos = { x: (Math.floor(x / 2) - toDir.x), y: (Math.floor(y / 2) - toDir.y) };
+  if (newPos.x < 0 || newPos.y < 0 || newPos.x >= game.dimentions.x / 2 || newPos.y >= game.dimentions.y / 2) {
+    return -1;
+  }
+  return newPos.x + newPos.y * game.dimentions.x / 2;
+}
+
+function getNextQuads() {
+  const out = new Map();
+  let count = 0;
+  if (!snakeHead) {
+    return out;
+  }
+  let currentSquare = {
+    x: snakeHead.x,
+    y: snakeHead.y
+  }
+  let hasNotCompleteLoop = true;
+
+  while (hasNotCompleteLoop) {
+    currentSquare = controlGrid[currentSquare.x][currentSquare.y].add(currentSquare);
+    const to = gridCoridnatesToGraphID(currentSquare);
+    const from = getQuadToSquare(currentSquare);
+    if (currentSquare.x == snakeHead.x && currentSquare.y == snakeHead.y) {
+      hasNotCompleteLoop = false;
+    }
+    if (from != -1 && !out.has(from) && !snakeSquares.has(from)) {
+      out.set(from, {
+        count: count == 0 ? Number.MAX_SAFE_INTEGER - 1 : count,
+        to
+      });
+    }
+    count += 1;
+  }
+  return out;
+}
 
 function bfsToSnake(loc) {
   start = gridCoridnatesToGraphID(loc);
   if (snakeSquares.size == 0) {
     return [];
   }
-  let goals = snakeSquares;
+  if (snakeSquares.has(loc)) {
+    return [];
+  }
   let frontier = [[start]];
   let visited = new Set([start]);
-  let path = null;
-  while (path == null) {
+  let bestPath = [];
+  const value = getNextQuads();
+  let leastSteps = Number.MAX_SAFE_INTEGER;
+  while (frontier.length > 0) {
     cur = frontier.shift();
     basisControlGraph[cur[0]].forEach(cell => {
-      if (!visited.has(cell)) {
+      if (!visited.has(cell) && !snakeSquares.has(cell)) {
         visited.add(cell);
         const newPath = [cell, ...cur];
-        frontier.push(newPath);
-        if (goals.has(cell)) {
-          path = newPath;
+        const thisSteps = value.get(cell)
+        if (thisSteps != undefined) {
+          if (thisSteps.count < leastSteps) {
+            leastSteps = thisSteps.count;
+            bestPath = [thisSteps.to, ...newPath];
+          }
+        } else {
+          frontier.push(newPath);
         }
       }
     });
   }
-  return path;
+  return bestPath;
 }
 
 
@@ -234,27 +286,32 @@ function simplifyPath() {
 function getApple() {
   setTimeout(() => {
     simplifyPath();
-    connectPath(bfsToSnake(currentApple));
+    if (!snakeSquares.has(currentAppleCellID)) {
+      //only connect the apple if its not on the path.
+      connectPath(bfsToSnake(currentApple));
+    }
   }, 1);
 }
 
 game.controlGrid = controlGrid;
 game.connectedQuads = connectedQuads;
 game.snakeSquares = snakeSquares;
+game.snakeSquaresAge;
 
 game.addNewAppleListner(apple => {
   currentApple = apple;
+  currentAppleCellID = gridCoridnatesToGraphID(apple);
   getApple();
 });
 
 let capturedTheSnake = false;
 let lastSnakeTail = null;
 let headQuad = -1;
-
+let snakeHead = null;
 
 game.addNewMoveListner((snake) => {
   //the next move has allready been selected pick the z
-  const snakeHead = snake[snake.length - 1];
+  snakeHead = snake[snake.length - 1];
   if (controlGrid && controlGrid.length > 0) {
     game.setDirection(controlGrid[snakeHead.x][snakeHead.y]);
   }
@@ -290,7 +347,7 @@ game.addNewMoveListner((snake) => {
         snakeSquares.delete(lastSnakeTailCellID);
         snakeSquaresMap.delete(lastSnakeTailCellID);
         //no longer contating snake 
-        if (canDeleteOldPath && connectedQuads.get(lastSnakeTailCellID).size == 1) {
+        if (canDeleteOldPath && currentAppleCellID != lastSnakeTailCellID && connectedQuads.get(lastSnakeTailCellID).size == 1 ) {
           detachTwoQuads([lastSnakeTailCellID, gridCoridnatesToGraphID(snake[0])])
         }
       } else {
@@ -301,9 +358,6 @@ game.addNewMoveListner((snake) => {
       }
     }
   }
-
   lastSnakeTail = snake[0];
-
-
 });
 
