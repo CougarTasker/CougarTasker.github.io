@@ -15,6 +15,7 @@ const colors = {
 let options = {
   graphicsDebug: false,
   aiDebug: false,
+  aiEnabled: true
 }
 const gameDimentions = { x: 16, y: 16 };
 lerp = (start, end, factor) => {
@@ -640,7 +641,9 @@ function createNewApple() {
     };
   } while (currentInstance.snake.some(({ x, y }) => x == currentInstance.appleLocation.x && y == currentInstance.appleLocation.y));
   currentInstance.newApple = true;
-  appleListners.forEach(l => { l(currentInstance.appleLocation, currentInstance.snake); });
+  if (options.aiEnabled) {
+    appleListners.forEach(l => { l(currentInstance.appleLocation, currentInstance.snake); });
+  }
 }
 
 
@@ -665,7 +668,9 @@ const game = {
     resetListners.push(listner);
   },
   reset: () => {
-    resetListners.forEach(l => { l(); });
+    if (options.aiEnabled) {
+      resetListners.forEach(l => { l(); });
+    }
     hasWon = false
     document.getElementById("score-container").textContent = 0;
     const gameCenter = {
@@ -735,7 +740,9 @@ const renderLoop = () => {
         createNewApple();
       }
     }
-    moveListners.forEach(l => { l(currentInstance.snake); });
+    if (options.aiEnabled) {
+      moveListners.forEach(l => { l(currentInstance.snake); });
+    }
     const mov = mainDirection;
 
     nextHead = {
@@ -843,3 +850,18 @@ document.querySelector(`.options>input[name="ai"]`).addEventListener("click", ev
 document.querySelector("#reset").addEventListener("click", event => {
   game.reset();
 })
+
+document.querySelectorAll(`.options>input[name="player"]`).forEach(radio => {
+  radio.addEventListener("change", event => {
+
+    switch (event.target.id) {
+      case "computer":
+        options.aiEnabled = true;
+        break;
+      case "human":
+        options.aiEnabled = false;
+        break;
+    }
+    game.reset();
+  })
+});
