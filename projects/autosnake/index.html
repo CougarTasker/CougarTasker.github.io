@@ -50,6 +50,37 @@
     <h1 id="">AutoSnake 2</h1>
   </div>
   <div id="game" class="container">
+    <div class="options">
+      <span>speed</span>
+      <input type="radio" id="slow" name="snake-speed" value="slow">
+      <label for="slow">slow</label>
+      <input type="radio" id="medium" name="snake-speed" value="medium" checked="checked">
+      <label for="medium">medium</label>
+      <input type="radio" id="fast" name="snake-speed" value="fast">
+      <label for="fast">fast</label>
+
+      <span>size</span>
+      <input type="radio" id="small" name="board-size" value="small">
+      <label for="small">small</label>
+      <input type="radio" id="medium" name="board-size" value="medium" checked="checked">
+      <label for="medium">medium</label>
+      <input type="radio" id="large" name="board-size" value="large">
+      <label for="large">large</label>
+
+      <span>player</span>
+      <input type="radio" id="computer" name="player" value="computer" checked="checked">
+      <label for="computer">computer</label>
+      <input type="radio" id="human" name="player" value="human">
+      <label for="human">human</label>
+
+      <span>debug views</span>
+      <input type="checkbox" id="graphics" name="graphics" value="graphics">
+      <label for="graphics">graphics</label>
+      <input type="checkbox" id="ai" name="ai" value="ai">
+      <label for="ai">AI</label>
+
+      <a class="button">reset game<span class="material-icons">refresh</span></a>
+    </div>
     <div class="canvas-container">
       <canvas></canvas>
     </div>

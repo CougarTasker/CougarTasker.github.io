@@ -248,3 +248,51 @@ hr {
   display: flex;
   justify-content: center;
   align-items: center; }
+
+.options {
+  display: grid;
+  grid-template-columns: auto min-content auto min-content auto min-content max-content;
+  grid-template-rows: repeat(4, min-content);
+  grid-column-gap: 5px;
+  grid-row-gap: 10px; }
+  .options > span {
+    grid-column-start: 1;
+    grid-column-end: 2;
+    font-weight: bold; }
+  .options > .button {
+    grid-column-start: 6;
+    grid-column-end: 8;
+    grid-row-start: 3;
+    grid-row-end: 5;
+    justify-self: left;
+    align-self: center; }
+
+.options > input[type="checkbox"],
+.options > input[type="radio"] {
+  justify-content: center;
+  align-self: center; }
+
+@media only screen and (max-width: 1000px) {
+  .options {
+    grid-template-rows: repeat(5, min-content); }
+    .options > .button {
+      grid-column-start: 1;
+      grid-column-end: 8;
+      grid-row-start: 5;
+      grid-row-end: 6;
+      justify-self: right; } }
+
+@media only screen and (max-width: 500px) {
+  .options {
+    grid-template-columns: min-content auto min-content auto min-content max-content;
+    grid-template-rows: repeat(9, min-content); }
+    .options > span {
+      grid-column-start: 1;
+      grid-column-end: 7;
+      justify-self: left; }
+    .options > .button {
+      grid-column-start: 1;
+      grid-column-end: 7;
+      grid-row-start: 9;
+      grid-row-end: 10;
+      justify-self: right; } }
