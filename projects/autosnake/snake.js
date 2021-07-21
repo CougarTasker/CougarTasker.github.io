@@ -650,6 +650,7 @@ const gameCenter = {
 
 let appleListners = [];
 let moveListners = [];
+let resetListners = []
 let previousTail, currentInstance, nextHead;
 
 const game = {
@@ -662,12 +663,16 @@ const game = {
   getCurrentSnake: () => {
     return currentInstance.snake;
   },
+  addResetListner: (listner) => {
+    resetListners.push(listner);
+  },
   reset: () => {
     previousTail = { x: gameCenter.x - 2, y: gameCenter.y };
     currentInstance = { snake: [{ x: gameCenter.x - 1, y: gameCenter.y }, gameCenter, { x: gameCenter.x + 1, y: gameCenter.y }], appleLocation: null, newApple: false }
     nextHead = { x: gameCenter.x + 2, y: gameCenter.y };
     mainDirection = new dir("right");
     createNewApple();
+    resetListners.forEach(l => { l(); })
   },
   addNewMoveListner: (listner) => {
     moveListners.push(listner);
@@ -699,11 +704,11 @@ let mainDirection = new dir("right");
 const isOutOfBounds = ({ x, y }) => x < 0 || y < 0 || y >= gameDimentions.y || x >= gameDimentions.x;
 
 const renderLoop = () => {
-  const progressDuration = 100;
+
   const progress = ((Date.now() - start) % progressDuration) / progressDuration;
   const step = Math.floor((Date.now() - start) / progressDuration)
 
-  if (lastStep > 0 && step != lastStep) {
+  if (step != lastStep && "dir" in currentInstance.snake[0]) {
     //we have made a step
     //make a step if there is one to make;
 
@@ -746,7 +751,7 @@ window.addEventListener('load', () => {
 
 });
 
-
+//user input listners 
 
 document.addEventListener("keydown", e => {
   switch (e.key) {
@@ -767,4 +772,29 @@ document.addEventListener("keydown", e => {
       game.setDirection(new dir("right"));
       break;
   }
+});
+let progressDuration = 500;
+function setNewSpeed(newProgressDuration) {
+  const now = Date.now()
+  const progress = ((now - start) % progressDuration) / progressDuration;
+  start = now - progress * newProgressDuration;
+  progressDuration = newProgressDuration;
+
+  lastStep = 0;
+}
+document.querySelectorAll(`.options>input[name="snake-speed"]`).forEach(radio => {
+  radio.addEventListener("change", event => {
+
+    switch (event.target.id) {
+      case "slow":
+        setNewSpeed(1000);
+        break;
+      case "speed-medium":
+        setNewSpeed(500);
+        break;
+      case "fast":
+        setNewSpeed(1);
+        break;
+    }
+  })
 });
