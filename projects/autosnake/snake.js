@@ -369,13 +369,11 @@ const snakeHeadSize = 0.7;
 
 drawInstance = (lastTail, { snake, appleLocation, newApple }, nextHead, progress) => {
 
+
   hitApple = nextHead.x == appleLocation.x && nextHead.y == appleLocation.y;
   //draw grid
-  if (options.aiDebug) {
-    ctx.fillStyle = colors.white;
-    const box = transform({ x: 0, y: 0, width: game.dimentions.x, height: game.dimentions.y });
-    ctx.fillRect(box.x, box.y, box.width, box.height);
-  } else {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (!options.aiDebug) {
     for (var x = 0; x < gameDimentions.x; x++) {
       for (var y = 0; y < gameDimentions.y; y++) {
         switch ((x + y) % 2) {
@@ -394,7 +392,10 @@ drawInstance = (lastTail, { snake, appleLocation, newApple }, nextHead, progress
 
 
   //draw the apple
-  drawAnApple(appleLocation, hitApple ? 1 - progress : (newApple ? progress : 1));
+  if (!hasWon) {
+    drawAnApple(appleLocation, hitApple ? 1 - progress : (newApple ? progress : 1));
+  }
+
 
   //draw a ciricle for each of the pars of the snake 
 
@@ -630,6 +631,7 @@ const setCanvasSize = () => {
 window.addEventListener("resize", setCanvasSize);
 setCanvasSize();
 
+
 function createNewApple() {
   do {
     currentInstance.appleLocation = {
@@ -640,7 +642,6 @@ function createNewApple() {
   currentInstance.newApple = true;
   appleListners.forEach(l => { l(currentInstance.appleLocation, currentInstance.snake); });
 }
-
 
 
 
@@ -665,6 +666,8 @@ const game = {
   },
   reset: () => {
     resetListners.forEach(l => { l(); });
+    hasWon = false
+    document.getElementById("score-container").textContent = 0;
     const gameCenter = {
       x: Math.floor(gameDimentions.x / 2),
       y: Math.floor(gameDimentions.y / 2)
@@ -698,7 +701,7 @@ let nextSteps = [];
 
 let start = Date.now();
 let lastStep = 0;
-
+let hasWon = false
 let goingTohitApple = false;
 
 let mainDirection = new dir("right");
@@ -708,7 +711,6 @@ const renderLoop = () => {
 
   const progress = ((Date.now() - start) % progressDuration) / progressDuration;
   const step = Math.floor((Date.now() - start) / progressDuration)
-
   if (step != lastStep && "dir" in currentInstance.snake[0]) {
     //we have made a step
     //make a step if there is one to make;
@@ -717,14 +719,22 @@ const renderLoop = () => {
     currentInstance.newApple = false;
 
     currentInstance.snake.push(nextHead);
+    hasWon = currentInstance.snake.length >= game.dimentions.x * game.dimentions.y
     const oldHead = currentInstance.snake[currentInstance.snake.length - 1];
-    if (!(oldHead.x == currentInstance.appleLocation.x && oldHead.y == currentInstance.appleLocation.y)) {
+
+    if (hasWon) {
+      //the game has be won
+      document.getElementById("score-container").textContent = (game.dimentions.x * game.dimentions.y - 3) + " - max";
       previousTail = currentInstance.snake.shift();
     } else {
-      //apple has been hit
-      createNewApple();
+      if (!(oldHead.x == currentInstance.appleLocation.x && oldHead.y == currentInstance.appleLocation.y)) {
+        previousTail = currentInstance.snake.shift();
+      } else {
+        //apple has been hit
+        document.getElementById("score-container").textContent = currentInstance.snake.length - 3;
+        createNewApple();
+      }
     }
-
     moveListners.forEach(l => { l(currentInstance.snake); });
     const mov = mainDirection;
 
@@ -733,12 +743,14 @@ const renderLoop = () => {
       y: oldHead.y + mov.y
     }
 
-    if (isOutOfBounds(nextHead) || currentInstance.snake.some(cur => cur.x == nextHead.x && cur.y == nextHead.y)) {
+    if (isOutOfBounds(nextHead) || (currentInstance.snake.some(cur => cur.x == nextHead.x && cur.y == nextHead.y) && !hasWon)) {
+      //you cant run into the tail if the ai has won
       game.reset();
     }
 
   }
   lastStep = step;
+
   drawInstance(previousTail, currentInstance, nextHead, progress);
   window.requestAnimationFrame(renderLoop);
 }
