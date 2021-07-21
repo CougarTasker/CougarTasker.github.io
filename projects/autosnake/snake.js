@@ -643,10 +643,7 @@ function createNewApple() {
 
 
 
-const gameCenter = {
-  x: Math.floor(gameDimentions.x / 2),
-  y: Math.floor(gameDimentions.y / 2)
-}
+
 
 let appleListners = [];
 let moveListners = [];
@@ -667,12 +664,16 @@ const game = {
     resetListners.push(listner);
   },
   reset: () => {
+    const gameCenter = {
+      x: Math.floor(gameDimentions.x / 2),
+      y: Math.floor(gameDimentions.y / 2)
+    }
     previousTail = { x: gameCenter.x - 2, y: gameCenter.y };
     currentInstance = { snake: [{ x: gameCenter.x - 1, y: gameCenter.y }, gameCenter, { x: gameCenter.x + 1, y: gameCenter.y }], appleLocation: null, newApple: false }
     nextHead = { x: gameCenter.x + 2, y: gameCenter.y };
     mainDirection = new dir("right");
     createNewApple();
-    resetListners.forEach(l => { l(); })
+    resetListners.forEach(l => { l(); });
   },
   addNewMoveListner: (listner) => {
     moveListners.push(listner);
@@ -773,7 +774,7 @@ document.addEventListener("keydown", e => {
       break;
   }
 });
-let progressDuration = 500;
+let progressDuration = 300;
 function setNewSpeed(newProgressDuration) {
   const now = Date.now()
   const progress = ((now - start) % progressDuration) / progressDuration;
@@ -790,7 +791,7 @@ document.querySelectorAll(`.options>input[name="snake-speed"]`).forEach(radio =>
         setNewSpeed(1000);
         break;
       case "speed-medium":
-        setNewSpeed(500);
+        setNewSpeed(300);
         break;
       case "fast":
         setNewSpeed(1);
@@ -798,3 +799,28 @@ document.querySelectorAll(`.options>input[name="snake-speed"]`).forEach(radio =>
     }
   })
 });
+document.querySelectorAll(`.options>input[name="board-size"]`).forEach(radio => {
+  radio.addEventListener("change", event => {
+
+    switch (event.target.id) {
+      case "small":
+        gameDimentions.x = 10;
+        gameDimentions.y = 10;
+        break;
+      case "size-medium":
+        gameDimentions.x = 16;
+        gameDimentions.y = 16;
+        break;
+      case "large":
+        gameDimentions.x = 20;
+        gameDimentions.y = 20;
+        break;
+    }
+    game.reset();
+  })
+});
+
+
+document.querySelector("#reset").addEventListener("click", event => {
+  game.reset();
+})
