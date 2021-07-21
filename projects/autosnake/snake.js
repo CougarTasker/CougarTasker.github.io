@@ -12,12 +12,13 @@ const colors = {
   red: "#ed254e"
 };
 
+let options = {
+  graphicsDebug: false,
+  aiDebug: false,
+}
 const gameDimentions = { x: 16, y: 16 };
 lerp = (start, end, factor) => {
   return start + (end - start) * factor;
-}
-function scaleAndTranslatePath(path, box) {
-
 }
 const appleImg = new Image();   // Create new img element
 
@@ -132,27 +133,32 @@ function splitBezierCurve(t, { s, c1, c2, e }, firstHalf = true) {
   }
 }
 function drawBezierControls({ s, c1, c2, e }) {
-  ctx.beginPath();
-  ctx.moveTo(s.x, s.y);
-  ctx.lineTo(c1.x, c1.y);
-  ctx.lineTo(c2.x, c2.y);
-  ctx.lineTo(e.x, e.y);
-  ctx.strokeStyle = colors.orange;
-  ctx.stroke();
+  if (options.graphicsDebug) {
+    ctx.beginPath();
+    ctx.moveTo(s.x, s.y);
+    ctx.lineTo(c1.x, c1.y);
+    ctx.lineTo(c2.x, c2.y);
+    ctx.lineTo(e.x, e.y);
+    ctx.strokeStyle = colors.orange;
+    ctx.stroke();
+  }
 }
 function drawCornerControls(corner) {
-  for (key in corner) {
-    if (key.includes("R")) {
-      ctx.fillStyle = colors.red;
-    } else {
-      ctx.fillStyle = colors.blue;
+  if (options.graphicsDebug) {
+    for (key in corner) {
+      if (key.includes("R")) {
+        ctx.fillStyle = colors.red;
+      } else {
+        ctx.fillStyle = colors.blue;
+
+      }
+      if (typeof corner[key] == "object" && "x" in corner[key]) {
+        ctx.fillRect(corner[key].x, corner[key].y, 3, 3);
+      }
 
     }
-    if (typeof corner[key] == "object" && "x" in corner[key]) {
-      ctx.fillRect(corner[key].x, corner[key].y, 3, 3);
-    }
-
   }
+
 }
 
 drawEndCap = (start, end, clockwize = true) => {
@@ -365,20 +371,27 @@ drawInstance = (lastTail, { snake, appleLocation, newApple }, nextHead, progress
 
   hitApple = nextHead.x == appleLocation.x && nextHead.y == appleLocation.y;
   //draw grid
-  for (var x = 0; x < gameDimentions.x; x++) {
-    for (var y = 0; y < gameDimentions.y; y++) {
-      switch ((x + y) % 2) {
-        case 0:
-          ctx.fillStyle = colors.white;
-          break;
-        case 1:
-          ctx.fillStyle = colors.white;
-          break;
+  if (options.aiDebug) {
+    ctx.fillStyle = colors.white;
+    const box = transform({ x: 0, y: 0, width: game.dimentions.x, height: game.dimentions.y });
+    ctx.fillRect(box.x, box.y, box.width, box.height);
+  } else {
+    for (var x = 0; x < gameDimentions.x; x++) {
+      for (var y = 0; y < gameDimentions.y; y++) {
+        switch ((x + y) % 2) {
+          case 0:
+            ctx.fillStyle = colors.black;
+            break;
+          case 1:
+            ctx.fillStyle = colors.white;
+            break;
+        }
+        const box = transform({ x, y, width: 1, height: 1 });
+        ctx.fillRect(box.x, box.y, box.width, box.height);
       }
-      const box = transform({ x, y, width: 1, height: 1 });
-      ctx.fillRect(box.x, box.y, box.width, box.height);
     }
   }
+
 
   //draw the apple
   drawAnApple(appleLocation, hitApple ? 1 - progress : (newApple ? progress : 1));
@@ -508,15 +521,33 @@ drawInstance = (lastTail, { snake, appleLocation, newApple }, nextHead, progress
     ctx.lineTo(lastCorner.endPosRT.x, lastCorner.endPosRT.y);
     ctx.fill();
   }
-  if ("controlGrid" in game) {
-    drawControlGrid(game.controlGrid);
+  if (options.aiDebug) {
+    if ("controlGrid" in game) {
+      drawControlGrid(game.controlGrid);
+    }
+    if ("connectedQuads" in game) {
+      drawConnectedQuads(game.connectedQuads);
+    }
+    if ("snakeSquares" in game) {
+      drawSnakeSquares(game.snakeSquares);
+    }
   }
-  if ("connectedQuads" in game) {
-    drawConnectedQuads(game.connectedQuads);
+
+  if (options.graphicsDebug && !options.aiDebug) {
+    snake.forEach(part => {
+      ctx.fillStyle = colors.red;
+      ctx.beginPath();
+      ctx.arc(
+        cellSize.x * (part.x + part.dir.x * progress) + offset.x + cellSize.x / 2,
+        cellSize.y * (part.y + part.dir.y * progress) + offset.x + offset.y + cellSize.y / 2,
+        cellSize.x * 0.5 * 0.3,
+        part.dir.angle - Math.PI / 2,
+        part.dir.angle + Math.PI / 2);
+      ctx.fill();
+    });
   }
-  if ("snakeSquares" in game) {
-    drawSnakeSquares(game.snakeSquares);
-  }
+}
+drawMoveIndicators = (snake) => {
   snake.forEach(part => {
     ctx.fillStyle = colors.red;
     ctx.beginPath();
@@ -668,7 +699,7 @@ let mainDirection = new dir("right");
 const isOutOfBounds = ({ x, y }) => x < 0 || y < 0 || y >= gameDimentions.y || x >= gameDimentions.x;
 
 const renderLoop = () => {
-  const progressDuration = 500;
+  const progressDuration = 100;
   const progress = ((Date.now() - start) % progressDuration) / progressDuration;
   const step = Math.floor((Date.now() - start) / progressDuration)
 
