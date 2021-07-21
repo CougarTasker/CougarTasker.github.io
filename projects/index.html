@@ -46,6 +46,41 @@
     </p>
   </div>
 
+
+  <div class="container project">
+    <hr />
+    <div class="top">
+      <h2>AutoSnake 2</h2>
+      <ul class="tags">
+        <li>JS</li>
+        <li>CSS</li>
+        <li>HTML</li>
+        <li>HTML5 Canvas</li>
+      </ul>
+    </div>
+    <p>
+      I built a new program for automatically playing snake improving on the previous version by ensuring the snake
+      follows a Hamiltonian cycle therefore never trapping itself, unlike the previous version.
+    </p>
+    <div class="video-container">
+      <video controls preload="metadata">
+        <source src="./vids/autoSnake2.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+    <div class="align-button">
+      <a href="#autosnake" class="button">
+        <span class="text">view previous version</span>
+        <span class="material-icons">arrow_downward</span>
+      </a>
+      <a href="./autosnake/" class="button">
+        <span class="text">try it</span>
+        <span class="material-icons">arrow_forward</span>
+      </a>
+    </div>
+
+  </div>
+
   <div class="container project">
     <hr />
     <div class="top">
@@ -205,12 +240,12 @@
       as a way of filling the time I created an online multiplayer cards against humanity game and added some of our own
       cards. It worked really well and I’m happy with it.
     </p>
-    <div class="video-container">
-      <video controls preload="metadata">
-        <source src="./vids/cah.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-      </video>
-    </div>
+    <div class=" video-container">
+        <video controls preload="metadata">
+          <source src="./vids/cah.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+  </div>
   </div>
 
 
@@ -349,9 +384,9 @@
   </div>
 
 
-  
 
-  <div class="container project">
+
+  <div class="container project" id="autosnake">
     <hr />
     <div class="top">
       <h2>AutoSnake</h2>
@@ -360,8 +395,10 @@
       </ul>
     </div>
     <p>
-      Inspired by a video made by code bullet on his own AI built to beat the game of snake I thought I could use a BFS search
-      solution to achieve similar results. Unfortunately, my solution cares more about reaching its goal rather than surviving
+      Inspired by a video made by code bullet on his own AI built to beat the game of snake I thought I could use a BFS
+      search
+      solution to achieve similar results. Unfortunately, my solution cares more about reaching its goal rather than
+      surviving
       to reach the next so can get stuck.
     </p>
     <div class="video-container">
