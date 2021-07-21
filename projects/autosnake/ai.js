@@ -47,7 +47,6 @@ const snakeSquares = new Set();
 const snakeSquaresMap = new Map();
 
 
-const toDisconnect = new Set();
 
 const gridCoridnatesToGraphID = ({ x, y }) => {
   return Math.floor(x / 2) + Math.floor(y / 2) * (game.dimentions.x / 2);
@@ -392,5 +391,17 @@ game.addResetListner(() => {
   snakeSquares.clear();
   snakeSquaresMap.clear();
   capturedTheSnake = false;
+  if (controlGrid.length == gameDimentions.x && controlGrid[0].length == controlGrid.y) {
+    let toDiconnect = []
+    for ([cell, connections] of connectedQuads.entries()) {
+      for (connection of connections) {
+        toDiconnect.push([cell, connection]);
+      }
+    }
+    toDiconnect.forEach(detachTwoQuads);
+  } else {
+    connectedQuads.clear();
+    setupControlGrid();
+  }
   setupCapturePath();
 })

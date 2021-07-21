@@ -664,6 +664,7 @@ const game = {
     resetListners.push(listner);
   },
   reset: () => {
+    resetListners.forEach(l => { l(); });
     const gameCenter = {
       x: Math.floor(gameDimentions.x / 2),
       y: Math.floor(gameDimentions.y / 2)
@@ -673,7 +674,6 @@ const game = {
     nextHead = { x: gameCenter.x + 2, y: gameCenter.y };
     mainDirection = new dir("right");
     createNewApple();
-    resetListners.forEach(l => { l(); });
   },
   addNewMoveListner: (listner) => {
     moveListners.push(listner);
@@ -820,6 +820,13 @@ document.querySelectorAll(`.options>input[name="board-size"]`).forEach(radio => 
   })
 });
 
+
+document.querySelector(`.options>input[name="graphics"]`).addEventListener("click", event => {
+  options.graphicsDebug = !options.graphicsDebug;
+});
+document.querySelector(`.options>input[name="ai"]`).addEventListener("click", event => {
+  options.aiDebug = !options.aiDebug;
+});
 
 document.querySelector("#reset").addEventListener("click", event => {
   game.reset();
