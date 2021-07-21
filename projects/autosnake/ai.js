@@ -52,6 +52,9 @@ const toDisconnect = new Set();
 const gridCoridnatesToGraphID = ({ x, y }) => {
   return Math.floor(x / 2) + Math.floor(y / 2) * (game.dimentions.x / 2);
 }
+const simpleConvert = (x, y) => {
+  return y * (game.dimentions.x / 2) + x;
+}
 function setupControlGrid() {
 
   //create the basic control grid 
@@ -69,9 +72,7 @@ function setupControlGrid() {
     controlGrid[x] = col;
   }
   //greate basic game graph
-  const simpleConvert = (x, y) => {
-    return y * (game.dimentions.x / 2) + x;
-  }
+
   for (let x = 0; x < (game.dimentions.x / 2); x++) {
     for (let y = 0; y < (game.dimentions.y / 2); y++) {
       const id = simpleConvert(x, y);
@@ -93,7 +94,8 @@ function setupControlGrid() {
   }
 
 
-  //create a catcher path
+}
+function setupCapturePath() {
   for (let x = 0; x < (game.dimentions.x / 2); x++) {
     //y == 0 
     if (x > 0) {
@@ -106,6 +108,7 @@ function setupControlGrid() {
 }
 
 setupControlGrid();
+setupCapturePath();
 
 
 function connectTwoQuads([a, b]) {
@@ -188,7 +191,6 @@ function getQuadToSquare({ x, y }) {
   }
   return newPos.x + newPos.y * game.dimentions.x / 2;
 }
-
 function getNextQuads() {
   const out = new Map();
   let count = 0;
@@ -284,38 +286,20 @@ function simplifyPath() {
 }
 
 function getApple() {
-  setTimeout(() => {
-    simplifyPath();
-    if (!snakeSquares.has(currentAppleCellID)) {
-      //only connect the apple if its not on the path.
-      connectPath(bfsToSnake(currentApple));
-    }
-  }, 1);
-}
-
-game.controlGrid = controlGrid;
-game.connectedQuads = connectedQuads;
-game.snakeSquares = snakeSquares;
-game.snakeSquaresAge;
-
-game.addNewAppleListner(apple => {
-  currentApple = apple;
-  currentAppleCellID = gridCoridnatesToGraphID(apple);
-  getApple();
-});
-
-let capturedTheSnake = false;
-let lastSnakeTail = null;
-let headQuad = -1;
-let snakeHead = null;
-
-game.addNewMoveListner((snake) => {
-  //the next move has allready been selected pick the z
-  snakeHead = snake[snake.length - 1];
-  if (controlGrid && controlGrid.length > 0) {
-    game.setDirection(controlGrid[snakeHead.x][snakeHead.y]);
+  if (capturedTheSnake) {
+    //can't get the apple untill the snake is cpatured on a path;
+    setTimeout(() => {
+      simplifyPath();
+      if (!snakeSquares.has(currentAppleCellID)) {
+        //only connect the apple if its not on the path.
+        connectPath(bfsToSnake(currentApple));
+      }
+    }, 1);
   }
 
+}
+
+function updateSnakeSquares(snake) {
   const snakeSquaresLength = snakeSquares.size
   if (snakeSquaresLength == 0) {
     for (square of snake) {
@@ -359,5 +343,54 @@ game.addNewMoveListner((snake) => {
     }
   }
   lastSnakeTail = snake[0];
+}
+game.controlGrid = controlGrid;
+game.connectedQuads = connectedQuads;
+game.snakeSquares = snakeSquares;
+game.snakeSquaresAge;
+
+game.addNewAppleListner(apple => {
+  currentApple = apple;
+  currentAppleCellID = gridCoridnatesToGraphID(apple);
+  getApple();
 });
 
+let capturedTheSnake = false;
+let lastSnakeTail = null;
+let headQuad = -1;
+let snakeHead = null;
+
+game.addNewMoveListner((snake) => {
+  //the next move has allready been selected pick the z
+  snakeHead = snake[snake.length - 1];
+  if (controlGrid && controlGrid.length > 0) {
+    game.setDirection(controlGrid[snakeHead.x][snakeHead.y]);
+  }
+
+  if (capturedTheSnake) {
+    updateSnakeSquares(snake);
+
+  } else {
+    //not captured the snake yet
+    // work out wether the snake is on the same path when it is vertical
+    let vertical = true;
+    for (let i = 1; i < snake.length; i++) {
+      if (snake[i].x != snake[i - 1].x) {
+        vertical = false;
+      }
+    }
+    if (vertical) {
+      capturedTheSnake = true;
+      updateSnakeSquares(snake);
+      getApple();
+    }
+  }
+
+});
+
+game.addResetListner(() => {
+  snakeSquares.clear();
+  snakeSquaresMap.clear();
+  capturedTheSnake = false;
+  setupCapturePath();
+})
