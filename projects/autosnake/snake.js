@@ -668,9 +668,10 @@ let mainDirection = new dir("right");
 const isOutOfBounds = ({ x, y }) => x < 0 || y < 0 || y >= gameDimentions.y || x >= gameDimentions.x;
 
 const renderLoop = () => {
-  const progressDuration = 500;
+  const progressDuration = 1;
   const progress = ((Date.now() - start) % progressDuration) / progressDuration;
   const step = Math.floor((Date.now() - start) / progressDuration)
+  drawInstance(previousTail, currentInstance, nextHead, progress);
   if (step != lastStep) {
     //we have made a step
     //make a step if there is one to make;
@@ -700,7 +701,7 @@ const renderLoop = () => {
     }
 
   }
-  drawInstance(previousTail, currentInstance, nextHead, progress);
+
   window.requestAnimationFrame(renderLoop);
 }
 
