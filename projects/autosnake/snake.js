@@ -704,18 +704,23 @@ const game = {
 
 let nextSteps = [];
 
-let start = Date.now();
+let startTime = Date.now();
 let lastStep = 0;
 let hasWon = false
 let goingTohitApple = false;
 
 let mainDirection = new dir("right");
 const isOutOfBounds = ({ x, y }) => x < 0 || y < 0 || y >= gameDimentions.y || x >= gameDimentions.x;
+let lastProgress = -1;
 
 const renderLoop = () => {
 
-  const progress = ((Date.now() - start) % progressDuration) / progressDuration;
-  const step = Math.floor((Date.now() - start) / progressDuration)
+  const progress = ((Date.now() - startTime) % progressDuration) / progressDuration;
+  const step = Math.floor((Date.now() - startTime) / progressDuration)
+  if (step != lastStep && lastProgress > 0 && (1 + progress - lastProgress) > 1) {
+    debugger;
+  }
+  lastProgress = progress;
   if (step != lastStep && "dir" in currentInstance.snake[0]) {
     //we have made a step
     //make a step if there is one to make;
@@ -796,8 +801,8 @@ document.addEventListener("keydown", e => {
 let progressDuration = 300;
 function setNewSpeed(newProgressDuration) {
   const now = Date.now()
-  const progress = ((now - start) % progressDuration) / progressDuration;
-  start = now - progress * newProgressDuration;
+  const progress = ((now - startTime) % progressDuration) / progressDuration;
+  startTime = now - progress * newProgressDuration;
   progressDuration = newProgressDuration;
 
   lastStep = 0;

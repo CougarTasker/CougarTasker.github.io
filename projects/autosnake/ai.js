@@ -221,14 +221,14 @@ function getNextQuads() {
 }
 
 function bfsToSnake(loc) {
-  start = gridCoridnatesToGraphID(loc);
+  startPos = gridCoridnatesToGraphID(loc);
   if (snakeSquares.size == 0) {
     return [];
   }
   if (snakeSquares.has(loc)) {
     return [];
   }
-  let frontier = [[start]];
+  let frontier = [[startPos]];
   let visited = new Set();
   let bestPath = [];
   const value = getNextQuads();
