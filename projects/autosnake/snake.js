@@ -12,7 +12,7 @@ const colors = {
   red: "#ed254e"
 };
 
-const gameDimentions = { x: 10, y: 10 };
+const gameDimentions = { x: 16, y: 16 };
 lerp = (start, end, factor) => {
   return start + (end - start) * factor;
 }
@@ -270,9 +270,9 @@ drawCorner = (cell, progress, snakeLenght, hitApple) => {
   fullCurveR = { s: startPosRT, c1: startPosRGuideT, c2: endPosRGuideT, e: endPosRT };
   fullCurveL = { s: startPosLT, c1: startPosLGuideT, c2: endPosLGuideT, e: endPosLT };
 
-  // drawCornerControls({
-  //   endPosRT, endPosRGuideT, startPosRT, startPosRGuideT, endPosLT, endPosLGuideT, startPosLT, startPosLGuideT
-  // });
+  drawCornerControls({
+    endPosRT, endPosRGuideT, startPosRT, startPosRGuideT, endPosLT, endPosLGuideT, startPosLT, startPosLGuideT
+  });
 
   drawBezerCurve = (curve, line = false, reverse = false) => {
     if (reverse) {
@@ -298,8 +298,8 @@ drawCorner = (cell, progress, snakeLenght, hitApple) => {
     // keep the tail still if the tail is within the curve and it has hit the apple 
     curveR = splitBezierCurve(cellProgress, fullCurveR, false);
     curveL = splitBezierCurve(cellProgress, fullCurveL, false);
-    // drawBezierControls(curveL);
-    // drawBezierControls(curveR);
+    drawBezierControls(curveL);
+    drawBezierControls(curveR);
 
     ctx.beginPath();
     drawBezerCurve(curveR);
@@ -314,16 +314,16 @@ drawCorner = (cell, progress, snakeLenght, hitApple) => {
     //head rendering 
     curveR = splitBezierCurve(progress + 0.5, fullCurveR, true);
     curveL = splitBezierCurve(progress + 0.5, fullCurveL, true);
-    // drawBezierControls(curveL);
-    // drawBezierControls(curveR);
+    drawBezierControls(curveL);
+    drawBezierControls(curveR);
     ctx.beginPath();
     drawBezerCurve(curveR);
     drawEndCap(curveR.e, curveL.e);
     drawBezerCurve(curveL, true, true);
     ctx.fill();
   } else {
-    // drawBezierControls(fullCurveR);
-    // drawBezierControls(fullCurveL);
+    drawBezierControls(fullCurveR);
+    drawBezierControls(fullCurveL);
 
     ctx.beginPath();
     drawBezerCurve(fullCurveR);
@@ -517,24 +517,23 @@ drawInstance = (lastTail, { snake, appleLocation, newApple }, nextHead, progress
   if ("snakeSquares" in game) {
     drawSnakeSquares(game.snakeSquares);
   }
-  // snake.forEach(part => {
-  //   ctx.fillStyle = colors.red;
-  //   ctx.beginPath();
-  //   ctx.arc(
-  //     cellSize.x * (part.x + part.dir.x * progress) + offset.x + cellSize.x / 2,
-  //     cellSize.y * (part.y + part.dir.y * progress) + offset.x + offset.y + cellSize.y / 2,
-  //     cellSize.x * 0.5 * 0.3,
-  //     part.dir.angle - Math.PI / 2,
-  //     part.dir.angle + Math.PI / 2);
-  //   ctx.fill();
-  // });
+  snake.forEach(part => {
+    ctx.fillStyle = colors.red;
+    ctx.beginPath();
+    ctx.arc(
+      cellSize.x * (part.x + part.dir.x * progress) + offset.x + cellSize.x / 2,
+      cellSize.y * (part.y + part.dir.y * progress) + offset.x + offset.y + cellSize.y / 2,
+      cellSize.x * 0.5 * 0.3,
+      part.dir.angle - Math.PI / 2,
+      part.dir.angle + Math.PI / 2);
+    ctx.fill();
+  });
 }
 drawSnakeSquares = (snakeSquares) => {
   const width = game.dimentions.x / 2;
   toCooridnates = n => {
     return transform({ x: (n % width) * 2 + 1, y: Math.floor(n / width) * 2 + 1, width: 0.2 });
   }
-
 
 
   ctx.fillStyle = colors.black;
@@ -661,7 +660,7 @@ const game = {
 let nextSteps = [];
 
 let start = Date.now();
-let lastProgress = 0;
+let lastStep = 0;
 
 let goingTohitApple = false;
 
@@ -669,11 +668,13 @@ let mainDirection = new dir("right");
 const isOutOfBounds = ({ x, y }) => x < 0 || y < 0 || y >= gameDimentions.y || x >= gameDimentions.x;
 
 const renderLoop = () => {
-  const progressDuration = 50;
+  const progressDuration = 500;
   const progress = ((Date.now() - start) % progressDuration) / progressDuration;
-  if (progress < lastProgress) {
+  const step = Math.floor((Date.now() - start) / progressDuration)
+  if (step != lastStep) {
     //we have made a step
     //make a step if there is one to make;
+    lastStep = step;
 
     currentInstance.newApple = false;
 
@@ -700,7 +701,6 @@ const renderLoop = () => {
 
   }
   drawInstance(previousTail, currentInstance, nextHead, progress);
-  lastProgress = progress;
   window.requestAnimationFrame(renderLoop);
 }
 
