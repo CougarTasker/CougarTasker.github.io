@@ -4,6 +4,7 @@ const canvasContainer = document.querySelector("#game .canvas-container");
 
 const colors = {
   black: "#292e1e",
+  darkBlack: "#0e0f0a",
   white: "#f7fff7",
   blue: "#7bdff2",
   green: "#9cde9f",
@@ -398,7 +399,7 @@ drawInstance = (lastTail, { snake, appleLocation, newApple }, nextHead, progress
   }
 
 
-  //draw a ciricle for each of the pars of the snake 
+
 
   //add moving head and tail
   const tail = snake[0];
@@ -406,11 +407,18 @@ drawInstance = (lastTail, { snake, appleLocation, newApple }, nextHead, progress
   const corners = computeDirections(lastTail, snake, nextHead);
 
 
+  if (!options.graphicsDebug) {
+    ctx.shadowOffsetX = 2;
+    ctx.shadowOffsetY = 2;
+    ctx.shadowBlur = 3;
+    ctx.shadowColor = colors.darkBlack;
+
+  }
+
+
+
+
   ctx.fillStyle = colors.green;
-
-
-
-
   // corners 
   let lastCorner = null
   let firstCorner = null; //first corner that is between two ends 
@@ -523,6 +531,14 @@ drawInstance = (lastTail, { snake, appleLocation, newApple }, nextHead, progress
     ctx.lineTo(lastCorner.endPosRT.x, lastCorner.endPosRT.y);
     ctx.fill();
   }
+
+  //disable further shaddows
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 0;
+  ctx.shadowBlur = 0;
+  ctx.shadowColor = 'rgba(0,0,0,0)';
+
+
   if (options.aiDebug) {
     if ("controlGrid" in game) {
       drawControlGrid(game.controlGrid);
