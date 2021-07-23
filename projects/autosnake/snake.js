@@ -166,26 +166,26 @@ function drawCornerControls(corner) {
 function vectorAngle({ x, y }) {
   if (x == 0) {
     if (y < 0) {
-      return 0;
+      return Math.PI * 3 / 2;
     } else {
-      return Math.PI;
+      return Math.PI / 2;
     }
   } else if (y == 0) {
     if (x > 0) {
-      return Math.PI / 2
+      return 0
     } else {
-      return -Math.PI / 2;
+      return Math.PI;
     }
   } else {
     const tanAngle = Math.atan(y / x);
     if (x > 0) {
-      return Math.PI / 2 + tanAngle;
+      return (tanAngle + Math.PI * 2) % (Math.PI * 2);
     } else {
-      return -Math.PI / 2 + tanAngle;
+      return (tanAngle + Math.PI * 3) % (Math.PI * 2);
     }
   }
 }
-function drawEndCap(right, left, clockwize = true) {
+function drawEndCap(right, left) {
   const ltoR = {
     x: right.x - left.x,
     y: right.y - left.y
@@ -200,9 +200,9 @@ function drawEndCap(right, left, clockwize = true) {
   ctx.arc(
     capCenter.x, capCenter.y,
     capR,
-    angle - Math.PI / 2,
-    angle + Math.PI / 2,
-    clockwize
+    angle,
+    angle + Math.PI,
+    false
   )
 }
 drawCorner = (cell, progress, snakeLenght, hitApple) => {
@@ -366,7 +366,7 @@ drawCorner = (cell, progress, snakeLenght, hitApple) => {
     return {
       draw: () => {
         drawBezerCurve(curveL, "none", false);
-        drawEndCap(curveR.e, curveL.e);
+        drawEndCap(curveL.e, curveR.e);
         drawBezerCurve(curveR, "none", true);
       },
       startPosLT,
@@ -464,7 +464,7 @@ function drawStraightHead(cell, progress, snakeLenght, hitApple) {
   return {
     draw: () => {
       ctx.lineTo(headPosLT.x, headPosLT.y);
-      drawEndCap(headPosRT, headPosLT);
+      drawEndCap(headPosLT, headPosRT);
       ctx.lineTo(startPosRT.x, startPosRT.y);
     },
     order: cell.order,
@@ -610,11 +610,11 @@ function drawSnake(snake, lastTail, nextHead, hitApple, progress) {
   //finally complete the loop on the right side just backwrds
   for (let i = snakeParts.length - 1; i >= 0; i--) {
     const thisCorner = snakeParts[i];
-    ctx.lineTo(
-      thisCorner.endPosRT.x,
-      thisCorner.endPosRT.y,
-    );
-    thisCorner.right();
+    // ctx.lineTo(
+    //   thisCorner.endPosRT.x,
+    //   thisCorner.endPosRT.y,
+    // );
+    //thisCorner.right();
   }
 
   ctx.strokeStyle = colors.red;
