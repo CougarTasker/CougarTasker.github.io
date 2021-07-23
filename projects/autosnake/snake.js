@@ -321,7 +321,7 @@ drawCorner = (cell, progress, snakeLenght, hitApple) => {
       curve.c2.x, curve.c2.y,
       curve.e.x, curve.e.y);
   }
-  if (cell.order == 1 && progress >= 0.5 && !hitApple || cell.order == 0 && (progress <= 0.5 || hitApple)) {
+  if (cell.order == 1 && progress > 0.5 && !hitApple || cell.order == 0 && (progress <= 0.5 || hitApple)) {
     //tail rendering 
 
     //the tail will never leave the corner 0 if it has eaten an apple 
@@ -480,7 +480,7 @@ function drawStraightTail(cell, progress, snakeLenght, hitApple) {
     endSize = lerp(snakeTailSize, snakeHeadSize, (cell.order - 0.5) / (snakeLenght + progress - 1));
   } else {
     //ofset the where in the snake this is.
-    let offset =  0.5 - progress;
+    let offset = 0.5 - progress;
     if (progress >= 0.5) {
       //we have setepd over the border and the start postion has moved forward 1
       offset += 1;
@@ -501,7 +501,7 @@ function drawStraightTail(cell, progress, snakeLenght, hitApple) {
     y: center.y + cell.dir.y * progress
   }
   let endPos;
-  if (progress < 0.5) {
+  if (progress < 0.5 || hitApple) {
     endPos = {
       x: center.x + cell.dir.x / 2,
       y: center.y + cell.dir.y / 2
@@ -560,25 +560,27 @@ function drawSnake(snake, lastTail, nextHead, hitApple, progress) {
   ctx.beginPath();
   const corners = computeDirections(lastTail, snake, nextHead);
   let snakeParts = [];
+  let headCorner = null;
+  let tailSnakePart = null;
   if (snake[0].corner && (progress >= 0.5 && !hitApple)) {
     //remove the corner that shouldn't be drawn 
     corners.shift();
   }
   if ((!snake[0].corner || (progress >= 0.5 && !hitApple)) && (!snake[1].corner || (progress <= 0.5 || hitApple))) {
     //the tail is not a corner and therfore must be a streight 
-    const thisCorner = drawStraightTail(snake[0], progress, snake.length, hitApple);
-    thisCorner.draw();
+    tailSnakePart = drawStraightTail(snake[0], progress, snake.length, hitApple);
+    tailSnakePart.draw();
   } else {
-    const thisCorner = drawCorner(corners.shift(), progress, snake.length, hitApple);
-    thisCorner.draw();
+    tailSnakePart = drawCorner(corners.shift(), progress, snake.length, hitApple);
+    tailSnakePart.draw();
   }
   const headIsCorner = snake[snake.length - 1].corner && progress <= 0.5
-  let headCorner = null;
+
   if (headIsCorner) {
     headCorner = corners.pop();
   }
-  corners.forEach(corner => {
-    const thisCorner = drawCorner(corner, progress, snake.length, hitApple);
+  for (let i = 0; i < corners.length - 1; i++) {
+    const thisCorner = drawCorner(corners[i], progress, snake.length, hitApple);
     snakeParts.push(thisCorner);
 
     //draw the left hand side forwards 
@@ -587,7 +589,7 @@ function drawSnake(snake, lastTail, nextHead, hitApple, progress) {
       thisCorner.startPosLT.y,
     );
     thisCorner.left();
-  });
+  }
 
   if (headIsCorner) {
     const thisCorner = drawCorner(headCorner, progress, snake.length, hitApple);
@@ -610,12 +612,22 @@ function drawSnake(snake, lastTail, nextHead, hitApple, progress) {
   //finally complete the loop on the right side just backwrds
   for (let i = snakeParts.length - 1; i >= 0; i--) {
     const thisCorner = snakeParts[i];
-    // ctx.lineTo(
-    //   thisCorner.endPosRT.x,
-    //   thisCorner.endPosRT.y,
-    // );
+    ctx.lineTo(
+      thisCorner.endPosRT.x,
+      thisCorner.endPosRT.y,
+    );
+    ctx.lineTo(
+      thisCorner.startPosRT.x,
+      thisCorner.startPosRT.y,
+    );
     //thisCorner.right();
   }
+
+  //complete the loop
+  ctx.lineTo(
+    tailSnakePart.endPosRT.x,
+    tailSnakePart.endPosRT.y,
+  );
 
   ctx.strokeStyle = colors.red;
   //ctx.fill();
