@@ -326,3 +326,13 @@ hr::after {
     position: absolute;
     top: 0;
     left: 0; }
+
+@media only screen and (max-width: 1000px) {
+  .align-button {
+    flex-direction: column-reverse; }
+    .align-button > .button {
+      max-width: unset; }
+    .align-button > .button:not(:first-child) {
+      margin-left: 0; }
+    .align-button > .button:not(:last-child) {
+      margin-top: 1ch; } }
