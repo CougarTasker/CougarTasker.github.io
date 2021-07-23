@@ -163,21 +163,40 @@ function drawCornerControls(corner) {
 
 }
 
-drawEndCap = (start, end, clockwize = true) => {
-  const rToL = {
-    x: end.x - start.x,
-    y: end.y - start.y
+function vectorAngle({ x, y }) {
+  if (x == 0) {
+    if (y < 0) {
+      return 0;
+    } else {
+      return Math.PI;
+    }
+  } else if (y == 0) {
+    if (x > 0) {
+      return Math.PI / 2
+    } else {
+      return -Math.PI / 2;
+    }
+  } else {
+    const tanAngle = Math.atan(y / x);
+    if (x > 0) {
+      return Math.PI / 2 + tanAngle;
+    } else {
+      return -Math.PI / 2 + tanAngle;
+    }
+  }
+}
+function drawEndCap(right, left, clockwize = true) {
+  const ltoR = {
+    x: right.x - left.x,
+    y: right.y - left.y
   }
 
-  angle = rToL.x === 0 ?
-    (clockwize ? 0 : Math.PI) :
-    (rToL.x < 0 ? (Math.atan(rToL.y / rToL.x) + Math.PI / 2) :
-      (Math.atan(rToL.y / rToL.x) - Math.PI / 2));
+  angle = vectorAngle(ltoR);
   const capCenter = {
-    x: start.x + rToL.x / 2,
-    y: start.y + rToL.y / 2,
+    x: left.x + ltoR.x / 2,
+    y: left.y + ltoR.y / 2,
   }
-  const capR = Math.sqrt(Math.pow(rToL.x, 2) + Math.pow(rToL.y, 2)) / 2
+  const capR = Math.sqrt(Math.pow(ltoR.x, 2) + Math.pow(ltoR.y, 2)) / 2
   ctx.arc(
     capCenter.x, capCenter.y,
     capR,
@@ -347,7 +366,7 @@ drawCorner = (cell, progress, snakeLenght, hitApple) => {
     return {
       draw: () => {
         drawBezerCurve(curveL, "none", false);
-        drawEndCap(curveL.e, curveR.e);
+        drawEndCap(curveR.e, curveL.e);
         drawBezerCurve(curveR, "none", true);
       },
       startPosLT,
@@ -445,7 +464,7 @@ function drawStraightHead(cell, progress, snakeLenght, hitApple) {
   return {
     draw: () => {
       ctx.lineTo(headPosLT.x, headPosLT.y);
-      drawEndCap(headPosLT, headPosRT);
+      drawEndCap(headPosRT, headPosLT);
       ctx.lineTo(startPosRT.x, startPosRT.y);
     },
     order: cell.order,
@@ -553,7 +572,7 @@ function drawSnake(snake, lastTail, nextHead, hitApple, progress) {
     const thisCorner = drawCorner(corners.shift(), progress, snake.length, hitApple);
     thisCorner.draw();
   }
-  const headIsCorner = snake[snake.length - 1].corner && progress < 0.5
+  const headIsCorner = snake[snake.length - 1].corner && progress <= 0.5
   let headCorner = null;
   if (headIsCorner) {
     headCorner = corners.pop();
