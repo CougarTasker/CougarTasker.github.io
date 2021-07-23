@@ -378,13 +378,13 @@ drawCorner = (cell, progress, snakeLenght, hitApple) => {
     drawBezierControls(fullCurveL);
     //normal 
     return {
-      left: () => {
-        drawBezerCurve(fullCurveL, "none", false);
-      },
-      right: () => {
-        drawBezerCurve(fullCurveR, "none", true);
-      },
-      startPosLT, startPosRT, endPosLT, endPosRT, order: cell.order
+      startPosLT,
+      startPosRT,
+      endPosLT,
+      endPosRT,
+      order: cell.order,
+      fullCurveL,
+      fullCurveR
     };
   }
 
@@ -396,8 +396,11 @@ drawCorner = (cell, progress, snakeLenght, hitApple) => {
 function drawStraightHead(cell, progress, snakeLenght, hitApple) {
   let startSize;
   if (hitApple) {
+
+    //ofset the where in the snake this is.
+    const offset = progress >= 0.5 ? 0.5 : -0.5;
     //progress the snake lenght 
-    startSize = lerp(snakeTailSize, snakeHeadSize, (cell.order - 0.5) / (snakeLenght + progress - 1));
+    startSize = lerp(snakeTailSize, snakeHeadSize, (cell.order + offset) / (snakeLenght + progress - 1));
   } else {
     //ofset the where in the snake this is.
     let offset = - 0.5 - progress;
@@ -477,7 +480,7 @@ function drawStraightTail(cell, progress, snakeLenght, hitApple) {
   let endSize;
   if (hitApple) {
     //progress the snake lenght 
-    endSize = lerp(snakeTailSize, snakeHeadSize, (cell.order - 0.5) / (snakeLenght + progress - 1));
+    endSize = lerp(snakeTailSize, snakeHeadSize, (cell.order + 0.5) / (snakeLenght + progress - 1));
   } else {
     //ofset the where in the snake this is.
     let offset = 0.5 - progress;
@@ -579,16 +582,12 @@ function drawSnake(snake, lastTail, nextHead, hitApple, progress) {
   if (headIsCorner) {
     headCorner = corners.pop();
   }
-  for (let i = 0; i < corners.length - 1; i++) {
+  for (let i = 0; i < corners.length; i++) {
     const thisCorner = drawCorner(corners[i], progress, snake.length, hitApple);
     snakeParts.push(thisCorner);
 
     //draw the left hand side forwards 
-    ctx.lineTo(
-      thisCorner.startPosLT.x,
-      thisCorner.startPosLT.y,
-    );
-    thisCorner.left();
+    drawBezerCurve(thisCorner.fullCurveL, "line", false);
   }
 
   if (headIsCorner) {
@@ -611,16 +610,7 @@ function drawSnake(snake, lastTail, nextHead, hitApple, progress) {
 
   //finally complete the loop on the right side just backwrds
   for (let i = snakeParts.length - 1; i >= 0; i--) {
-    const thisCorner = snakeParts[i];
-    ctx.lineTo(
-      thisCorner.endPosRT.x,
-      thisCorner.endPosRT.y,
-    );
-    ctx.lineTo(
-      thisCorner.startPosRT.x,
-      thisCorner.startPosRT.y,
-    );
-    //thisCorner.right();
+    drawBezerCurve(snakeParts[i].fullCurveR, "line", true);
   }
 
   //complete the loop
