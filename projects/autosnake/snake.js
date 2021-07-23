@@ -480,7 +480,7 @@ function drawStraightTail(cell, progress, snakeLenght, hitApple) {
     endSize = lerp(snakeTailSize, snakeHeadSize, (cell.order - 0.5) / (snakeLenght + progress - 1));
   } else {
     //ofset the where in the snake this is.
-    let offset = - 0.5 - progress;
+    let offset =  0.5 - progress;
     if (progress >= 0.5) {
       //we have setepd over the border and the start postion has moved forward 1
       offset += 1;
