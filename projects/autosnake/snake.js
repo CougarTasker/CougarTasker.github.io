@@ -620,8 +620,7 @@ function drawSnake(snake, lastTail, nextHead, hitApple, progress) {
   );
 
   ctx.strokeStyle = colors.red;
-  //ctx.fill();
-  ctx.stroke();
+  ctx.fill();
 }
 
 // i am going to create a grid cordinates to canvas coridnates function 
@@ -683,9 +682,10 @@ drawInstance = (lastTail, { snake, appleLocation, newApple }, nextHead, progress
 
 
   if (!options.graphicsDebug) {
-    ctx.shadowOffsetX = 2;
-    ctx.shadowOffsetY = 2;
-    ctx.shadowBlur = 3;
+    const box = transform({ x: 0.1, y: 0.1, width: 0.2 })
+    ctx.shadowOffsetX = box.x;
+    ctx.shadowOffsetY = box.y;
+    ctx.shadowBlur = box.width;
     ctx.shadowColor = colors.darkBlack;
 
   }
