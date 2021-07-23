@@ -219,8 +219,10 @@ function getNextQuads() {
   }
   return out;
 }
-
+//need to add the size of the path into the metric of how good it is 
 function bfsToSnake(loc) {
+  const start = Date.now();
+  const maxSearchTime = 1000 / 60 * 2;
   startPos = gridCoridnatesToGraphID(loc);
   if (snakeSquares.size == 0) {
     return [];
@@ -233,7 +235,7 @@ function bfsToSnake(loc) {
   let bestPath = [];
   const value = getNextQuads();
   let leastSteps = Number.MAX_SAFE_INTEGER;
-  while (frontier.length > 0) {
+  while ((frontier.length > 0) && Date.now() - start < maxSearchTime) {
     cur = frontier.shift();
     visited.add(cur[0]);
 
@@ -243,13 +245,12 @@ function bfsToSnake(loc) {
         leastSteps = thisSteps.count;
         bestPath = [thisSteps.to, ...cur];
       }
-    } else {
-      basisControlGraph[cur[0]].forEach(cell => {
-        if (!visited.has(cell) && !snakeSquares.has(cell)) {
-          frontier.push([cell, ...cur]);
-        }
-      });
     }
+    basisControlGraph[cur[0]].forEach(cell => {
+      if (!visited.has(cell) && !snakeSquares.has(cell)) {
+        frontier.push([cell, ...cur]);
+      }
+    });
   }
   return bestPath;
 }
