@@ -908,7 +908,7 @@ let startTime = Date.now();
 let lastStep = 0;
 let hasWon = false
 let goingTohitApple = false;
-
+let hasTriggeredWinReset = false;
 let mainDirection = new dir("right");
 const isOutOfBounds = ({ x, y }) => x < 0 || y < 0 || y >= gameDimentions.y || x >= gameDimentions.x;
 
@@ -931,6 +931,16 @@ const renderLoop = () => {
       //the game has be won
       document.getElementById("score-container").textContent = (game.dimentions.x * game.dimentions.y - 3) + " - max";
       previousTail = currentInstance.snake.shift();
+      startConfetti();
+      if (!hasTriggeredWinReset) {
+        hasTriggeredWinReset = true;
+        setTimeout(() => {
+          stopConfetti();
+          game.reset();
+          hasTriggeredWinReset = false;
+        }, 5000);
+      }
+
     } else {
       if (!(oldHead.x == currentInstance.appleLocation.x && oldHead.y == currentInstance.appleLocation.y)) {
         previousTail = currentInstance.snake.shift();
@@ -970,6 +980,8 @@ window.addEventListener('load', () => {
   appleImg.addEventListener('load', renderLoop, false);
 
 });
+//confetti win effect
+
 
 //user input listners 
 
