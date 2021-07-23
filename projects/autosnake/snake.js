@@ -135,30 +135,26 @@ function splitBezierCurve(t, { s, c1, c2, e }, firstHalf = true) {
   }
 }
 function drawBezierControls({ s, c1, c2, e }) {
-  if (options.graphicsDebug) {
-    ctx.beginPath();
-    ctx.moveTo(s.x, s.y);
-    ctx.lineTo(c1.x, c1.y);
-    ctx.lineTo(c2.x, c2.y);
-    ctx.lineTo(e.x, e.y);
-    ctx.strokeStyle = colors.orange;
-    ctx.stroke();
-  }
+  ctx.beginPath();
+  ctx.moveTo(s.x, s.y);
+  ctx.lineTo(c1.x, c1.y);
+  ctx.lineTo(c2.x, c2.y);
+  ctx.lineTo(e.x, e.y);
+  ctx.strokeStyle = colors.orange;
+  ctx.stroke();
 }
 function drawCornerControls(corner) {
-  if (options.graphicsDebug) {
-    for (key in corner) {
-      if (key.includes("R")) {
-        ctx.fillStyle = colors.red;
-      } else {
-        ctx.fillStyle = colors.blue;
-
-      }
-      if (typeof corner[key] == "object" && "x" in corner[key]) {
-        ctx.fillRect(corner[key].x, corner[key].y, 3, 3);
-      }
+  for (key in corner) {
+    if (key.includes("R")) {
+      ctx.fillStyle = colors.red;
+    } else {
+      ctx.fillStyle = colors.blue;
 
     }
+    if (typeof corner[key] == "object" && "x" in corner[key]) {
+      ctx.fillRect(corner[key].x, corner[key].y, 3, 3);
+    }
+
   }
 
 }
@@ -205,7 +201,27 @@ function drawEndCap(right, left) {
     false
   )
 }
-drawCorner = (cell, progress, snakeLenght, hitApple) => {
+function drawBezerCurve(curve, howToStart, reverse = false) {
+  if (reverse) {
+    curve = { s: curve.e, c1: curve.c2, c2: curve.c1, e: curve.s }
+  }
+  switch (howToStart) {
+    case "move":
+      ctx.moveTo(curve.s.x, curve.s.y);
+      break;
+    case "line":
+      ctx.lineTo(curve.s.x, curve.s.y);
+      break;
+    case "none":
+    default:
+      break;
+  }
+  ctx.bezierCurveTo(
+    curve.c1.x, curve.c1.y,
+    curve.c2.x, curve.c2.y,
+    curve.e.x, curve.e.y);
+}
+drawCorner = (cell, progress, snakeLenght, hitApple, debug = false) => {
   //if this curve includes the tail 
   const rightHand = cell.preDir.x == cell.dir.y && -cell.preDir.y == cell.dir.x
 
@@ -297,30 +313,13 @@ drawCorner = (cell, progress, snakeLenght, hitApple) => {
   fullCurveR = { s: startPosRT, c1: startPosRGuideT, c2: endPosRGuideT, e: endPosRT };
   fullCurveL = { s: startPosLT, c1: startPosLGuideT, c2: endPosLGuideT, e: endPosLT };
 
-  drawCornerControls({
-    endPosRT, endPosRGuideT, startPosRT, startPosRGuideT, endPosLT, endPosLGuideT, startPosLT, startPosLGuideT
-  });
-
-  drawBezerCurve = (curve, howToStart, reverse = false) => {
-    if (reverse) {
-      curve = { s: curve.e, c1: curve.c2, c2: curve.c1, e: curve.s }
-    }
-    switch (howToStart) {
-      case "move":
-        ctx.moveTo(curve.s.x, curve.s.y);
-        break;
-      case "line":
-        ctx.lineTo(curve.s.x, curve.s.y);
-        break;
-      case "none":
-      default:
-        break;
-    }
-    ctx.bezierCurveTo(
-      curve.c1.x, curve.c1.y,
-      curve.c2.x, curve.c2.y,
-      curve.e.x, curve.e.y);
+  if (debug) {
+    drawCornerControls({
+      endPosRT, endPosRGuideT, startPosRT, startPosRGuideT, endPosLT, endPosLGuideT, startPosLT, startPosLGuideT
+    });
   }
+
+
   if (cell.order == 1 && progress > 0.5 && !hitApple || cell.order == 0 && (progress <= 0.5 || hitApple)) {
     //tail rendering 
 
@@ -331,8 +330,11 @@ drawCorner = (cell, progress, snakeLenght, hitApple) => {
     // keep the tail still if the tail is within the curve and it has hit the apple 
     curveR = splitBezierCurve(cellProgress, fullCurveR, false);
     curveL = splitBezierCurve(cellProgress, fullCurveL, false);
-    drawBezierControls(curveL);
-    drawBezierControls(curveR);
+    if (debug) {
+      drawBezierControls(curveL);
+      drawBezierControls(curveR);
+    }
+
 
 
 
@@ -356,8 +358,11 @@ drawCorner = (cell, progress, snakeLenght, hitApple) => {
     //head rendering 
     curveR = splitBezierCurve(progress + 0.5, fullCurveR, true);
     curveL = splitBezierCurve(progress + 0.5, fullCurveL, true);
-    drawBezierControls(curveL);
-    drawBezierControls(curveR);
+    if (debug) {
+      drawBezierControls(curveL);
+      drawBezierControls(curveR);
+    }
+
 
 
 
@@ -374,15 +379,14 @@ drawCorner = (cell, progress, snakeLenght, hitApple) => {
       order: cell.order
     }
   } else {
-    drawBezierControls(fullCurveR);
-    drawBezierControls(fullCurveL);
+
+    if (debug) {
+      drawBezierControls(fullCurveR);
+      drawBezierControls(fullCurveL);
+    }
+
     //normal 
     return {
-      startPosLT,
-      startPosRT,
-      endPosLT,
-      endPosRT,
-      order: cell.order,
       fullCurveL,
       fullCurveR
     };
@@ -393,7 +397,7 @@ drawCorner = (cell, progress, snakeLenght, hitApple) => {
 
 }
 
-function drawStraightHead(cell, progress, snakeLenght, hitApple) {
+function drawStraightHead(cell, progress, snakeLenght, hitApple, debug = false) {
   let startSize;
   if (hitApple) {
 
@@ -458,12 +462,15 @@ function drawStraightHead(cell, progress, snakeLenght, hitApple) {
   headPosRT = transform(headPosR);
   headPosLT = transform(headPosL);
 
-  drawCornerControls({
-    startPosRT,
-    startPosLT,
-    headPosRT,
-    headPosLT,
-  });
+  if (debug) {
+    drawCornerControls({
+      startPosRT,
+      startPosLT,
+      headPosRT,
+      headPosLT,
+    });
+  }
+
   return {
     draw: () => {
       ctx.lineTo(headPosLT.x, headPosLT.y);
@@ -476,7 +483,7 @@ function drawStraightHead(cell, progress, snakeLenght, hitApple) {
   }
 }
 
-function drawStraightTail(cell, progress, snakeLenght, hitApple) {
+function drawStraightTail(cell, progress, snakeLenght, hitApple, debug = false) {
   let endSize;
   if (hitApple) {
     //progress the snake lenght 
@@ -539,12 +546,15 @@ function drawStraightTail(cell, progress, snakeLenght, hitApple) {
   tailPosLT = transform(tailPosL);
   tailPosRT = transform(tailPosR);
 
-  drawCornerControls({
-    endPosRT,
-    endPosLT,
-    tailPosLT,
-    tailPosRT
-  });
+  if (debug) {
+    drawCornerControls({
+      endPosRT,
+      endPosLT,
+      tailPosLT,
+      tailPosRT
+    });
+  }
+
   return {
     draw: () => {
       ctx.moveTo(endPosRT.x, endPosRT.y);
@@ -619,8 +629,17 @@ function drawSnake(snake, lastTail, nextHead, hitApple, progress) {
     tailSnakePart.endPosRT.y,
   );
 
-  ctx.strokeStyle = colors.red;
   ctx.fill();
+
+  if (options.graphicsDebug) {
+    ctx.strokeStyle = colors.red;
+    ctx.stroke();
+    drawStraightTail(snake[0], progress, snake.length, hitApple, true);
+    for (let i = 0; i < corners.length; i++) {
+      drawCorner(corners[i], progress, snake.length, hitApple, true);
+    }
+    drawStraightHead(snake[snake.length - 1], progress, snake.length, hitApple, true);
+  }
 }
 
 // i am going to create a grid cordinates to canvas coridnates function 
