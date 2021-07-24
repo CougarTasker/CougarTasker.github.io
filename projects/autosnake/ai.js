@@ -117,7 +117,10 @@ function setupCapturePath() {
 
 setupControlGrid();
 setupCapturePath();
-
+function directionBetweenAtoB(a, b) {
+  const tempDir = new dir(a, b);
+  return allDirections.find(a => a.equals(tempDir));
+}
 
 function connectTwoQuads([a, b]) {
   //add the connection the the graph
@@ -136,24 +139,23 @@ function connectTwoQuads([a, b]) {
   const width = game.dimentions.x / 2;
   const ATopLeft = { x: a % width, y: Math.floor(a / width) };
   const BTopLeft = { x: b % width, y: Math.floor(b / width) };
-  const tempDir = new dir(ATopLeft, BTopLeft);
-  const ab = allDirections.findIndex(a => a.equals(tempDir));
-  const right = (ab + 1) % 4;
-  const ba = (ab + 2) % 4;
+  const ab = directionBetweenAtoB(ATopLeft, BTopLeft);
+  const right = ab.clock;
+  const ba = right.clock;
   aCenter = {
     x: ATopLeft.x * 2 + 1,
     y: ATopLeft.y * 2 + 1
   }
   bOffset = {
-    x: Math.floor(allDirections[ab].x * 1.5 + allDirections[right].x * 0.5),
-    y: Math.floor(allDirections[ab].y * 1.5 + allDirections[right].y * 0.5)
+    x: Math.floor(ab.x * 1.5 + right.x * 0.5),
+    y: Math.floor(ab.y * 1.5 + right.y * 0.5)
   }
   aOffset = {
-    x: Math.floor(allDirections[ab].x * 0.5 - allDirections[right].x * 0.5),
-    y: Math.floor(allDirections[ab].y * 0.5 - allDirections[right].y * 0.5)
+    x: Math.floor(ab.x * 0.5 - right.x * 0.5),
+    y: Math.floor(ab.y * 0.5 - right.y * 0.5)
   }
-  controlGrid[aCenter.x + bOffset.x][aCenter.y + bOffset.y] = allDirections[ba];
-  controlGrid[aCenter.x + aOffset.x][aCenter.y + aOffset.y] = allDirections[ab];
+  controlGrid[aCenter.x + bOffset.x][aCenter.y + bOffset.y] = ba;
+  controlGrid[aCenter.x + aOffset.x][aCenter.y + aOffset.y] = ab;
 }
 function detachTwoQuads([a, b]) {
   //add the connection the the graph
@@ -179,24 +181,24 @@ function detachTwoQuads([a, b]) {
   const width = game.dimentions.x / 2;
   const ATopLeft = { x: a % width, y: Math.floor(a / width) };
   const BTopLeft = { x: b % width, y: Math.floor(b / width) };
-  const tempDir = new dir(ATopLeft, BTopLeft);
-  const ab = allDirections.findIndex(a => a.equals(tempDir));
-  const right = (ab + 1) % 4;
-  const left = (ab + 3) % 4;
+
+  const ab = directionBetweenAtoB(ATopLeft, BTopLeft);
+  const right = ab.clock;
+  const left = ab.antiClock;
   aCenter = {
     x: ATopLeft.x * 2 + 1,
     y: ATopLeft.y * 2 + 1
   }
   bOffset = {
-    x: Math.floor(allDirections[ab].x * 1.5 + allDirections[right].x * 0.5),
-    y: Math.floor(allDirections[ab].y * 1.5 + allDirections[right].y * 0.5)
+    x: Math.floor(ab.x * 1.5 + right.x * 0.5),
+    y: Math.floor(ab.y * 1.5 + right.y * 0.5)
   }
   aOffset = {
-    x: Math.floor(allDirections[ab].x * 0.5 - allDirections[right].x * 0.5),
-    y: Math.floor(allDirections[ab].y * 0.5 - allDirections[right].y * 0.5)
+    x: Math.floor(ab.x * 0.5 - right.x * 0.5),
+    y: Math.floor(ab.y * 0.5 - right.y * 0.5)
   }
-  controlGrid[aCenter.x + bOffset.x][aCenter.y + bOffset.y] = allDirections[left];
-  controlGrid[aCenter.x + aOffset.x][aCenter.y + aOffset.y] = allDirections[right];
+  controlGrid[aCenter.x + bOffset.x][aCenter.y + bOffset.y] = left;
+  controlGrid[aCenter.x + aOffset.x][aCenter.y + aOffset.y] = right;
 }
 function getQuadToSquare({ x, y }) {
   const toDir = (x & 1) == 0 ?
@@ -253,6 +255,12 @@ function getMovesNeededBetweenDirections(pre, next) {
 function bfsToSnake(loc) {
   const start = Date.now();
   const maxSearchTime = 1000 / 60 * 2;
+  const quadLoc = (gridID) => {
+    return {
+      x: gridID % (game.dimentions.x / 2),
+      y: Math.floor(gridID / game.dimentions.x / 2)
+    }
+  }
   startPos = gridCoridnatesToGraphID(loc);
   appleDirection = controlGrid[loc.x][loc.y];
   if (snakeSquares.size == 0) {
@@ -275,8 +283,14 @@ function bfsToSnake(loc) {
 
     const thisSteps = value.get(headQuad)
     if (thisSteps != undefined) {
-      if (thisSteps.count + cur.steps < leastSteps) {
-        leastSteps = thisSteps.count + cur.steps;
+
+      const lastStep = getMovesNeededBetweenDirections(
+        cur.lastDirection,
+        directionBetweenAtoB(headQuad, quadLoc(thisSteps.to))
+      );
+      const pathLenght = thisSteps.count + cur.steps + lastStep;
+      if (pathLenght < leastSteps) {
+        leastSteps = pathLenght;
         foundAPath = true;
         bestPath = [thisSteps.to, ...cur.path];
       }
@@ -328,10 +342,12 @@ function getApple() {
   if (capturedTheSnake) {
     //can't get the apple untill the snake is cpatured on a path;
     setTimeout(() => {
-      simplifyPath();
-      if (!snakeSquares.has(currentAppleCellID)) {
-        //only connect the apple if its not on the path.
-        connectPath(bfsToSnake(currentApple));
+      if (capturedTheSnake) {
+        simplifyPath();
+        if (!snakeSquares.has(currentAppleCellID)) {
+          //only connect the apple if its not on the path.
+          connectPath(bfsToSnake(currentApple));
+        }
       }
     }, 1);
   }
