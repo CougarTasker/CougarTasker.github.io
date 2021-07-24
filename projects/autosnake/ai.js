@@ -38,6 +38,15 @@ const left = new dir("left");
 const right = new dir("right");
 const allDirections = [up, right, down, left];
 
+up.clock = right;
+right.clock = down;
+down.clock = left;
+left.clock = up;
+
+up.antiClock = left;
+left.antiClock = down;
+down.antiClock = right;
+right.antiClock = up;
 
 const controlGrid = [];
 const basisControlGraph = [];
@@ -77,16 +86,16 @@ function setupControlGrid() {
       const id = simpleConvert(x, y);
       let adjacent = [];
       if (y > 0) {
-        adjacent.push(simpleConvert(x, y - 1));
+        adjacent.push([simpleConvert(x, y - 1), up]);
       }
       if (x > 0) {
-        adjacent.push(simpleConvert(x - 1, y));
+        adjacent.push([simpleConvert(x - 1, y), left]);
       }
       if (y < (gameDimentions.y / 2) - 1) {
-        adjacent.push(simpleConvert(x, y + 1));
+        adjacent.push([simpleConvert(x, y + 1), down]);
       }
       if (x < (gameDimentions.x / 2) - 1) {
-        adjacent.push(simpleConvert(x + 1, y));
+        adjacent.push([simpleConvert(x + 1, y), right]);
       }
       basisControlGraph[id] = adjacent;
     }
@@ -149,12 +158,22 @@ function connectTwoQuads([a, b]) {
 function detachTwoQuads([a, b]) {
   //add the connection the the graph
   const Aconnected = connectedQuads.get(a);
-  if (!Aconnected.has(b)) {
+  if (Aconnected == undefined || !Aconnected.has(b)) {
     return false;
   }
-  Aconnected.delete(b)
+  if (Aconnected.size == 1) {
+    connectedQuads.delete(a)
+  } else {
+    Aconnected.delete(b)
+  }
+
+
   const Bconnected = connectedQuads.get(b);
-  Bconnected.delete(a);
+  if (Bconnected.size == 1) {
+    connectedQuads.delete(b)
+  } else {
+    Bconnected.delete(a);
+  }
 
 
   const width = game.dimentions.x / 2;
@@ -192,7 +211,7 @@ function getQuadToSquare({ x, y }) {
 }
 function getNextQuads() {
   const out = new Map();
-  let count = 0;
+  let count = 1;
   if (!snakeHead) {
     return out;
   }
@@ -201,7 +220,8 @@ function getNextQuads() {
     y: snakeHead.y
   }
   let hasNotCompleteLoop = true;
-
+  //step forwards one because we cant control where the snake is going to right now anymore
+  currentSquare = controlGrid[currentSquare.x][currentSquare.y].add(currentSquare);
   while (hasNotCompleteLoop) {
     currentSquare = controlGrid[currentSquare.x][currentSquare.y].add(currentSquare);
     const to = gridCoridnatesToGraphID(currentSquare);
@@ -209,9 +229,9 @@ function getNextQuads() {
     if (currentSquare.x == snakeHead.x && currentSquare.y == snakeHead.y) {
       hasNotCompleteLoop = false;
     }
-    if (from != -1 && !out.has(from) && !snakeSquares.has(from)) {
+    if (from != -1 && !out.has(from) && connectedQuads.get(from) == undefined) {
       out.set(from, {
-        count: count == 0 ? Number.MAX_SAFE_INTEGER - 1 : count,
+        count,
         to
       });
     }
@@ -219,36 +239,55 @@ function getNextQuads() {
   }
   return out;
 }
+
+function getMovesNeededBetweenDirections(pre, next) {
+  if (pre.clock.equals(next)) {
+    return 1
+  }
+  if (pre.equals(next)) {
+    return 2;
+  }
+  return 3;
+}
 //need to add the size of the path into the metric of how good it is 
 function bfsToSnake(loc) {
   const start = Date.now();
   const maxSearchTime = 1000 / 60 * 2;
   startPos = gridCoridnatesToGraphID(loc);
+  appleDirection = controlGrid[loc.x][loc.y];
   if (snakeSquares.size == 0) {
     return [];
   }
-  if (snakeSquares.has(loc)) {
+  if (connectedQuads.has(startPos)) {
     return [];
   }
-  let frontier = [[startPos]];
+
+  let frontier = [{ path: [startPos], lastDirection: appleDirection, steps: 0 }];
   let visited = new Set();
   let bestPath = [];
   const value = getNextQuads();
   let leastSteps = Number.MAX_SAFE_INTEGER;
-  while ((frontier.length > 0) && Date.now() - start < maxSearchTime) {
+  let foundAPath = false;
+  while ((frontier.length > 0) && (Date.now() - start < maxSearchTime || !foundAPath)) {
     cur = frontier.shift();
-    visited.add(cur[0]);
+    const headQuad = cur.path[0];
+    visited.add(headQuad);
 
-    const thisSteps = value.get(cur[0])
+    const thisSteps = value.get(headQuad)
     if (thisSteps != undefined) {
-      if (thisSteps.count < leastSteps) {
-        leastSteps = thisSteps.count;
-        bestPath = [thisSteps.to, ...cur];
+      if (thisSteps.count + cur.steps < leastSteps) {
+        leastSteps = thisSteps.count + cur.steps;
+        foundAPath = true;
+        bestPath = [thisSteps.to, ...cur.path];
       }
     }
-    basisControlGraph[cur[0]].forEach(cell => {
-      if (!visited.has(cell) && !snakeSquares.has(cell)) {
-        frontier.push([cell, ...cur]);
+    basisControlGraph[headQuad].forEach(([cell, direction]) => {
+      if (!visited.has(cell) && !connectedQuads.has(cell)) {
+        frontier.push({
+          path: [cell, ...cur.path],
+          lastDirection: direction,
+          steps: cur.steps + getMovesNeededBetweenDirections(cur.lastDirection, direction)
+        });
       }
     });
   }
@@ -369,7 +408,7 @@ game.addNewMoveListner((snake) => {
 
   if (capturedTheSnake) {
     updateSnakeSquares(snake);
-
+    getApple();
   } else {
     //not captured the snake yet
     // work out wether the snake is on the same path when it is vertical
