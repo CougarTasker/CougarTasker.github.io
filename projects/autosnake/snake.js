@@ -887,7 +887,10 @@ const game = {
     moveListners.push(listner);
   },
   setDirection: (dir) => {
-    headDir = currentInstance.snake[currentInstance.snake.length - 2].dir;
+    headDir = {
+      x: currentInstance.snake[currentInstance.snake.length - 1].x - currentInstance.snake[currentInstance.snake.length - 2].x,
+      y: currentInstance.snake[currentInstance.snake.length - 1].y - currentInstance.snake[currentInstance.snake.length - 2].y
+    }
     if (-dir.x !== headDir.x || -dir.y !== headDir.y) {
       //if the asked direction is not oppsite to the main direction ie no 180 turns.
       mainDirection = dir;
@@ -896,7 +899,8 @@ const game = {
   getDirection: () => {
     return mainDirection;
   },
-  dimentions: gameDimentions
+  dimentions: gameDimentions,
+  stepsPerMove: 1
 }
 
 
@@ -910,62 +914,70 @@ let hasWon = false
 let goingTohitApple = false;
 let hasTriggeredWinReset = false;
 let mainDirection = new dir("right");
+function updateSnake() {
+  currentInstance.newApple = false;
+
+  currentInstance.snake.push(nextHead);
+  hasWon = currentInstance.snake.length >= game.dimentions.x * game.dimentions.y
+  const oldHead = currentInstance.snake[currentInstance.snake.length - 1];
+
+  if (hasWon) {
+    //the game has be won
+    document.getElementById("score-container").textContent = (game.dimentions.x * game.dimentions.y - 3) + " - max";
+    previousTail = currentInstance.snake.shift();
+    startConfetti();
+    if (!hasTriggeredWinReset) {
+      hasTriggeredWinReset = true;
+      setTimeout(() => {
+        stopConfetti();
+        game.reset();
+        hasTriggeredWinReset = false;
+      }, 5000);
+    }
+
+  } else {
+    if (!(oldHead.x == currentInstance.appleLocation.x && oldHead.y == currentInstance.appleLocation.y)) {
+      previousTail = currentInstance.snake.shift();
+    } else {
+      //apple has been hit
+      document.getElementById("score-container").textContent = currentInstance.snake.length - 3;
+      createNewApple();
+    }
+  }
+  if (options.aiEnabled) {
+    moveListners.forEach(l => { l(currentInstance.snake); });
+  }
+  const mov = mainDirection;
+
+  nextHead = {
+    x: oldHead.x + mov.x,
+    y: oldHead.y + mov.y
+  }
+
+  if (isOutOfBounds(nextHead) || (currentInstance.snake.some(cur => cur.x == nextHead.x && cur.y == nextHead.y) && !hasWon)) {
+    //you cant run into the tail if the ai has won
+    game.reset();
+  }
+
+}
 const isOutOfBounds = ({ x, y }) => x < 0 || y < 0 || y >= gameDimentions.y || x >= gameDimentions.x;
+
 
 const renderLoop = () => {
 
   const progress = ((Date.now() - startTime) % progressDuration) / progressDuration;
   const step = Math.floor((Date.now() - startTime) / progressDuration)
-  if (step != lastStep && "dir" in currentInstance.snake[0]) {
+  if (progressDuration <= 1000 / 60) {
+    //there is a move every frame
+    for (let i = 0; i < Math.floor(currentInstance.snake.length / 100) + 1; i++) {
+      updateSnake();
+    }
+  } else if (step != lastStep && "dir" in currentInstance.snake[0]) {
     //we have made a step
     //make a step if there is one to make;
-
-
-    currentInstance.newApple = false;
-
-    currentInstance.snake.push(nextHead);
-    hasWon = currentInstance.snake.length >= game.dimentions.x * game.dimentions.y
-    const oldHead = currentInstance.snake[currentInstance.snake.length - 1];
-
-    if (hasWon) {
-      //the game has be won
-      document.getElementById("score-container").textContent = (game.dimentions.x * game.dimentions.y - 3) + " - max";
-      previousTail = currentInstance.snake.shift();
-      startConfetti();
-      if (!hasTriggeredWinReset) {
-        hasTriggeredWinReset = true;
-        setTimeout(() => {
-          stopConfetti();
-          game.reset();
-          hasTriggeredWinReset = false;
-        }, 5000);
-      }
-
-    } else {
-      if (!(oldHead.x == currentInstance.appleLocation.x && oldHead.y == currentInstance.appleLocation.y)) {
-        previousTail = currentInstance.snake.shift();
-      } else {
-        //apple has been hit
-        document.getElementById("score-container").textContent = currentInstance.snake.length - 3;
-        createNewApple();
-      }
-    }
-    if (options.aiEnabled) {
-      moveListners.forEach(l => { l(currentInstance.snake); });
-    }
-    const mov = mainDirection;
-
-    nextHead = {
-      x: oldHead.x + mov.x,
-      y: oldHead.y + mov.y
-    }
-
-    if (isOutOfBounds(nextHead) || (currentInstance.snake.some(cur => cur.x == nextHead.x && cur.y == nextHead.y) && !hasWon)) {
-      //you cant run into the tail if the ai has won
-      game.reset();
-    }
-
+    updateSnake();
   }
+
   lastStep = step;
 
   drawInstance(previousTail, currentInstance, nextHead, progress);
