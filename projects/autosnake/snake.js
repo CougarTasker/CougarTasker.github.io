@@ -709,8 +709,8 @@ drawInstance = (lastTail, { snake, appleLocation, newApple }, nextHead, progress
 
   }
   const grd = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-  grd.addColorStop(0, colors.teal);
-  grd.addColorStop(1, colors.green);
+  grd.addColorStop(0, colors.green);
+  grd.addColorStop(1, colors.teal);
   ctx.fillStyle = grd;
   drawSnake(snake, lastTail, nextHead, hitApple, progress);
 
