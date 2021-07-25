@@ -254,7 +254,7 @@ function getMovesNeededBetweenDirections(pre, next) {
 //need to add the size of the path into the metric of how good it is 
 function bfsToSnake(loc) {
   const start = Date.now();
-  const maxSearchTime = 1000 / 60 * 2;
+  const maxSearchTime = 1000 / 60 * 0.9;
   const quadLoc = (gridID) => {
     return {
       x: gridID % (game.dimentions.x / 2),
@@ -305,6 +305,11 @@ function bfsToSnake(loc) {
       }
     });
   }
+  // let overflowCount = 0
+  // while (Date.now() - start < maxSearchTime) {
+  //   overflowCount++;
+  // }
+  // console.log(overflowCount);
   return bestPath;
 }
 
