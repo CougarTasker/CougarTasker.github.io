@@ -22,6 +22,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500&family=Roboto&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" rel="stylesheet">
   <meta name="theme-color" content="#292e1e">
+
+  <link rel="stylesheet" data-name="vs/editor/editor.main"
+    href="./monaco/min/vs/editor/editor.main.css">
 </head>
 
 <body>
@@ -46,6 +49,89 @@
     </p>
   </div>
 
+  <div class="container project" id="FOLD">
+    <hr />
+    <div class="top">
+      <h2>FOLD3R</h2>
+      <ul class="tags">
+        <li>Java</li>
+        <li>JavaFX</li>
+        <li>ART</li>
+      </ul>
+    </div>
+    <p>
+      As part of the software language engineering module, I created my own Domain-specific programming language. Inspired by
+      an origami bird I wanted to develop a programming language for manipulating sheet material such as paper as this can be
+      challenging to achieve in other 3D modelling languages.
+    </p>
+
+    <img  src="./img/folds.png" 
+          alt="various folds created from programmes in my language"  
+          width="1920" height="1080"/>
+    
+    <p>
+      My language was built around creating folds and the control points. Folds are defined between these control points, and
+      therefore the model can be built in a deterministic way. I had hoped to develop the syntax a lot further to support
+      first-class functions and closures however the backend took the most of my time. Display the material model that the
+      language uses. I had to handle the surfaces manually creating my own triangulation and transformation systems.
+    </p>
+    
+
+
+    <script src="./monaco/min/vs/loader.js"></script>
+    <div id="code-container" style="width: 100%; height: 10em;"></div>
+
+    <script>
+      require.config({ paths: { 'vs': './monaco/min/vs' } });
+        window.MonacoEnvironment = { getWorkerUrl: () => proxy };
+
+        let proxy = URL.createObjectURL(new Blob([`
+	self.MonacoEnvironment = {
+		baseUrl: 'https://www.cougartasker.com/projects/monaco/min/'
+	};
+	importScripts('https://www.cougartasker.com/projects/monaco/min/vs/base/worker/workerMain.js');
+`], { type: 'text/javascript' }));
+
+        require(["vs/editor/editor.main"], function () {
+          let editor = monaco.editor.create(document.querySelector('#FOLD>#code-container'), {
+            value: [
+              '//fan.fold3r',
+              'angle <- 40.0;',
+              'count <- 10;',
+              '',
+              'topLeft,bottomLeft,bottomRight,topRight <- createA4();',
+              '',
+              'leftMiddle <- mix(topLeft,bottomLeft,0.5);',
+              'i <- 0;',
+              'cur <- topRight;',
+              'progress <- 0.0;',
+              'while(i < count){',
+              '\tlastProgress <- progress;',
+              '\tprogress <- (cast(i, double)+0.5) / cast(count, double);',
+              '\tfactor <- (progress-lastProgress)/(1.0-lastProgress);',
+              '\tcur <- mix(cur,bottomRight,factor);',
+              '\tif(i % 2 = 0){',
+              '\t\tvally(leftMiddle, cur, angle);',
+              '\t}else{',
+              '\t\tmountain(leftMiddle, cur, angle);',
+              '\t}',
+              '\ti <- i + 1;',
+              '}'].join('\n'),
+            language: 'javascript',
+            readOnly: true,
+            theme: 'vs-dark',
+            automaticLayout: true
+          });
+          fetch('./monaco/Monokai.json')
+            .then(data => data.json())
+            .then(data => {
+              monaco.editor.defineTheme('monokai', data);
+              monaco.editor.setTheme('monokai');
+            });
+        });
+        
+    </script>
+  </div>
 
   <div class="container project">
     <hr />

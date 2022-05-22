@@ -35,13 +35,14 @@ hr::after {
   transform: translate(-50%, -50%) rotate(45deg);
 }
 
-.project .top {
+.top .project {
   display: flex;
   flex-direction: row;
   align-items: stretch;
   justify-content: space-between;
   flex-wrap: wrap;
-  & > ul.tags {
+}
+.top > ul.tags {
     list-style-type: none;
     display: flex;
     flex-direction: row;
@@ -65,6 +66,10 @@ hr::after {
       }
     }
   }
+
+.project > img{
+    width: 100%;
+    height: auto;
 }
 
 .align-button {
