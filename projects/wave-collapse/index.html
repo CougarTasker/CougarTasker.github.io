@@ -1,0 +1,111 @@
+<!doctype html>
+<html class="no-js" lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>AutoSnake 2 - Cougar Tasker</title>
+  <meta name="description"
+    content="This is a game of snake with an AI that automatically plays the game for you. you can play manually change the speed of the game and size of the board.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- add the relavent icons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg?v=2" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#2b5797">
+
+  <link rel="stylesheet" href="/css/normalize.min.css">
+  <link rel="stylesheet" href="css/snake.css">
+  <!-- include fonts and icon set from google -->
+  <link rel="dns-prefetch" href="//fonts.googleapis.com">
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500&family=Roboto&display=swap"
+    as="style" onload="this.onload=null;this.rel='stylesheet'" />
+  <link rel="preload" href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" as="style"
+    onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500&family=Roboto&display=swap" rel="stylesheet"
+      type="text/css" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" rel="stylesheet">
+  </noscript>
+  <meta name="theme-color" content="#292e1e">
+
+</head>
+
+<body>
+  <!--[if IE]>
+		<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+	<![endif]-->
+
+  <nav class="container shadow">
+    <a href="/"><img src="/img/icon2.svg" width="20" height="20" alt="CT homepage"></a>
+    <ul>
+      <li><a href="/">About</a></li>
+      <li class="active"><a href="/projects">Projects</a></li>
+      <li><a href="/contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <div id="nav-spacer" class="nav-height container"></div>
+  <div id="intro" class="container">
+    <h1 id="">AutoSnake 2</h1>
+  </div>
+  <div id="game" class="container">
+    <div><b>score:</b><span id="score-container"></span></div>
+    <div class="canvas-container">
+      <canvas></canvas>
+    </div>
+    <div class="options">
+      <span>speed</span>
+      <input type="radio" id="slow" name="snake-speed" value="slow">
+      <label for="slow">slow</label>
+      <input type="radio" id="speed-medium" name="snake-speed" value="medium" checked="checked">
+      <label for="speed-medium">medium</label>
+      <input type="radio" id="fast" name="snake-speed" value="fast">
+      <label for="fast">fast</label>
+
+      <span>size</span>
+      <input type="radio" id="small" name="board-size" value="small">
+      <label for="small">small</label>
+      <input type="radio" id="size-medium" name="board-size" value="medium" checked="checked">
+      <label for="size-medium">medium</label>
+      <input type="radio" id="large" name="board-size" value="large">
+      <label for="large">large</label>
+
+      <span class="mobileHiddden">player</span>
+      <input class="mobileHiddden" type="radio" id="computer" name="player" value="computer" checked="checked">
+      <label class="mobileHiddden" for="computer">computer</label>
+      <input class="mobileHiddden" type="radio" id="human" name="player" value="human">
+      <label class="mobileHiddden" for="human">human (wasd)</label>
+
+      <span>debug views</span>
+      <input type="checkbox" id="graphics" name="graphics" value="graphics">
+      <label for="graphics">graphics</label>
+      <input type="checkbox" id="ai" name="ai" value="ai">
+      <label for="ai">AI</label>
+
+      <a class="button" id="reset">reset game<span class="material-icons">refresh</span></a>
+    </div>
+  </div>
+
+
+
+  <footer class="container">
+    <a href="https://creativecommons.org/licenses/by-sa/4.0/">
+      <img src="/img/ccheart_red.svg" alt="creative commons shareAlike 4.0" width="18" height="18">
+      Cougar Tasker 2020</a>
+
+    <script src="./confetti.js"></script>
+    <script src="./snake.js"></script>
+    <script src="./ai.js"></script>
+
+
+    <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+    <script>
+      window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+      ga('create', 'UA-XXXXX-Y', 'auto'); ga('set', 'transport', 'beacon'); ga('send', 'pageview')
+    </script>
+    <script src="https://www.google-analytics.com/analytics.js" async></script>
+</body>
+
+</html>
