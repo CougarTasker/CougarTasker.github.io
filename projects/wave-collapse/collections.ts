@@ -29,7 +29,10 @@ type node = empty | leaf | branch
 type error = string
 
 
-
+const updateBallanceInformation = (node: branch): void => {
+  node.height = Math.max(node.left.height, node.right.height) + 1;
+  node.ballanceFactor = node.right.height - node.left.height;
+}
 const ballanceNode = (root: node): node | error => {
   const rotateRight = (root: node): node | error => {
     if (root.type != "branch" || root.left.type != "branch") {
@@ -39,6 +42,8 @@ const ballanceNode = (root: node): node | error => {
     const middle = newRoot.right;
     newRoot.right = root;
     root.left = middle;
+    updateBallanceInformation(root);
+    updateBallanceInformation(newRoot);
     return newRoot;
   }
   const rotateLeft = (root: node): node | error => {
@@ -49,6 +54,8 @@ const ballanceNode = (root: node): node | error => {
     const middle = newRoot.left;
     newRoot.left = root;
     root.right = middle;
+    updateBallanceInformation(root);
+    updateBallanceInformation(newRoot);
     return newRoot;
   }
   const rotateRightLeft = (root: node): node | error => {
@@ -80,17 +87,17 @@ const ballanceNode = (root: node): node | error => {
   if (root.type != "branch") {
     return "can only ballance branches"
   }
-  if(root.ballanceFactor > 0){
+  if (root.ballanceFactor > 0) {
     // right heavy
-    if(root.right.type != "branch"){
+    if (root.right.type != "branch") {
       return "how is the right side heavy but not a branch?"
     }
-    if(root.ballanceFactor < 0){
+    if (root.ballanceFactor < 0) {
       return rotateRightLeft(root)
-    }else{
+    } else {
       return rotateLeft(root)
     }
-  }else{
+  } else {
     // left heavy
     if (root.left.type != "branch") {
       return "how is the left side heavy but not a branch?"
@@ -137,7 +144,7 @@ const insert = (root: node, value: number): node | error => {
   } else if (root.type == "branch") {
     if (value > root.payload) {
       const updatedSubtree = insert(root.right, value);
-      if(typeof updatedSubtree == "string"){
+      if (typeof updatedSubtree == "string") {
         return updatedSubtree
       }
       root.right = updatedSubtree
@@ -151,17 +158,28 @@ const insert = (root: node, value: number): node | error => {
       root.left = updatedSubtree
     }
 
-    root.ballanceFactor = root.right.height - root.left.height
-    root.height = Math.max(root.left.height, root.right.height) + 1
+    updateBallanceInformation(root);
     const ballanceDiff = Math.abs(root.ballanceFactor);
-    if(ballanceDiff == 2){
+    if (ballanceDiff == 2) {
       return ballanceNode(root)
-    }else if(ballanceDiff > 2){
+    } else if (ballanceDiff > 2) {
       return "cannot re-ballance diffrance more than 2"
-    }else{
+    } else {
       //no ballancing needed 
       return root
     }
   }
+  return "missing node type"
+}
+const toTree = (items: number[]): node | error => {
+  let tree: node | error = emptyNode
+  for (let item of items) {
+    if (typeof tree == "string") {
+      return tree;
+    }
+    tree = insert(tree, item);
+  }
+  return tree;
 }
 
+export { emptyNode, insert, toTree }
