@@ -2,6 +2,7 @@ const canvas: HTMLCanvasElement = document.querySelector(".canvas-container canv
 const ctx = canvas.getContext("2d");
 const canvasContainer: HTMLElement = document.querySelector(".canvas-container");
 
+
 const colors = {
   black: "#292e1e",
   darkBlack: "#0e0f0a",
@@ -39,10 +40,6 @@ interface Cell {
   y: number
 }
 
-interface SuperPosition {
-  cell: Cell
-  tiles: Set<Tile>
-}
 
 interface SuperPositionCollection {
   cells: Map<Cell, Set<Tile>>,
@@ -64,7 +61,7 @@ const renderLoop = () => {
   window.requestAnimationFrame(renderLoop);
 }
 
-const union = <T>(a: Set<T>, b: Set<T>): Set<T> => {
+const intersection = <T>(a: Set<T>, b: Set<T>): Set<T> => {
   const out = new Set<T>();
   a.forEach(v => {
     if (b.has(v)) {
@@ -73,24 +70,30 @@ const union = <T>(a: Set<T>, b: Set<T>): Set<T> => {
   })
   return out;
 }
-
+const shallowCopySuperPosition =
+  (input: SuperPositionCollection): SuperPositionCollection => {
+    const cells = new Map<Cell, Set<Tile>>()
+    const closedCells = new Set<Cell>(input.closedCells)
+    const openCells = new Set<Cell>(input.openCells)
+    for (let [key, value] of input.cells.entries()) {
+      cells.set(key, new Set(value));
+    }
+    return { cells, openCells, closedCells }
+  }
 const generateSuperPosition = (): SuperPositionCollection => {
   const cells = new Map<Cell, Set<Tile>>()
   let allTiles = new Set<Tile>(tiles);
   for (let x = 0; x < options.numberOfColumns(); x++) {
     for (let y = 0; y < options.numberOfRows(); y++) {
-      cells.set({x,y},allTiles);
+      cells.set({ x, y }, allTiles);
     }
   }
   const openCells = new Set(cells.keys())
-  const closedCells:Set<Cell> = new Set()
-  return {cells,openCells,closedCells}
+  const closedCells: Set<Cell> = new Set()
+  return { cells, openCells, closedCells }
 }
 
-
-
-const collapseSingleCell = (a: SuperPositionCollection)
-  : SuperPositionCollection => {
+const getRandomItemFromSet = (a: Set<T>): T => {
   const randomizeIndex = x => Math.round((x - 1) * Math.random())
   const getItemFromIndex = <T>(item: IterableIterator<T>, index: number): T => {
     let result: IteratorResult<T, any>
@@ -100,44 +103,45 @@ const collapseSingleCell = (a: SuperPositionCollection)
     } while (index < 1 && !result.done)
     return result.value
   }
-  const cellIndex = randomizeIndex(a.openCells.size);
+  const i = randomizeIndex(a.size)
+  return getItemFromIndex(a.values(), i);
+}
 
-  const cell = getItemFromIndex(a.openCells.values(),cellIndex)
+const collapseSingleCell = (a: SuperPositionCollection)
+  : SuperPositionCollection => {
+
+  const cell = getRandomItemFromSet(a.openCells);
 
   const tiles = a.cells.get(cell)
 
-  const tileIndex = randomizeIndex(tiles.size)
-  const tile = getItemFromIndex(tiles.values(),tileIndex);
+  const tile = getRandomItemFromSet(tiles);
+
   a.openCells.delete(cell);
   a.closedCells.add(cell);
-
-  const cells = new Map<Cell, Set<Tile>>()
+  tiles.clear();
+  tiles.add(tile);
 
   return a;
 }
-const compareCells = (a: Cell, b: Cell): boolean => a.x == b.x && a.y == b.y
-const collapseSuperPosition = (input: SuperPosition[]): SuperPosition[] => {
-  
-  let cellIndex: number
-  do {
-    cellIndex = randomizeIndex(input.length);
-  } while (input[cellIndex].tiles.size == 1)
 
-  const tileIndex: number = randomizeIndex(input[cellIndex].tiles.size);
-
-
-  const tile: Tile = getIndexFromItterator(
-    input[cellIndex].tiles.values(),
-    tileIndex)
-
-  input[cellIndex].tiles = new Set();
-  input[cellIndex].tiles.add(tile);
-
-
+const propogateRelationShips = (a: SuperPositionCollection, b: Cell)
+  : SuperPositionCollection | "fail" => {
   const releventRelationships = relationships.filter(
     ({ match }) =>
       (typeof match === "function" && match(tile))
       || match.name === tile.name)
+
+    return "fail"
+}
+
+const compareCells = (a: Cell, b: Cell): boolean => a.x == b.x && a.y == b.y
+
+const collapseSuperPosition = (input: SuperPositionCollection): SuperPositionCollection => {
+
+  i = collapseSingleCell(i)
+
+
+  
 
 
   const poss = releventRelationships.map(
@@ -151,7 +155,7 @@ const collapseSuperPosition = (input: SuperPosition[]): SuperPosition[] => {
 
   for (let [cell, tileConstraints] of possBag) {
     const cellMatch = input.find(k => compareCells(k.cell, cell));
-    cellMatch.tiles = union(cellMatch.tiles, tileConstraints);
+    cellMatch.tiles = intersection(cellMatch.tiles, tileConstraints);
   }
 }
 
