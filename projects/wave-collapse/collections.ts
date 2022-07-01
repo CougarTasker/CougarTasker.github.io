@@ -11,175 +11,153 @@ interface empty extends nodeBase {
   height: 0,
   ballanceFactor: 0,
 }
-interface leaf extends nodeBase {
-  type: "leaf",
-  payload: number,
-  height: 0,
-  ballanceFactor: 0,
-}
-interface branch extends nodeBase {
+interface branch<L, R, T> extends nodeBase {
   type: "branch"
-  payload: number
-  left: node
-  right: node
+  payload: { value: T, hash: number }
+  left: L
+  right: R
+}
+type branchAny<T> = branch<node<T>, node<T>, T>
+type leaf<T> = branch<empty, empty, T>
+type branchLeft<T> = branch<branchAny<T>, node<T>, T>
+type branchRight<T> = branch<node<T>, branchAny<T>, T>
+type branchLeftRight<T> = branch<branchRight<T>, node<T>, T>
+type branchRightLeft<T> = branch<node<T>, branchLeft<T>, T>
+type node<T> = empty | branchAny<T>
+type valueComparison<T> = {
+  hash: (value: T) => number,
+  equal: (a: T, b: T) => boolean
 }
 
-type node = empty | leaf | branch
 
-type error = string
-
-
-const updateBallanceInformation = (node: branch): void => {
+const updateBallanceInformation = <T>(node: branchAny<T>): void => {
   node.height = Math.max(node.left.height, node.right.height) + 1;
   node.ballanceFactor = node.right.height - node.left.height;
 }
-const ballanceNode = (root: node): node | error => {
-  const rotateRight = (root: node): node | error => {
-    if (root.type != "branch" || root.left.type != "branch") {
-      return "can only rotate branches"
+const ballanceNode = <T>(root: branchAny<T>): branchAny<T> => {
+  const rotateRight = <T>(root: branchLeft<T>): branchRight<T> => {
+    const middle = root.left.right;
+    const newChild: branchAny<T> = {
+      ...root,
+      left: middle
     }
-    const newRoot = root.left;
-    const middle = newRoot.right;
-    newRoot.right = root;
-    root.left = middle;
-    updateBallanceInformation(root);
+    const newRoot: branchRight<T> = {
+      ...root.left,
+      right: newChild
+    }
+    updateBallanceInformation(newChild);
     updateBallanceInformation(newRoot);
     return newRoot;
   }
-  const rotateLeft = (root: node): node | error => {
-    if (root.type != "branch" || root.right.type != "branch") {
-      return "can only rotate branches"
+  const rotateLeft = <T>(root: branchRight<T>): branchLeft<T> => {
+    const middle = root.right.left;
+    const newChild: branchAny<T> = {
+      ...root,
+      right: middle
     }
-    const newRoot = root.right;
-    const middle = newRoot.left;
-    newRoot.left = root;
-    root.right = middle;
-    updateBallanceInformation(root);
+    const newRoot: branchLeft<T> = {
+      ...root.right,
+      left: newChild
+    }
+    updateBallanceInformation(newChild);
     updateBallanceInformation(newRoot);
     return newRoot;
   }
-  const rotateRightLeft = (root: node): node | error => {
-    if (root.type != "branch"
-      || root.right.type != "branch"
-      || root.right.left.type != "branch") {
-      return "can only rotate branches"
-    }
-    const newRight = rotateRight(root.right);
-    if (typeof newRight == "string") {
-      return newRight
-    }
-    root.right = newRight;
-    return rotateLeft(root);
+
+  // double rotations actually guarntee a branch with two branch children
+
+  const rotateRightLeft = (root: branchRightLeft<T>): branchAny<T> => {
+    return rotateLeft({
+      ...root,
+      right: rotateRight(root.right)
+    });
   }
-  const rotateLeftRight = (root: node): node | error => {
-    if (root.type != "branch"
-      || root.left.type != "branch"
-      || root.left.right.type != "branch") {
-      return "can only rotate branches"
-    }
-    const newleft = rotateLeft(root.left);
-    if (typeof newleft == "string") {
-      return newleft
-    }
-    root.left = newleft;
-    return rotateLeft(root);
+  const rotateLeftRight = (root: branchLeftRight<T>): branchAny<T> => {
+    return rotateRight({
+      ...root,
+      left: rotateLeft(root.
+        left)
+    });
   }
-  if (root.type != "branch") {
-    return "can only ballance branches"
-  }
+
   if (root.ballanceFactor > 0) {
-    // right heavy
-    if (root.right.type != "branch") {
-      return "how is the right side heavy but not a branch?"
-    }
+    // right heavy 
     if (root.ballanceFactor < 0) {
+      // @ts-ignore rl heavy 
       return rotateRightLeft(root)
     } else {
+      // @ts-ignore
       return rotateLeft(root)
     }
   } else {
     // left heavy
-    if (root.left.type != "branch") {
-      return "how is the left side heavy but not a branch?"
-    }
     if (root.ballanceFactor > 0) {
+      // @ts-ignore lr heavy
       return rotateLeftRight(root)
     } else {
+      // @ts-ignore
       return rotateRight(root)
     }
   }
 }
 
 const emptyNode: empty = { type: "empty", height: 0, ballanceFactor: 0 }
-const insert = (root: node, value: number): node | error => {
+const insertValue = <T>(root: node<T>, value: T, compare: valueComparison<T>): node<T> => {
+  const hash = compare.hash(value);
   if (root.type == "empty") {
     return {
-      type: "leaf",
-      payload: value,
+      type: "branch",
       ballanceFactor: 0,
-      height: 0
-    }
-  } else if (root.type == "leaf") {
-    if (value > root.payload) {
-      return {
-        type: "branch",
-        payload: value,
-        height: 1,
-        left: root,
-        right: emptyNode,
-        ballanceFactor: -1
-      }
-    } else if (value == root.payload) {
-      return root
-    } else {
-      return {
-        type: "branch",
-        payload: value,
-        height: 1,
-        left: emptyNode,
-        right: root,
-        ballanceFactor: 1
-      }
+      height: 1,
+      payload: { value, hash },
+      left: emptyNode,
+      right: emptyNode
     }
   } else if (root.type == "branch") {
-    if (value > root.payload) {
-      const updatedSubtree = insert(root.right, value);
-      if (typeof updatedSubtree == "string") {
-        return updatedSubtree
+    let newRoot: branchAny<T>
+    if (hash > root.payload.hash) {
+      newRoot = {
+        ...root,
+        right: insertValue(root.right, value, compare)
       }
-      root.right = updatedSubtree
-    } else if (value == root.payload) {
+    } else if (hash == root.payload.hash && compare.equal(value, root.payload.value)) {
       return root
     } else {
-      const updatedSubtree = insert(root.left, value);
-      if (typeof updatedSubtree == "string") {
-        return updatedSubtree
+      newRoot = {
+        ...root,
+        left: insertValue(root.left, value, compare)
       }
-      root.left = updatedSubtree
     }
 
-    updateBallanceInformation(root);
-    const ballanceDiff = Math.abs(root.ballanceFactor);
+    updateBallanceInformation(newRoot);
+    const ballanceDiff = Math.abs(newRoot.ballanceFactor);
     if (ballanceDiff == 2) {
-      return ballanceNode(root)
-    } else if (ballanceDiff > 2) {
-      return "cannot re-ballance diffrance more than 2"
+      return ballanceNode(newRoot)
     } else {
       //no ballancing needed 
-      return root
+      return newRoot;
     }
+  } else {
+    return emptyNode;
   }
-  return "missing node type"
 }
-const toTree = (items: number[]): node | error => {
-  let tree: node | error = emptyNode
+
+
+
+const numberCompare: valueComparison<number> = {
+  hash: a => a,
+  equal: (a, b) => a == b
+}
+
+const toTree = (items: number[]): node<number> => {
+  let tree: node<number> = emptyNode
   for (let item of items) {
     if (typeof tree == "string") {
       return tree;
     }
-    tree = insert(tree, item);
+    tree = insertValue(tree, item, numberCompare);
   }
   return tree;
 }
 
-export { emptyNode, insert, toTree }
+export { emptyNode, insertValue as insert, toTree }
