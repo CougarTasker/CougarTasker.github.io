@@ -1,15 +1,20 @@
 import { useState } from 'react';
 import './App.css';
-
+import { useResource } from "./loadResources.ts";
 
 
 function App() {
-  const [count, setCount] = useState(0);
+  const a = useResource();
+  const b = useResource();
+  const c = useResource();
+
   return (
     <div className='App'>
-      <button onClick={() => setCount(x => x + 1)}>+</button>
-      <div>{count}</div>
-      <button onClick={() => setCount(x => x - 1)}>-</button>
+      <ul>
+        <li>{a}</li>
+        <li>{b}</li>
+        <li>{c}</li>
+      </ul>
     </div>
   );
 }
