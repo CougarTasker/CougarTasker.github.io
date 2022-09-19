@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import docs from "./resources/Docs.json";
+
 const itemHive = `Class'/Script/FactoryGame.FGItemDescriptor'`
 const recipeHive = `Class'/Script/FactoryGame.FGRecipe'`
 
@@ -10,31 +12,67 @@ type dataClass = {
   [key: string]: dataClass | string
 }[]
 
-type data = {
-  loading: 1
+type hive = {
   NativeClass: string
   Classes: dataClass
-} | { loading: number }
+}
+type loading<T> = { state: "empty" } | { state: "requested", callbacks: (() => void)[] } | { state: "available", value: T };
+type dataMap = {
+  [key: string]: dataClass
+}
+
+let sharedDatabase: loading<dataMap> = { state: "empty" };
 
 
-const database: { [key: string]: data } = {}
-
-
-let a = 1
-
-function useResource(name: string | undefined): number {
-
-  const [result, setResult] = useState(-1);
-
+function useDatabase(): loading<dataMap> {
+  const [database, setDatabase] = useState(sharedDatabase);
   useEffect(() => {
-    
-    setTimeout(() => {
-      setResult(Math.random());
-    }, 1000*a + Math.random() * 1000);
-    a += 1
-  }, [])
+    if (sharedDatabase.state === "empty") {
+      sharedDatabase = {
+        state: "requested",
+        callbacks: [() => {
+          setDatabase(sharedDatabase);
+        }]
+      };
+      fetch(`${docs}`).then(r => r.json()).then((data: hive[]) => {
+        if (sharedDatabase.state === "requested") {
+          const { callbacks } = sharedDatabase;
+          sharedDatabase = {
+            state: "available",
+            value: data.reduce((pre, hive) => pre[hive.NativeClass] = hive.Classes, {})
+          }
+          for (let cb of callbacks) {
+            cb();
+          }
+        }
+      });
+    } else if (sharedDatabase.state === "requested") {
+      sharedDatabase.callbacks.push(() => {
+        setDatabase(sharedDatabase)
+      });
+    }
+  }, []);
+  return database;
+}
 
-  return result
+export interface resource {
+  name: string
+}
+
+function fmap<T, S>(item: loading<T>, m: (a: T) => S): loading < S > {
+  if(item.state === "available"){
+  return { state: "available", value: m(item.value) }
+  }else {
+    return { state: "requested", callbacks: [] }
+  }
+}
+
+function useAllResorces(params: type): loading<resource[]> {
+
+  return
+}
+function useResource(name: string): loading<resource> {
+  return { name: "testing" }
 }
 
 export { useResource }
