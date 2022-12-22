@@ -9,7 +9,11 @@
       "request": "launch",
       "name": "Launch Chrome against localhost",
       "url": "http://localhost:8080/projects/wave-collapse/",
-      "webRoot": "${workspaceFolder}"
+      "webRoot": "${workspaceFolder}",
+      "sourceMapPathOverrides": {
+     
+        "webpack://wave-collapse/*": "${workspaceFolder}/projects/wave-collapse/*"
+      }
     }
   ]
 }

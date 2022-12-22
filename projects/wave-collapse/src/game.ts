@@ -1,25 +1,24 @@
-import { PossibleTileGrid } from "./tileRelations";
+import { PossibleTileGrid } from "./collapse";
+import { COLLAPSE_FAILURE, getTileGrid, NO_CELL_TO_COLLAPSE } from "./getPossibleTileGrid";
 import { blockNameCoordinates } from "./TileName";
 import TileMapImage from "./tiles.png";
 
-const canvasContainer: HTMLElement |null=
+const canvasContainer: HTMLElement | null =
   document.querySelector(".canvas-container");
 
-if(canvasContainer=== null){
+if (canvasContainer === null) {
   throw new Error("document missing canvas container");
 }
-const canvas: HTMLCanvasElement|null = document.querySelector(
-  ".canvas-container canvas"\
+const canvas: HTMLCanvasElement | null = document.querySelector(
+  ".canvas-container canvas"
 );
-if(canvas === null){
+if (canvas === null) {
   throw new Error("document missing canvas");
 }
 const ctx = canvas.getContext("2d");
-if(ctx === null){
+if (ctx === null) {
   throw new Error("canvas missing 2d context");
-  
 }
- 
 
 const colors = {
   black: "#292e1e",
@@ -62,15 +61,18 @@ interface Coordinates {
 export type CellCoordinates = Coordinates;
 export type TileCoordinates = Coordinates;
 
+const primeB = 49157
+const primeA = 98317;
+export type coordinatesHash = number
+export const hashCoordinates = (coords:Coordinates): coordinatesHash => coords.x * primeA + coords.y * primeB
+
 const renderLoop = () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  const grid: PossibleTileGrid = getTileGrid();
-  for (const [cellCoords, tiles] of grid) {
-    if (tiles.size === 1) {
-      const tileCoords = blockNameCoordinates.get<null>(tiles.first(), null);
-      if (tileCoords !== null) {
-        drawTile(tileCoords, cellCoords);
-      }
+  const grid = getTileGrid();
+  for (const [cellCoords, tile] of grid.values()) {
+    const tileCoords = blockNameCoordinates.get<null>(tile, null);
+    if (tileCoords !== null) {
+      drawTile(tileCoords, cellCoords);
     }
   }
   window.requestAnimationFrame(renderLoop);
@@ -98,5 +100,3 @@ const drawTile = (tile: TileCoordinates, cell: CellCoordinates) => {
     Options.cellSize() - 2
   );
 };
-
-
