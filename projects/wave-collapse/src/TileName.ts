@@ -1,5 +1,5 @@
 import { Map } from "immutable";
-import { TileCoordinates } from "./game";
+import { TileCoordinates } from "./TileCoordinates";
 
 
 export const enum TileName {

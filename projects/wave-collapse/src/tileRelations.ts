@@ -1,9 +1,12 @@
 import { Map, Set } from "immutable";
-import { CellCoordinates } from "./game";
+import { CellCoordinates, coordinatesHash, hashCoordinates } from "./TileCoordinates";
 import { TileName } from "./TileName";
 
-type mustContainAny = Map<CellCoordinates, Set<TileName>>;
+type mustContainAny = Map<coordinatesHash, [CellCoordinates, Set<TileName>]>;
 
+type MapTypes<T> = T extends Map<infer K, infer V>
+  ? { key: K; value: V }
+  : never;
 
 type tileAdjacencyRules = Map<TileName, mustContainAny>;
 
@@ -13,7 +16,6 @@ const directions: Record<"up" | "down" | "left" | "right", CellCoordinates> = {
   left: { x: -1, y: 0 },
   right: { x: 1, y: 0 },
 };
-
 function updateDirectionToInclude(
   base: TileName,
   offset: CellCoordinates,
@@ -21,10 +23,16 @@ function updateDirectionToInclude(
   rules: tileAdjacencyRules
 ): tileAdjacencyRules {
   const existingRules = rules.get(base) || Map();
-  const existingTiles = existingRules.get(offset) || Set();
+   const offsetHash = hashCoordinates(offset);
+  const existingTiles: Set<TileName> =
+    existingRules.get(offsetHash)?.[1] || Set();
+ 
   return rules.set(
     base,
-    existingRules.set(offset, existingTiles.add(adjacent))
+    existingRules.set(offsetHash, [
+      offset,
+      existingTiles.add(adjacent),
+    ])
   );
 }
 type relationMutator = (input: tileAdjacencyRules) => tileAdjacencyRules;
@@ -60,7 +68,6 @@ const fourSides =
     left: TileName,
     right: TileName
   ): relationMutator =>
-  (rules) =>
     buildRelations(
       vertical(top, base),
       vertical(base, bottom),
@@ -70,13 +77,14 @@ const fourSides =
 
 function buildRelations(
   ...relationBuilders: relationMutator[]
-): tileAdjacencyRules {
-  const base: tileAdjacencyRules = Map();
-  return relationBuilders.reduce((val, builder) => builder(val), base);
+): relationMutator {
+  return (rules: tileAdjacencyRules) => {
+    return relationBuilders.reduce((val, builder) => builder(val), rules);
+  }
 }
 const e = TileName.Empty;
 export const tileRelations = buildRelations(
   vertical(e, e),
   horizontal(e, e),
   fourSides(TileName.GrassMiddle, e, e, e, e)
-);
+)(Map());

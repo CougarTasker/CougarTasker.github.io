@@ -1,5 +1,6 @@
 import { PossibleTileGrid } from "./collapse";
 import { COLLAPSE_FAILURE, getTileGrid, NO_CELL_TO_COLLAPSE } from "./getPossibleTileGrid";
+import { TileCoordinates, CellCoordinates } from "./TileCoordinates";
 import { blockNameCoordinates } from "./TileName";
 import TileMapImage from "./tiles.png";
 
@@ -54,18 +55,6 @@ window.addEventListener("load", () => {
   window.addEventListener("resize", updateSize);
   updateSize();
 });
-interface Coordinates {
-  x: number;
-  y: number;
-}
-export type CellCoordinates = Coordinates;
-export type TileCoordinates = Coordinates;
-
-const primeB = 49157
-const primeA = 98317;
-export type coordinatesHash = number
-export const hashCoordinates = (coords:Coordinates): coordinatesHash => coords.x * primeA + coords.y * primeB
-
 const renderLoop = () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   const grid = getTileGrid();

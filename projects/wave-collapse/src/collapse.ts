@@ -1,10 +1,10 @@
 import { Map, Set } from "immutable";
+import { Options } from "./game";
 import {
   CellCoordinates,
   coordinatesHash,
   hashCoordinates,
-  Options,
-} from "./game";
+} from "./TileCoordinates";
 import { COLLAPSE_FAILURE } from "./getPossibleTileGrid";
 import { TileName } from "./TileName";
 import { tileRelations } from "./tileRelations";
@@ -21,15 +21,20 @@ export function collapseCell(
   grid: PossibleTileGrid
 ): PossibleTileGrid | typeof COLLAPSE_FAILURE {
   const constraints = tileRelations.get(tile);
-  if (!constraints) {
+  if (!constraints || !getTile(cell,grid).possibilities.has(tile) || !isWithinBounds(cell)) {
     return COLLAPSE_FAILURE;
   }
+  const collapsedValue:cellPossibilityDetails = {
+    coordinates: cell,
+    possibilities: Set([tile])
+  } 
+  const gridWithCollapsedCell = grid.set(hashCoordinates(cell), collapsedValue);
   return constraints.reduce<PossibleTileGrid | typeof COLLAPSE_FAILURE>(
-    (reduction, tiles, offset) =>
+    (reduction, [offset, tiles]) =>
       reduction === COLLAPSE_FAILURE
         ? COLLAPSE_FAILURE
-        : applyIntersection(addCellCoordinates(cell, offset), tiles, grid),
-    grid
+        : applyIntersection(addCellCoordinates(cell, offset), tiles, reduction),
+    gridWithCollapsedCell
   );
 }
 
@@ -41,6 +46,9 @@ function applyIntersection(
   const intersection = getTile(cell, grid).possibilities.intersect(tiles);
   if (intersection.size <= 0) {
     return COLLAPSE_FAILURE;
+  }
+  if(!isWithinBounds(cell)){
+    return grid;
   }
   return grid.set(hashCoordinates(cell), {
     coordinates: cell,
@@ -57,24 +65,22 @@ function addCellCoordinates(
 const emptyItem = Set([TileName.Empty]);
 function getTile(
   cell: CellCoordinates,
-  grid: PossibleTileGrid,
-  width: number = Options.numberOfColumns(),
-  height: number = Options.numberOfRows()
+  grid: PossibleTileGrid
 ): cellPossibilityDetails {
-  if (cell.x < 0 || cell.x >= width) {
+  if (!isWithinBounds(cell)) {
     return {
       coordinates: cell,
       possibilities: emptyItem,
     };
-  } else if (cell.y < 0 || cell.y >= height) {
-    return {
-      coordinates: cell,
-      possibilities: emptyItem,
-    };
-  } else {
-    return grid.get(hashCoordinates(cell), {
-      coordinates: cell,
-      possibilities: emptyItem,
-    });
   }
+  return grid.get(hashCoordinates(cell), {
+    coordinates: cell,
+    possibilities: emptyItem,
+  });
+}
+
+function isWithinBounds(cell: CellCoordinates): boolean {
+  const width = Options.numberOfColumns();
+  const height = Options.numberOfRows();
+  return cell.x >= 0 && cell.x < width && cell.y >= 0 && cell.x < height;
 }

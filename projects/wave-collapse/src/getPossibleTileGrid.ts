@@ -4,14 +4,15 @@ import {
   PossibleTileGrid,
 } from "./collapse";
 import { blockNameCoordinates, TileName } from "./TileName";
-import { Set, Map, Seq, Stack } from "immutable";
+import { Set, Map, Seq, Stack, has } from "immutable";
+import { Options } from "./game";
 import {
   CellCoordinates,
   coordinatesHash,
   hashCoordinates,
-  Options,
-} from "./game";
+} from "./TileCoordinates";
 import { selectRandomElementFromCollection } from "./selectRandomElementFromCollection";
+import { cellIsEmpty } from "./emptyCellTest";
 
 /**
  * creates a set of cell coordinates within a given width and height
@@ -57,33 +58,22 @@ export const NO_CELL_TO_COLLAPSE = "NO_CELL_TO_COLLAPSE";
  */
 function lowestEntropyCells(
   possibilities: PossibleTileGrid
-): PossibleTileGrid | typeof NO_CELL_TO_COLLAPSE {
-  type currentEntropy = { size: number; cells: PossibleTileGrid } | null;
-  const reduceLowerEntropy = (
-    previous: currentEntropy,
-    options: cellPossibilityDetails,
-    coords: coordinatesHash
-  ): currentEntropy => {
-    if (options.possibilities.size === 1) {
-      return previous;
-    } else if (previous === null || options.possibilities.size < previous.size) {
-      return { size: options.possibilities.size, cells: Map([[coords, options]]) };
-    } else if (options.possibilities.size === previous.size) {
-      return {
-        size: previous.size,
-        cells: previous.cells.set(coords, options),
-      };
-    } else {
-      return previous;
+): PossibleTileGrid{
+  let entropyLevel = Number.MAX_SAFE_INTEGER;
+  let lowestCells: PossibleTileGrid = Map();
+  for (const [hash, details] of possibilities.entries()) {
+    if (details.possibilities.size > 1) {
+      //fixed cells have no entropy so no use
+      if (entropyLevel < details.possibilities.size) {
+        entropyLevel = details.possibilities.size;
+        lowestCells = Map(); // reset the subset there is a low entropy level
+      }
+      if (entropyLevel === details.possibilities.size) {
+        lowestCells = lowestCells.set(hash, details);
+      }
     }
-  };
-  const lowestEntropy = possibilities.reduce(reduceLowerEntropy, null);
-  if (lowestEntropy === null) {
-    //nothing matched to be reduced
-    // we are done
-    return NO_CELL_TO_COLLAPSE;
   }
-  return lowestEntropy.cells;
+  return lowestCells
 }
 
 /**
@@ -95,15 +85,11 @@ function getCellToCollapse(
   possibilities: PossibleTileGrid
 ): cellPossibilityDetails | typeof NO_CELL_TO_COLLAPSE {
   const cells = lowestEntropyCells(possibilities);
-  if (cells === NO_CELL_TO_COLLAPSE) {
-    return NO_CELL_TO_COLLAPSE;
-  }
   const selection = selectRandomElementFromCollection(cells)[0];
   if (selection === undefined) {
-    console.error("odd behavior");
     return NO_CELL_TO_COLLAPSE;
   }
-  const [_hash, details] = selection
+  const [_hash, details] = selection;
   return details;
 }
 
@@ -138,7 +124,7 @@ function collapsedGrid(
   grid: PossibleTileGrid
 ): TileGrid | typeof COLLAPSE_FAILURE {
   const output = Set<[CellCoordinates, TileName]>().asMutable();
-  for (const [_cell, {coordinates,possibilities:tiles}] of grid.entries()) {
+  for (const [_cell, { coordinates, possibilities: tiles }] of grid.entries()) {
     const tile = tiles.first();
     if (tile === undefined || tiles.size > 1) {
       return COLLAPSE_FAILURE;
@@ -167,12 +153,18 @@ function runCollapseAttempt({
   possibleTiles,
   coordinate,
 }: collapseAttemptDetails) {
+  console.log(
+    `cell collapse attempt ${JSON.stringify(coordinate)}:${possibleTiles.size}`
+  );
+
   const [selectedTile, remaining] =
     selectRandomElementFromCollection(possibleTiles);
   if (selectedTile === undefined) {
     return; // no more cells to try this has been a bad pick
   }
+
   const gridAttempt = collapseCell(selectedTile, coordinate, grid);
+
   const pushNextIteration = () => {
     const nextIteration: stackEntry<collapseAttemptDetails> = {
       return: runCollapseAttempt,
@@ -189,6 +181,7 @@ function runCollapseAttempt({
     pushNextIteration();
     return;
   }
+  console.log("collapse success");
   const finalGrid = collapsedGrid(gridAttempt);
   if (finalGrid === COLLAPSE_FAILURE) {
     // not final try collapse another cell
@@ -216,16 +209,23 @@ function doneLoop(grid: PossibleTileGrid) {
 
 function pickCell(grid: PossibleTileGrid) {
   const selected = getCellToCollapse(grid);
+  console.log(
+    `select cell to reduce ${
+      typeof selected === "string"
+        ? selected
+        : JSON.stringify(selected.coordinates)
+    }`
+  );
   if (selected === NO_CELL_TO_COLLAPSE) {
     return;
   }
-  const {coordinates, possibilities} = selected;
+  const { coordinates, possibilities } = selected;
   const firstIteration: stackEntry<collapseAttemptDetails> = {
     return: runCollapseAttempt,
     state: {
       possibleTiles: possibilities,
       grid,
-      coordinate:coordinates,
+      coordinate: coordinates,
     },
   };
   callStack.push(firstIteration);
@@ -259,14 +259,16 @@ export function getTileGrid(): TileGrid {
 
 function getRandomTileGrid(poss: PossibleTileGrid): TileGrid {
   return Set<[CellCoordinates, TileName]>().withMutations((mutable) => {
-    console.log(`mapSize ${poss.size}`);
-    for (const [_cell, {possibilities, coordinates}] of poss.entries()) {
-      const [option] = selectRandomElementFromCollection(possibilities);
-      if (option) {
-        mutable.add([coordinates, option]);
-      }else{
-        console.error("missing options for this cell");
-        
+    for (const [_cell, { possibilities, coordinates }] of poss.entries()) {
+      if (possibilities.includes(TileName.RockBottom)) {
+        mutable.add([coordinates, TileName.RockBottom]);
+      } else {
+        const [option] = selectRandomElementFromCollection(possibilities);
+        if (option !== undefined) {
+          mutable.add([coordinates, option]);
+        } else {
+          console.error("missing options for this cell");
+        }
       }
     }
   });
