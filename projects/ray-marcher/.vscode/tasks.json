@@ -1,0 +1,15 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "build - wasm",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"command" :"wasm-pack build -t web ${workspaceFolder}/ray-marcher-rust --out-dir ${workspaceFolder}/packages/ray-marcher-rust"
+		}
+
+	]
+}

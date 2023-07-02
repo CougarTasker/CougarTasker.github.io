@@ -1,0 +1,9 @@
+{
+    "private": true,
+    "name": "ray-marcher",
+    "workspaces": [
+        "packages/*"
+    ],
+    "scripts": {}
+ }
+ 
