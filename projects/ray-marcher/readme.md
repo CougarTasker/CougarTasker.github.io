@@ -7,3 +7,9 @@ the wasm is built from rust [following this guide](https://rustwasm.github.io/do
 
 the rust application will render a scene using ray marching
 
+
+
+https://rustwasm.github.io/wasm-bindgen/examples/webgl.html
+
+or image approach 
+
